@@ -1,23 +1,13 @@
-# BOOMBA
-## Project proposal: embedded audio player on freeRTOS-based system
+# Project BOOMBA: Embedded Audio Player On FreeRTOS-based System
 
-## Team members and responsibilities 
-- Christian Bender
-- Katherine Cloutier
-- Christian Cole
-- Noah Mitchell 
+## Description
+The project involves bootstrapping a FreeRTOS-based audio streaming system on an STM32 development board, which includes the utilization of an audio codec, SD card reader and SD card, STM32 microprocessor, H7 DMA modules, and a headphone amplifier. 
 
+The system architecture utilizes an SD card which interfaces with the STM32 MCU through SDIO. A FATFS file system will be implemented for SD card file access. The MCU will host a .WAV parser responsible for interpreting the header and audio data of the .WAV file from the SD card, transforming it into audio words for playback. This parsed data will then be sent to the codec through a DMA FIFO.
 
+Using SAI, (which is I2S-compatible), communication between the STM32 and the DMA will be established. The DMA will act as a FIFO, and will buffer the samples to be sent to the codec. The codec is connected to the STM32 I2C, which will be used for configuration. 
 
-## Work involved: 
-Bootstrap a FreeRTOS based system on an STM32 dev board with an audio
-codec, SD card reader, and headphone amplifier. Port WAV parser/player, and write drivers for
-codec (I2S) and headphone driver
-## End goal: parse a .WAV file off of the SD card on the system and play it over the headphone out
-## Stretch goal: UI with buttons and the OLED screen!
-
-
-## Overall Description
+The primary objective is to parse a .WAV file stored on an SD card and play it through the headphone output. Achieving this involves sending .WAV data from the SD card to the MCU, processing that data and sending it to the DMA FIFO, and then processing that data in the codec. Additionally, if there is time, there is a stretch goal that will involve implementing a user interface with buttons and an OLED screen for enhanced user interaction.
 
 ## System diagram
 (with individual components and their interfaces. This visualization should take the initial feedback into account and be more detailed than the Project Idea submission.)
@@ -69,4 +59,38 @@ Documentation related
 14. Document Process 
 15. Update README with Instructions
 
+
+
+
+## Description 
+Bootstrap a FreeRTOS based system on an STM32 dev board with an audio
+codec, SD card reader, and headphone amplifier. Port WAV parser/player, and write drivers for
+codec (I2S) and headphone driver
+## End goal: parse a .WAV file off of the SD card on the system and play it over the headphone out
+## Stretch goal: UI with buttons and the OLED screen!
+
+- Bootstrap a FreeRTOS based system on an STM32 dev board with an audio
+codec, SD card reader, and headphone amplifier. Port WAV parser/player, and write drivers for
+codec (I2S) and headphone driver
+- end goal: parse a .WAV file off of the SD card on the system and play it over the headphone out
+- Stretch goal: UI with buttons and the OLED screen!
+- SD card with an SDIO interface to MCU
+    - FS interface is FATFS
+- On MCU, wav parser that takes in a file pointer to a wav file on the SD card
+    - Parses header and audio data into audio words
+- Codec and STM32 i2C interface for codec configuration
+- SAI (which is i2s compatible) interface between STM32 and Codec, with a DMA in the middle that acts as a FIFO
+    - Setup the DMA as a FIFO
+- Output the audio to a headphone out
+
+
+## Team members and responsibilities 
+- Christian Bender
+- Katherine Cloutier
+- Christian Cole
+- Noah Mitchell 
+
+
+
+## Work involved: 
 
