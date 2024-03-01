@@ -12,13 +12,9 @@ The primary objective is to parse a .WAV file stored on an SD card and play it t
 ## System diagram
 ![system diagram](IMG_0088.jpg)
 
-## Major components
+## Team members and responsibilities 
 
-
-### Issue synopsis
-
-Katherine: Parsing wave
-
+### Katherine Cloutier: Parsing wave
 
 Issues
 Research and thinking related
@@ -47,22 +43,17 @@ Research and thinking related
 11. Integrate Parsing with Audio Playback
 - parsing with audio playback functionality
 
-  
-Testing related
-12. Test with Sample WAV File
-- evaluate parsing with WAV files of varying sizes
-13. Test with Large WAV Files
-- evaluate parsing with WAV files of varying sizes
 
-  
-Documentation related 
-14. Document Process 
-15. Update README with Instructions
+### Christian Bender
 
 
+### Christian Cole
 
 
-## Description 
+### Noah Mitchell
+
+
+<!-- ## Description 
 Bootstrap a FreeRTOS based system on an STM32 dev board with an audio
 codec, SD card reader, and headphone amplifier. Port WAV parser/player, and write drivers for
 codec (I2S) and headphone driver
@@ -84,13 +75,9 @@ codec (I2S) and headphone driver
 - Output the audio to a headphone out
 
 
-## Team members and responsibilities 
-- Christian Bender
-- Katherine Cloutier
-- Christian Cole
-- Noah Mitchell 
+
 
 
 
 ## Work involved: 
-
+ -->
