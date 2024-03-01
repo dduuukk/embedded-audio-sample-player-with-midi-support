@@ -53,6 +53,12 @@ This task is a crucial element in the overall project, enabling the smooth flow 
 
 ### Christian Cole
 
+Tasks will involve managing the system's audio codec, the Wolfson WM8731. This codec will first be configured over I2C based on the file it will be recieving samples from. To manage audio, we will simlarly configure the STM32's SAI communication with the codec to manage clock timings and data transfer from the dedicated 8-word SAI FIFO.
+
+To achieve this, the [WM8731's datasheet](https://cdn.sparkfun.com/datasheets/Dev/Arduino/Shields/WolfsonWM8731.pdf) will be utilized to understand the specifics of integration between the STM32H7 and the codec. Likewise, the [STM32H7's resource manual](https://www.st.com/resource/en/reference_manual/dm00314099-stm32h742-stm32h743-753-and-stm32h750-value-line-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf) will be used to manage the SAI system for audio data transfer.
+
+Audio ouput will be available via a direct hardware line-out or a headphone amplifier that has already been designed on the custom development board.
+
 
 ### Noah Mitchell
 
