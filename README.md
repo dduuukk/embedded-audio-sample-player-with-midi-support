@@ -10,7 +10,7 @@ Using SAI, (which is I2S-compatible), communication between the STM32 and the DM
 The primary objective is to parse a .WAV file stored on an SD card and play it through the headphone output. Achieving this involves sending .WAV data from the SD card to the MCU, processing that data and sending it to the DMA FIFO, and then processing that data in the codec. Additionally, if there is time, there is a stretch goal that will involve implementing a user interface with buttons and an OLED screen for enhanced user interaction.
 
 ## System diagram
-(with individual components and their interfaces. This visualization should take the initial feedback into account and be more detailed than the Project Idea submission.)
+![system diagram](IMG_0088.jpg)
 
 ## Major components
 
