@@ -12,12 +12,9 @@ The primary objective is to parse a .WAV file stored on an SD card and play it t
 ## System diagram
 ![system diagram](IMG_0088.jpg)
 
-## Team members and responsibilities 
+## Team Members And Responsibilities 
 
 ### Katherine Cloutier: Parsing wave
-
-Issues
-Research and thinking related
 
 1. Research WAV File Format
 - look at past labs that delt with this
@@ -43,8 +40,15 @@ Research and thinking related
 11. Integrate Parsing with Audio Playback
 - parsing with audio playback functionality
 
+### Christian Bender: DMA FIFO Management
 
-### Christian Bender
+Tasks will involve setting up an H7 DMA (Direct Memory Access) as a FIFO (First-In-First-Out) to manage audio samples for the SAI (Serial Audio Interface) FIFO. The DMA will receive buffered .WAV samples processed by the STM32. The DMA FIFO, configured as a larger storage buffer (likely 512-1024 samples), will feed data to the SAI audio 8-word FIFO, which will subsequently output to the audio codec.
+
+To achieve this, reference documentation for the STM32H7 series will be used, such as the resource manual available [here](https://www.st.com/resource/en/reference_manual/dm00314099-stm32h742-stm32h743-753-and-stm32h750-value-line-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf). The DMA will serve as a bridge between the STM32-processed audio samples and the SAI interface FIFO.
+
+Key steps include initializing the DMA to function as a FIFO, establishing communication between the larger DMA FIFO and the SAI audio 8-word FIFO, and getting input samples from the STM37.
+
+This task is a crucial element in the overall project, enabling the smooth flow of audio data through the system. The codec and Christian's work will rely on the successful buffering of samples, and I will rely on the STM32 parsing for audio sample filling.
 
 
 ### Christian Cole
