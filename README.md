@@ -3,11 +3,11 @@
 ## Description
 The project involves bootstrapping a FreeRTOS-based audio streaming system on an STM32 development board, which includes the utilization of an audio codec, SD card reader and SD card, STM32 microprocessor, H7 DMA modules, and a headphone amplifier. 
 
-The system architecture utilizes an SD card which interfaces with the STM32 MCU through SDIO. A FATFS file system will be implemented for SD card file access. The MCU will host a .WAV parser responsible for interpreting the header and audio data of the .WAV file from the SD card, transforming it into audio words for playback. This parsed data will then be sent to the codec through a DMA FIFO.
+The system architecture utilizes an SD card which interfaces with the STM32 MCU through SDIO. A FATFS file system will be implemented for SD card file access. The MCU will host a .WAV parser responsible for interpreting the header and audio data of the .WAV file from the SD card, transforming it into audio words for playback. This parsed data will then be sent to the codec through a DMA FIFO and an SAI peripheral.
 
-Using SAI, (which is I2S-compatible), communication between the STM32 and the DMA will be established. The DMA will act as a FIFO, and will buffer the samples to be sent to the codec. The codec is connected to the STM32 I2C, which will be used for configuration. 
+Using the STM32 Serial Audio Interface (SAI) peripheral, (which is I2S-compatible), communication between the STM32 and the codec will be established. An internal DMA channel will act as a FIFO, and will buffer the samples to be sent to the codec. The codec is also connected to the STM32 via I2C, which will be used for configuration. 
 
-The primary objective is to parse a .WAV file stored on an SD card and play it through the headphone output. Achieving this involves sending .WAV data from the SD card to the MCU, processing that data and sending it to the DMA FIFO, and then processing that data in the codec. Additionally, if there is time, there is a stretch goal that will involve implementing a user interface with buttons and an OLED screen for enhanced user interaction.
+The primary objective is to parse a .WAV file stored on an SD card and play it through the headphone output. Achieving this involves sending .WAV data from the SD card to the MCU, processing that data and sending it to the DMA FIFO, and then sending that data to the codec over SAI/I2S. Additionally, if there is time, there is a stretch goal that will involve implementing a user interface with buttons and an OLED screen for enhanced user interaction.
 
 ## System diagram
 ![system diagram](IMG_0088.jpg)
@@ -61,6 +61,10 @@ Audio ouput will be available via a direct hardware line-out or a headphone ampl
 
 
 ### Noah Mitchell
+
+Tasks will involve determining which filesystem library to use for interfacing with the SD card filesystem in software (potentially FatFS, FreeRTOS+Fat, or LittleFS), writing communication/peripheral drivers for the SD card using the SDMMC peripheral of the STM32H7 (described starting on page 2378 of the [STM32H7 reference manual](https://www.st.com/resource/en/reference_manual/dm00314099-stm32h742-stm32h743-753-and-stm32h750-value-line-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf)), and implementing file system handling functions in a preemption-safe/thread-aware manner. FreeRTOS configuration and task setup will also need to occur. 
+
+The overall goal will be to pass a file pointer to Kat's .WAV parsing code, along with an easy-to-use, thread-safe, performant interface for getting the data out of the file.
 
 
 <!-- ## Description 
