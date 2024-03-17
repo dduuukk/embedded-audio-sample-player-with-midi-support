@@ -4,7 +4,6 @@ OBJS:=$(SRCS:.c=.o)
 LZED:=-lzed
 LALSA:= -lasound -lpthread -lrt -ldl -lm
 
-include ../zed.mk
 .PHONY: clean
 
 all: $(TARGET)

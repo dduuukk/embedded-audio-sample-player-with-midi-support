@@ -28,73 +28,127 @@ Katherine Cloutier: Parsing wave
 
 
 
-// Wave header from lab 5
+/*
+data struct for WAV file
+
+*/
 struct wave_header
 {
-  uint32_t chunkID;
-  uint32_t chunkSize;
-  uint32_t format;
+  uint32_t chunkID; //"RIFF" (0x52494646 big-endian form) 4
+  uint32_t chunkSize; // file size - 8 bytes  4
+  uint32_t format; // "WAVE" (0x57415645 big-endian form)  4
 
-  uint32_t subchunk1ID;
-  uint32_t subchunk1Size;
-  uint16_t audioFormat;
-  uint16_t numChannels;
-  uint32_t SampleRate;
-  uint32_t byteRate;
-  uint16_t blockAlign;
-  uint16_t bitsPerSample;
+  //"WAVE" format, "fmt" and "data"
+  //"fmt" describes the sound data's format
 
-  uint32_t subchunk2ID;
-  uint32_t subchunk2Size;
+
+  uint32_t subchunk1ID; //"fmt " (0x666d7420 big-endian form) 4
+  uint32_t subchunk1Size; // size of theformat chunk 16 for PCM 4
+  uint16_t audioFormat; // PCM=1  2
+  uint16_t numChannels; // Mono = 1, Stereo = 2, etc. 2
+  uint32_t sampleRate; // 8000,44100, etc.  4
+  uint32_t byteRate; //= SampleRate * NumChannels * BitsPerSample/8  4
+  uint16_t blockAlign; //= NumChannels * BitsPerSample/8   The number of bytes for one sample including all channels  2
+  uint16_t bitsPerSample;  // 8 bits = 8, 16 bits = 16, etc.  2
+
+  // data subchunk that contains the size of the data and the actual sound
+  uint32_t subchunk2ID; //"data" (0x64617461 big-endian form)  4
+  uint32_t subchunk2Size; //= NumSamples * NumChannels * BitsPerSample/8  This is the number of bytes in the data.  4
 };
 
 
-int check_file_name(char *filename); //checks file name
+/*
+reads the file and puts correcct information into the struct
 
-
-
-void list(char **array) //prints all stuff in wave_header struct
+*/
+void read_wave(FILE* fp, struct wave_header* dest)
 {
-    wavHeader wave_header;
-    FILE *pFile;
-
-
-    if(check_file_name(array[2]) == 0)
-    {
-        printf("wrong file name\n");
-        exit(1);
-    }
-    pFile = fopen (array[2] ,"r");
 
 
 
-    if( pFile != NULL)
-    {
-        fread(&wave_header, sizeof(wave_header), 1, pFile);
-        fclose(pFile);
-        printf("ChunkID: %c%c%c%c\n",wave_header.chunkID);
-        printf("ChunkSize: %d\n",wave_header.chunkSize);
-        printf("Format: %c%c%c%c\n",wave_header.format);
 
-        printf("SubChunk1ID: %c%c%c%c\n",wave_header.subchunk1ID);
-        printf("Subchunk1Size: %d\n",wave_header.subchunk1Size);
-        printf("AudioFormat: %d\n",wave_header.audioFormat);
-        printf("NumChannels: %d\n",wave_header.numChannels); 
-        printf("SampleRate: %d\n",wave_header.sampleRate);
-        printf("ByteRate: %d\n",wave_header.byteRate);     
-        printf("BlockAlign: %d\n",wave_header.blockAlign);   
-        printf("BitsPerSample: %d\n",wave_header.bitsPerSample);
-
-        printf("Subchunk2ID: %c%c%c%c\n",wave_header.subchunk2ID);
-        printf("Subchunk2Size: %d\n",wave_header.subchunk2Size);
-    }
-    else
-    {
-        printf("This file doesn't exit\n");
-        exit(1);
-    }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+validation checks to ensure the WAV file is intact and valid
+
+*/
+int validate_wave(struct wave_header* wavHeader)
+{
+
+// verify that this is a RIFF file header
+  if((wavHeader->chunkID != (0x46464952)))
+    return -1;
+  //verify that this is WAVE file
+  if(wavHeader->format != (0x45564157))
+    return -1;
+
+ 
+
+    return 0;
+}
+
+
+
+/*
+
+prints all stuff in wave_header struct
+
+*/
+void list_wave(struct wave_header* wavHeader) 
+{
+        printf("ChunkID: %u\n",wavHeader->chunkID);
+        printf("ChunkSize: %d\n",wavHeader->chunkSize);
+        printf("Format: %c\n",wavHeader->format);
+
+
+
+        printf("SubChunk1ID: %c\n",wavHeader->subchunk1ID);
+        printf("Subchunk1Size: %d\n",wavHeader->subchunk1Size);
+        printf("AudioFormat: %d\n",wavHeader->audioFormat);
+        printf("NumChannels: %d\n",wavHeader->numChannels); 
+        printf("SampleRate: %d\n",wavHeader->sampleRate);
+        printf("ByteRate: %d\n",wavHeader->byteRate);     
+        printf("BlockAlign: %d\n",wavHeader->blockAlign);   
+        printf("BitsPerSample: %d\n",wavHeader->bitsPerSample);
+
+        printf("Subchunk2ID: %c\n",wavHeader->subchunk2ID);
+        printf("Subchunk2Size: %d\n",wavHeader->subchunk2Size);
+ 
+}
+
+
+
+/* From Chris  */
+void fifo()
+{
+
+}
+
+int main(int argc, char** argv)
+{
+
+    FILE* fp; //From Noah 
+
+
+
+
+
+
+
+}
 
 
 
