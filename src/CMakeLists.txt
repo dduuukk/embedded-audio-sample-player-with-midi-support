@@ -19,11 +19,10 @@ add_library(hal-intf
     INTERFACE
     )
 
-# TODO update your chip here
 target_include_directories(hal-intf
     INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../build/_deps/stm32-hal-f1-src/Inc/
-    ${CMAKE_CURRENT_SOURCE_DIR}/../build/_deps/stm32-cmsis-f1-src/Include/
+    ${CMAKE_CURRENT_SOURCE_DIR}/../build/_deps/stm32-hal-h7-src/Inc/
+    ${CMAKE_CURRENT_SOURCE_DIR}/../build/_deps/stm32-cmsis-h7-src/Include/
     ${CMAKE_CURRENT_SOURCE_DIR}/../build/_deps/stm32-cmsis-src/Include/
     )
 
@@ -39,21 +38,18 @@ target_include_directories(hal-intf
 #    )
 
 
-# TODO change chip
 stm32_fetch_cmsis(H7)
 stm32_fetch_hal(H7)
 
-# TODO change chip
 find_package(HAL COMPONENTS STM32H7 REQUIRED)
 find_package(CMSIS COMPONENTS STM32H7 REQUIRED)
 
 # TODO enable FreeRTOS
 #find_package(FreeRTOS COMPONENTS ARM_CM4F REQUIRED)
 
-# TODO add and update hal conf
 add_executable(${TARGET} blinky.cpp stm32h7xx_hal_conf.h)
 
-# TODO change chip
+
 target_link_libraries(${TARGET}
         HAL::STM32::H7::M7::RCC
         HAL::STM32::H7::M7::GPIO
@@ -70,7 +66,6 @@ target_link_libraries(${TARGET}
 # stm32_add_linker_script(${TARGET} PUBLIC deps/libDaisy/core/STM32H750IB_flash.lds)
 
 
-# TODO change -mcpu=, -mfpu, -mfloat-abi, and -Map. For F4, -mfpu=vfpv4-d16 -mfloat-abi=hard are needed for FPU
 # Make gcc go brrrr
 Set(LINK_OPTIONS -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard --specs=nano.specs --specs=nosys.specs -Wl,-Map=${TARGET}.map,--cref -Wl,--gc-sections -Wl,--print-memory-usage -lc -lm -lnosys)
 Set(CFLAGS -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb  -O2 -Wall -Wno-missing-attributes -fasm -fdata-sections -ffunction-sections -Wno-stringop-overflow -g -ggdb -mthumb-interwork)
@@ -84,7 +79,6 @@ target_compile_options(${TARGET} PUBLIC
     $<$<COMPILE_LANGUAGE:ASM>: ${ASM_FLAGS}>
 )
 
-# TODO change chip defines (DCORE_CMX, DSTM32FXXXX, remove arm_math_cm4, etc)
 target_compile_definitions(${TARGET} PUBLIC 
     -DCORE_CM7  
     -DSTM32H750xx 
@@ -101,7 +95,6 @@ target_compile_definitions(${TARGET} PUBLIC
 )
 
 
-# TODO change chip
 add_compile_definitions(STM32H750xx)
 
 add_compile_options(
