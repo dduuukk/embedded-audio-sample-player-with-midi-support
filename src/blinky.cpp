@@ -1,9 +1,9 @@
 #include "sai-driver.h"
 #include <stm32h7xx_hal.h>
 
-#define LED_PORT GPIOD
-#define LED_PIN GPIO_PIN_15
-#define LED_PORT_CLK_ENABLE __HAL_RCC_GPIOD_CLK_ENABLE
+#define LED_PORT GPIOC
+#define LED_PIN GPIO_PIN_0
+#define LED_PORT_CLK_ENABLE __HAL_RCC_GPIOC_CLK_ENABLE
 
 static RCC_ClkInitTypeDef rccClkInstance = {
     .ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK |
@@ -61,7 +61,7 @@ void SysTick_Handler(void) {
   HAL_IncTick();
 
   // 1 Hz blinking
-  if ((HAL_GetTick() % 1000) == 0) {
+  if ((HAL_GetTick() % 10) == 0) {
     HAL_GPIO_TogglePin(LED_PORT, LED_PIN);
   }
   HAL_SYSTICK_IRQHandler();
