@@ -116,3 +116,10 @@ SAIDriver::~SAIDriver() {
     HAL_NVIC_DisableIRQ(SAI1_IRQn);
     HAL_SAI_DeInit(&hsai);
 }
+
+void SAIDriver::SAINBTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout) {
+    // Transmit data over SAI
+    if(HAL_SAI_Transmit(&hsai, pData, Size, Timeout) != HAL_OK) {
+        __asm__ __volatile__("bkpt #1");
+    }
+}

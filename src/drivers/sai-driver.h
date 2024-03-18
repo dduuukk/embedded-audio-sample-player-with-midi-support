@@ -3,6 +3,7 @@
 
 // Include any necessary headers here
 #include "stm32h7xx_hal.h"
+#include <cstdint>
 
 // Define your class or struct here
 class SAIDriver {
@@ -10,6 +11,8 @@ class SAIDriver {
     public:
         SAIDriver();
         ~SAIDriver();
+
+        void SAINBTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout);
 
         void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai);  
         void clocks_initialise(void);

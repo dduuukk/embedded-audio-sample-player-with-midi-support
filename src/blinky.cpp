@@ -43,13 +43,19 @@ void initGPIO() {
 
 int main(void) {
   HAL_Init();
-  SAIDriver theycallmeepic = SAIDriver();
+  SAIDriver newSAIDriver = SAIDriver();
   initGPIO();
 
   clocks_initialise();
   // 1kHz ticks
   HAL_SYSTICK_Config(SystemCoreClock / 1000);
   HAL_InitTick(1UL << (__NVIC_PRIO_BITS - 1));
+
+  uint8_t pData[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+                       0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
+  newSAIDriver.SAINBTransmit(pData, 16, 50);
+  newSAIDriver.SAINBTransmit(pData, 16, 50);
+
   while (1)
     ;
   return 0;
