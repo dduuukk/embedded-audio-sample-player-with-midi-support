@@ -43,6 +43,7 @@ void initGPIO() {
 
 int main(void) {
   HAL_Init();
+  SAIDriver theycallmeepic = SAIDriver();
   initGPIO();
 
   clocks_initialise();

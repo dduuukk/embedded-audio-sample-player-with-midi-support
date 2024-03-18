@@ -55,6 +55,7 @@ target_link_libraries(${TARGET}
         HAL::STM32::H7::M7::GPIO
         HAL::STM32::H7::M7::CORTEX
         HAL::STM32::H7::M7::SAI
+        HAL::STM32::H7::M7::RCCEx
         CMSIS::STM32::H750IB::M7
         STM32::NoSys
         #FreeRTOS::Timers

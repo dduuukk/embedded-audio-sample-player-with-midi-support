@@ -7,37 +7,38 @@
 // Initializer
 SAIDriver::SAIDriver() {
     
+
     // Set up HSAI configurations such as protocol and such
     // hsai->Init.request = SAI_BLOCKA_REQUEST_ENABLE;
     // hsai->Init.direction = SAI_DIR_TX;
-    hsai->Init.AudioMode = SAI_MODEMASTER_TX;
+    hsai.Init.AudioMode = SAI_MODEMASTER_TX;
 
-    hsai->Init.Synchro = SAI_ASYNCHRONOUS; // Master mode should be asynchronous
-    hsai->Init.SynchroExt = SAI_SYNCEXT_DISABLE;
+    hsai.Init.Synchro = SAI_ASYNCHRONOUS; // Master mode should be asynchronous
+    hsai.Init.SynchroExt = SAI_SYNCEXT_DISABLE;
 
     // TODO: CHECK IF NOT DEFINING MCKOUTPUT IS OK
     // hsai->Init.MckOutput = SAI_MCK_OUTPUT_DISABLE;
 
-    hsai->Init.OutputDrive = SAI_OUTPUTDRIVE_DISABLED;
-    hsai->Init.NoDivider = SAI_MASTERDIVIDER_ENABLE;
-    hsai->Init.FIFOThreshold = SAI_FIFOTHRESHOLD_EMPTY;
-    hsai->Init.AudioFrequency = SAI_AUDIO_FREQUENCY_48K;
+    hsai.Init.OutputDrive = SAI_OUTPUTDRIVE_DISABLED;
+    hsai.Init.NoDivider = SAI_MASTERDIVIDER_ENABLE;
+    hsai.Init.FIFOThreshold = SAI_FIFOTHRESHOLD_EMPTY;
+    hsai.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_48K;
     // TODO: CHECK IF NOT DEFINING THIS IS OK
     // hsai->Init.Mckdiv = 0;
     // TODO: OVERSAMPLING
     
-    hsai->Init.MonoStereoMode = SAI_STEREOMODE;
-    hsai->Init.CompandingMode = SAI_NOCOMPANDING;
-    hsai->Init.TriState = SAI_OUTPUT_NOTRELEASED;
+    hsai.Init.MonoStereoMode = SAI_STEREOMODE;
+    hsai.Init.CompandingMode = SAI_NOCOMPANDING;
+    hsai.Init.TriState = SAI_OUTPUT_NOTRELEASED;
 
-    hsai->Init.Protocol = SAI_I2S_STANDARD;
-    hsai->Init.DataSize = SAI_DATASIZE_32;
+    hsai.Init.Protocol = SAI_I2S_STANDARD;
+    hsai.Init.DataSize = SAI_DATASIZE_32;
     // hsai->Init.FirstBit = SAI_FIRSTBIT_MSB;
 
     // Perform any necessary initialization for SAI peripheral
     // Simplified mode initialization
     // TODO: ADD FUNCTIONS TO CHANGE PROTOCOL AND BIT DEPTH ON STARTUP
-    if(HAL_SAI_InitProtocol(hsai, SAI_I2S_STANDARD, SAI_PROTOCOL_DATASIZE_32BIT, 2) != HAL_OK) {
+    if(HAL_SAI_InitProtocol(&hsai, SAI_I2S_STANDARD, SAI_PROTOCOL_DATASIZE_32BIT, 2) != HAL_OK) {
         // TODO: SOME SORT OF ERROR HANDLING
         __asm__ __volatile__("bkpt #0");
     }
@@ -111,5 +112,5 @@ SAIDriver::~SAIDriver() {
     __HAL_RCC_GPIOA_CLK_DISABLE();
     __HAL_RCC_DMA1_CLK_DISABLE();
     HAL_NVIC_DisableIRQ(SAI1_IRQn);
-    HAL_SAI_DeInit(hsai);
+    HAL_SAI_DeInit(&hsai);
 }
