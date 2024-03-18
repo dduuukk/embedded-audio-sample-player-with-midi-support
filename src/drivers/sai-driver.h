@@ -8,7 +8,7 @@
 class SAIDriver {
     // Declare any member variables or functions here
     public:
-        SAIDriver(SAI_HandleTypeDef *hsai);
+        SAIDriver();
         ~SAIDriver();
 
         void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai);  
@@ -41,6 +41,7 @@ class SAIDriver {
         //     .PLL = {.PLLState = RCC_PLL_ON, .PLLSource = RCC_PLLSOURCE_HSE}
         // };
         GPIO_InitTypeDef GPIO_Config;
+        SAI_HandleTypeDef* hsai;
 };
 
 // Declare any member variables or functions here
