@@ -1,4 +1,6 @@
 #include "sai-driver.h"
+#include "stm32h7xx_hal_def.h"
+#include "stm32h7xx_hal_sai.h"
 
 // Initializer
 SAIDriver::SAIDriver(SAI_HandleTypeDef *hsai) {
@@ -48,5 +50,22 @@ void SAIDriver::HAL_SAI_MspInit(SAI_HandleTypeDef* hsai) {
 
         // Configure SAI pins
         initPins();
+
+        // Enable SAI interrupts
+        // TODO: CHECK IF THIS IS NECESSARY FOR THE FIRST ITERATION
+        HAL_NVIC_SetPriority(SAI1_IRQn, 0, 0);
+        HAL_NVIC_EnableIRQ(SAI1_IRQn);
+
+        // Skipping DMA configuration for now
+        // Otherwise, DMA configuration goes here
+
+        // Simplified mode initialization
+        // TODO: ADD FUNCTIONS TO CHANGE PROTOCOL AND BIT DEPTH ON STARTUP
+        if(HAL_SAI_InitProtocol(hsai, SAI_I2S_STANDARD, SAI_PROTOCOL_DATASIZE_32BIT, 2) != HAL_OK) {
+            // TODO: SOME SORT OF ERROR HANDLING
+            
+            return;
+        }
+        
     }
 }
