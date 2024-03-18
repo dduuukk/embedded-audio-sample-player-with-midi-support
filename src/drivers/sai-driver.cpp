@@ -1,12 +1,14 @@
 #include "sai-driver.h"
 #include "Legacy/stm32_hal_legacy.h"
+#include "stm32h750xx.h"
 #include "stm32h7xx_hal_def.h"
 #include "stm32h7xx_hal_gpio.h"
 #include "stm32h7xx_hal_sai.h"
 
 // Initializer
 SAIDriver::SAIDriver() {
-    
+    // Set SAI instance
+    hsai.Instance = SAI1_Block_A;
 
     // Set up HSAI configurations such as protocol and such
     // hsai->Init.request = SAI_BLOCKA_REQUEST_ENABLE;
