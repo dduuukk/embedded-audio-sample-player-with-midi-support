@@ -65,9 +65,56 @@ void read_wave(FILE* fp, struct wave_header* dest)
 {
 
 
+  if (!dest || !fp)
+    {
+      return -ENOENT;
+    }
+
+  rewind(fp); //Resets the file pointer
+
+  struct stat st;
+  fstat(fileno(fp), &st);
+  if(!(S_ISREG(st.st_mode) && st.st_size > 44))
+    return -1;
 
 
+  //read header
+  int x = 0;
+  x=fseek(fp, 0, SEEK_SET);
+  x=fread(&(dest->chunkID), sizeof(uint32_t), 1, fp);  
+  x=fseek(fp, 4, SEEK_SET);
+  x=fread(&(dest->chunkSize), sizeof(uint32_t), 1, fp);
+  x=fseek(fp, 8, SEEK_SET);
+  x=fread(&(dest->format), sizeof(uint32_t), 1, fp);
+
+  x=fseek(fp, 12, SEEK_SET);
+  x=fread(&(dest->subchunk1ID), sizeof(uint32_t), 1, fp);
+  x=fseek(fp, 16, SEEK_SET);
+  x=fread(&(dest->subchunk1Size), sizeof(uint32_t), 1, fp);
+  x=fseek(fp, 20, SEEK_SET);
+  x=fread(&(dest->audioFormat), sizeof(uint16_t), 1, fp);
+  x=fseek(fp, 22, SEEK_SET);
+  x=fread(&(dest->numChannels), sizeof(uint16_t), 1, fp);
+  x=fseek(fp, 24, SEEK_SET);
+  x=fread(&(dest->SampleRate), sizeof(uint32_t), 1, fp);
+  x=fseek(fp, 28, SEEK_SET);
+  x=fread(&(dest->byteRate), sizeof(uint32_t), 1, fp);
+  x=fseek(fp, 32, SEEK_SET);
+  x=fread(&(dest->blockAlign), sizeof(uint16_t), 1, fp);
+  x=fseek(fp, 34, SEEK_SET);
+  x=fread(&(dest->bitsPerSample), sizeof(uint16_t), 1, fp);
+
+  x=fseek(fp, 36, SEEK_SET);
+  x=fread(&(dest->subchunk2ID), sizeof(uint32_t), 1, fp);
+  x=fseek(fp, 40, SEEK_SET);
+  x=fread(&(dest->subchunk2Size), sizeof(uint32_t), 1, fp);
+
+  //printf("Expected file size: %d, Actual file size: %ld\n", (dest->chunkSize + 8), st.st_size);
+
+  return !((dest->chunkSize + 8) == st.st_size);
 }
+
+
 
 
 
