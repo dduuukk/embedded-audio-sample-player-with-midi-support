@@ -161,7 +161,10 @@ SAIDriver::~SAIDriver() {
 
 void SAIDriver::SAINBTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout) {
     // Transmit data over SAI
-    if(HAL_SAI_Transmit(&hsai, pData, Size, Timeout) != HAL_OK) {
+    // if(HAL_SAI_Transmit(&hsai, pData, Size, Timeout) != HAL_OK) {
+    //     __asm__ __volatile__("bkpt #1");
+    // }
+    if(HAL_SAI_Transmit_DMA(&hsai, pData, Size) != HAL_OK) {
         __asm__ __volatile__("bkpt #1");
     }
 }
