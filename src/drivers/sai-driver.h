@@ -19,6 +19,7 @@ class SAIDriver {
         void clocks_initialise(void);
         void initGPIO(void);
         void initDMA(void);
+        void deInitDMA(void);
 
     private:
         // GPIO Pin values accoring to the daisy documentation

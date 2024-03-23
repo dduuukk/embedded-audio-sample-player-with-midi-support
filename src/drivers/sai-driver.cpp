@@ -76,7 +76,11 @@ void SAIDriver::initDMA() {
 
     // Link DMA to SAI
     __HAL_LINKDMA(&hsai, hdmatx, hdma);
-    
+}
+
+void SAIDriver::deInitDMA() {
+    // Deinitialize DMA
+    HAL_DMA_DeInit(hsai.hdmatx);
 }
 
 // Clock source init
@@ -121,6 +125,11 @@ void SAIDriver::HAL_SAI_MspInit(SAI_HandleTypeDef* hsai) {
 
         // Configure SAI pins
         initPins();
+
+        // TODO: POSSIBLY INIT INTERRUPTS
+
+        // Init DMA
+        initDMA();
 
         // Enable SAI interrupts
         // TODO: CHECK IF THIS IS NECESSARY FOR THE FIRST ITERATION
