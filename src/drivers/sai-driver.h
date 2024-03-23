@@ -4,6 +4,7 @@
 // Include any necessary headers here
 #include "stm32h7xx_hal.h"
 #include <cstdint>
+#include <stm32h7xx_hal_dma.h>
 
 // Define your class or struct here
 class SAIDriver {
@@ -17,6 +18,7 @@ class SAIDriver {
         void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai);  
         void clocks_initialise(void);
         void initGPIO(void);
+        void initDMA(void);
 
     private:
         // GPIO Pin values accoring to the daisy documentation
@@ -45,6 +47,7 @@ class SAIDriver {
         // };
         GPIO_InitTypeDef GPIO_Config;
         SAI_HandleTypeDef hsai;
+        DMA_HandleTypeDef hdma;
 };
 
 // Declare any member variables or functions here
