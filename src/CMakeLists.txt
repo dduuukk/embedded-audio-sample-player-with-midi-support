@@ -60,6 +60,7 @@ target_link_libraries(${TARGET}
         #FreeRTOS::Heap::4
         #FreeRTOS::ARM_CM4F
         #TODO your object libraries go here
+        wm8731-driver
     )
 
 # TODO if you want a linker script
@@ -102,6 +103,7 @@ add_compile_options(
     )
 
 # TODO add_subdirectory(folder-name) goes here for all folders!
+add_subdirectory(drivers)
 
 add_library(core-conf 
     INTERFACE

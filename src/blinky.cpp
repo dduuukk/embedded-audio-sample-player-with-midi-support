@@ -1,5 +1,6 @@
-
 #include <stm32h7xx_hal.h>
+
+#include "codec_wm8731.h"
 
 #define LED_PORT GPIOC
 #define LED_PIN GPIO_PIN_0

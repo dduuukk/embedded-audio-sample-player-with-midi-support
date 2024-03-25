@@ -9,7 +9,7 @@
 #define ADDR0 0b0011010
 #define ADDR1 0b0011011
 
-//register definitions (all are left justified to leave space for the r/w bit)
+//register definitions (all are left justified to leave space for the one byte of data also sent)
 #define REG_LEFT_LINE_IN    0x00
 #define REG_RIGHT_LINE_IN   0x02
 #define REG_LEFT_HP_OUT     0x04
@@ -48,7 +48,7 @@
 
 //Digital Audio Path Controls
 #define ADC_HPF_ENABLE      0x00
-#define ADC_HPF_ENABLE      0x01
+#define ADC_HPF_DISABLE     0x01
 #define NO_DEEMP            0x00
 #define DEEMP_32KHZ         0x02
 #define DEEMP_44_1KHZ       0x04
@@ -113,6 +113,8 @@ class WM8731
 public:
     WM8731();
 
+    void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c);
+
     void init();
 
     void enable();
@@ -122,7 +124,7 @@ public:
     void registerWrite(uint8_t reg, uint16_t value);
 
 private:
-    I2C_HandleTypeDef i2c_handle;
+    I2C_HandleTypeDef hi2c2;
     uint8_t dev_address;
     uint8_t reg_address;
 
