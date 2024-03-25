@@ -1,6 +1,7 @@
 #include "sai-driver.h"
 #include "Legacy/stm32_hal_legacy.h"
 #include "stm32h750xx.h"
+#include "stm32h7xx_hal_cortex.h"
 #include "stm32h7xx_hal_def.h"
 #include "stm32h7xx_hal_dma.h"
 #include "stm32h7xx_hal_gpio.h"
@@ -129,7 +130,9 @@ extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai) {
         // Configure SAI pins
         initPins();
 
-        // TODO: POSSIBLY INIT INTERRUPTS
+        // Enable DMA and sai interrupts
+        HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
+        HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
 
         // Init DMA
         initDMA(hsai);
@@ -170,4 +173,8 @@ void SAIDriver::SAINBTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout) {
     if(HAL_SAI_Transmit_DMA(&hsai, pData, Size) != HAL_OK) {
         __asm__ __volatile__("bkpt #1");
     }
+}
+
+extern "C" void DMA1_Stream0_IRQHandler() {
+    HAL_DMA_IRQHandler(&hdma);
 }
