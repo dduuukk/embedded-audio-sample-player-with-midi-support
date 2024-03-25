@@ -39,7 +39,7 @@ class SAIDriver {
         //     .PLL = {.PLLState = RCC_PLL_ON, .PLLSource = RCC_PLLSOURCE_HSE}
         // };
         
-        SAI_HandleTypeDef hsai;
+        SAI_HandleTypeDef hsai = {};
 };
 
 enum gpioPinValues {
