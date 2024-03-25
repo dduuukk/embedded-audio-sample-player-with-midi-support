@@ -6,6 +6,8 @@
 #include "stm32h7xx_hal_gpio.h"
 #include "stm32h7xx_hal_sai.h"
 
+DMA_HandleTypeDef hdma;
+
 // Initializer
 SAIDriver::SAIDriver() {
     // Set SAI instance
@@ -48,7 +50,7 @@ SAIDriver::SAIDriver() {
 }
 
 // Setup a DMA TX for SAI
-void SAIDriver::initDMA() {
+void initDMA(SAI_HandleTypeDef* hsai) {
     // Initialize DMA for SAI
     hdma.Instance = DMA1_Stream0;
 
@@ -72,19 +74,19 @@ void SAIDriver::initDMA() {
         __asm__ __volatile__("bkpt #2");
     }
 
-    hsai.hdmatx = &hdma;
+    hsai->hdmatx = &hdma;
 
     // Link DMA to SAI
-    __HAL_LINKDMA(&hsai, hdmatx, hdma);
+    __HAL_LINKDMA(hsai, hdmatx, hdma);
 }
 
-void SAIDriver::deInitDMA() {
+void deInitDMA(SAI_HandleTypeDef* hsai) {
     // Deinitialize DMA
-    HAL_DMA_DeInit(hsai.hdmatx);
+    HAL_DMA_DeInit(hsai->hdmatx);
 }
 
 // Clock source init
-void SAIDriver::initClk() {
+void initClk() {
     // Enable all possible necessary clocks possible for daisy
     // Enable SAI interface clocks
     __HAL_RCC_SAI1_CLK_ENABLE();
@@ -101,13 +103,14 @@ void SAIDriver::initClk() {
 }
 
 // SAI pins init
-void SAIDriver::initPins() {
+void initPins() {
+    GPIO_InitTypeDef GPIO_Config;
     // Initialize pins for SAI1
-    GPIO_Config.Pin = SAIDriver::gpioPinValues::SAI1_FS_A |
-                      SAIDriver::gpioPinValues::SAI1_MCLK_A |
-                      SAIDriver::gpioPinValues::SAI1_SCK_A |
-                      SAIDriver::gpioPinValues::SAI1_SA_A |
-                      SAIDriver::gpioPinValues::SAI1_SB_A;
+    GPIO_Config.Pin = gpioPinValues::SAI1_FS_A |
+                      gpioPinValues::SAI1_MCLK_A |
+                      gpioPinValues::SAI1_SCK_A |
+                      gpioPinValues::SAI1_SA_A |
+                      gpioPinValues::SAI1_SB_A;
     // Configure SAI pins as alternate function pull-up.
     GPIO_Config.Mode = GPIO_MODE_AF_PP;
     GPIO_Config.Pull = GPIO_PULLUP;
@@ -117,7 +120,7 @@ void SAIDriver::initPins() {
 }
 
 // HAL SAI MSP Init
-void SAIDriver::HAL_SAI_MspInit(SAI_HandleTypeDef* hsai) {
+extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai) {
     // Perform any necessary initialization for SAI peripheral
     if (hsai->Instance == SAI1_Block_A || hsai->Instance == SAI1_Block_B) {
         // Enable clocks
@@ -129,7 +132,7 @@ void SAIDriver::HAL_SAI_MspInit(SAI_HandleTypeDef* hsai) {
         // TODO: POSSIBLY INIT INTERRUPTS
 
         // Init DMA
-        initDMA();
+        initDMA(hsai);
 
         // Enable SAI interrupts
         // TODO: CHECK IF THIS IS NECESSARY FOR THE FIRST ITERATION

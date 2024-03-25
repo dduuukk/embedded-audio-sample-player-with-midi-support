@@ -5,6 +5,7 @@
 #include "stm32h7xx_hal.h"
 #include <cstdint>
 #include <stm32h7xx_hal_dma.h>
+#include <stm32h7xx_hal_sai.h>
 
 // Define your class or struct here
 class SAIDriver {
@@ -14,25 +15,16 @@ class SAIDriver {
         ~SAIDriver();
 
         void SAINBTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout);
-
-        void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai);  
+  
         void clocks_initialise(void);
         void initGPIO(void);
-        void initDMA(void);
-        void deInitDMA(void);
+        
 
     private:
         // GPIO Pin values accoring to the daisy documentation
-        enum gpioPinValues {
-            SAI1_SA_A = GPIO_PIN_6,
-            SAI1_SB_A = GPIO_PIN_3,
-            SAI1_FS_A = GPIO_PIN_4,
-            SAI1_SCK_A = GPIO_PIN_5,
-            SAI1_MCLK_A = GPIO_PIN_2
-        };
+        
 
-        void initPins();
-        void initClk();
+        
         // RCC_ClkInitTypeDef rccClkInstance = {
         //     .ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK |
         //                 RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2,
@@ -46,10 +38,23 @@ class SAIDriver {
         //     .HSEState = RCC_CR_HSEON,
         //     .PLL = {.PLLState = RCC_PLL_ON, .PLLSource = RCC_PLLSOURCE_HSE}
         // };
-        GPIO_InitTypeDef GPIO_Config;
+        
         SAI_HandleTypeDef hsai;
-        DMA_HandleTypeDef hdma;
 };
+
+enum gpioPinValues {
+            SAI1_SA_A = GPIO_PIN_6,
+            SAI1_SB_A = GPIO_PIN_3,
+            SAI1_FS_A = GPIO_PIN_4,
+            SAI1_SCK_A = GPIO_PIN_5,
+            SAI1_MCLK_A = GPIO_PIN_2
+        };
+
+void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai);
+void initPins();
+void initClk();
+void initDMA(SAI_HandleTypeDef* hsai, DMA_HandleTypeDef* hdma);
+void deInitDMA(SAI_HandleTypeDef* hsai);
 
 // Declare any member variables or functions here
 
