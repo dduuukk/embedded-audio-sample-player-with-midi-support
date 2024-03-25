@@ -50,6 +50,13 @@ int main(void) {
   // 1kHz ticks
   HAL_SYSTICK_Config(SystemCoreClock / 1000);
   HAL_InitTick(1UL << (__NVIC_PRIO_BITS - 1));
+
+  WM8731 codec;
+
+  codec.init();
+
+  codec.registerWrite(REG_ANALOG_ROUTING, MIC_MUTE_ENABLE | ADC_SEL_LINE_INPUT | SELECT_DAC | BYPASS_EN); //same config as the init, but enables the analog bypass
+
   while (1)
     ;
   return 0;
