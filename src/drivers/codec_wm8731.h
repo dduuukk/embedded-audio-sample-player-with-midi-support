@@ -113,8 +113,6 @@ class WM8731
 public:
     WM8731();
 
-    void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c);
-
     void init();
 
     void enable();

@@ -2,34 +2,7 @@
 #include "stm32h7xx_hal.h"
 #include "stm32h7xx_hal_rcc.h"
 
-WM8731::WM8731()
-{
-    hi2c2.Instance = I2C2;
-    if(HAL_RCC_GetPCLK1Freq() == 120000000) //from Daisy
-    {
-        hi2c2.Init.Timing = 0x6090435F;
-    }
-    else
-    {
-        hi2c2.Init.Timing = 0x30E0628A;
-    }
-    hi2c2.Init.OwnAddress1 = 0;
-    hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-    hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-    hi2c2.Init.OwnAddress2 = 0;
-    hi2c2.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
-    hi2c2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-    hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-
-    __HAL_RCC_I2C1_CLK_ENABLE();
-
-    if (HAL_I2C_Init(&hi2c2) != HAL_OK)
-    {
-        __asm__ __volatile__("bkpt #0");
-    }
-}
-
-void WM8731::HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
+extern "C" void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
 {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
     if(hi2c->Instance==I2C2)
@@ -59,6 +32,33 @@ void WM8731::HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
         // HAL_NVIC_SetPriority(I2C2_EV_IRQn, 0, 0); //from Daisy
         // HAL_NVIC_EnableIRQ(I2C2_EV_IRQn); //from Daisy
      }
+}
+
+WM8731::WM8731()
+{
+    hi2c2.Instance = I2C2;
+    if(HAL_RCC_GetPCLK1Freq() == 120000000) //from Daisy
+    {
+        hi2c2.Init.Timing = 0x6090435F;
+    }
+    else
+    {
+        hi2c2.Init.Timing = 0x30E0628A;
+    }
+    hi2c2.Init.OwnAddress1 = 0;
+    hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+    hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+    hi2c2.Init.OwnAddress2 = 0;
+    hi2c2.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+    hi2c2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+    hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+
+    __HAL_RCC_I2C1_CLK_ENABLE();
+
+    if (HAL_I2C_Init(&hi2c2) != HAL_OK)
+    {
+        __asm__ __volatile__("bkpt #0");
+    }
 }
 
 void WM8731::init()
