@@ -122,7 +122,7 @@ public:
     void registerWrite(uint8_t reg, uint16_t value);
 
 private:
-    I2C_HandleTypeDef hi2c2;
+    I2C_HandleTypeDef hi2c2 = {};
     uint8_t dev_address;
     uint8_t reg_address;
 
