@@ -75,7 +75,7 @@ void initDMA(SAI_HandleTypeDef* hsai) {
         __asm__ __volatile__("bkpt #2");
     }
 
-    hsai->hdmatx = &hdma;
+    // hsai->hdmatx = &hdma;
 
     // Link DMA to SAI
     __HAL_LINKDMA(hsai, hdmatx, hdma);
