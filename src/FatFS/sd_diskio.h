@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "bsp_sd_diskio.h"
+#include "ff_gen_drv.h"
 
 extern const Diskio_drvTypeDef SD_Driver; /**< & */
 
