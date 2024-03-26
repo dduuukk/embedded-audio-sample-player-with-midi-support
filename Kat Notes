@@ -53,6 +53,14 @@ The primary objective is to parse a .WAV file stored on an SD card and play it t
 Noah gonna give you a FILE* that you read from, you’re gonna send data into a FIFO provided by Chris
 
 
+3/25/24 notes:
+- need to set up compiler with help from noah
+- get bit depth and sample rate
+https://stackoverflow.com/questions/21567920/how-to-read-bit-rate-of-wav-file-in-c-sharp 
+https://forum.arduino.cc/t/wav-to-c-program/293973/6
+https://discuss.cakewalk.com/index.php?/topic/16397-win-10-users-how-to-find-audio-bitsample-rate/ 
+- no print
+- make your file an include 
 
 
 

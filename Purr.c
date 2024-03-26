@@ -46,8 +46,10 @@ struct wave_header
   uint32_t subchunk1Size; // size of theformat chunk 16 for PCM 4
   uint16_t audioFormat; // PCM=1  2
   uint16_t numChannels; // Mono = 1, Stereo = 2, etc. 2
+
   uint32_t sampleRate; // 8000,44100, etc.  4
   uint32_t byteRate; //= SampleRate * NumChannels * BitsPerSample/8  4
+  
   uint16_t blockAlign; //= NumChannels * BitsPerSample/8   The number of bytes for one sample including all channels  2
   uint16_t bitsPerSample;  // 8 bits = 8, 16 bits = 16, etc.  2
 
@@ -63,6 +65,9 @@ reads the file and puts correcct information into the struct
 */
 void read_wave(FILE* fp, struct wave_header* dest)
 {
+
+//GET BIT DEPTH AND SAMPLE RATE 
+
 
 
   if (!dest || !fp)
@@ -82,30 +87,43 @@ void read_wave(FILE* fp, struct wave_header* dest)
   int x = 0;
   x=fseek(fp, 0, SEEK_SET);
   x=fread(&(dest->chunkID), sizeof(uint32_t), 1, fp);  
+
   x=fseek(fp, 4, SEEK_SET);
   x=fread(&(dest->chunkSize), sizeof(uint32_t), 1, fp);
+
   x=fseek(fp, 8, SEEK_SET);
   x=fread(&(dest->format), sizeof(uint32_t), 1, fp);
 
   x=fseek(fp, 12, SEEK_SET);
   x=fread(&(dest->subchunk1ID), sizeof(uint32_t), 1, fp);
+
   x=fseek(fp, 16, SEEK_SET);
   x=fread(&(dest->subchunk1Size), sizeof(uint32_t), 1, fp);
+
   x=fseek(fp, 20, SEEK_SET);
   x=fread(&(dest->audioFormat), sizeof(uint16_t), 1, fp);
+
   x=fseek(fp, 22, SEEK_SET);
   x=fread(&(dest->numChannels), sizeof(uint16_t), 1, fp);
+
+
+
   x=fseek(fp, 24, SEEK_SET);
   x=fread(&(dest->SampleRate), sizeof(uint32_t), 1, fp);
   x=fseek(fp, 28, SEEK_SET);
   x=fread(&(dest->byteRate), sizeof(uint32_t), 1, fp);
+
+
+
   x=fseek(fp, 32, SEEK_SET);
   x=fread(&(dest->blockAlign), sizeof(uint16_t), 1, fp);
+
   x=fseek(fp, 34, SEEK_SET);
   x=fread(&(dest->bitsPerSample), sizeof(uint16_t), 1, fp);
 
   x=fseek(fp, 36, SEEK_SET);
   x=fread(&(dest->subchunk2ID), sizeof(uint32_t), 1, fp);
+
   x=fseek(fp, 40, SEEK_SET);
   x=fread(&(dest->subchunk2Size), sizeof(uint32_t), 1, fp);
 
@@ -152,8 +170,9 @@ int validate_wave(struct wave_header* wavHeader)
 /*
 
 prints all stuff in wave_header struct
+no print >:((
 
-*/
+
 void list_wave(struct wave_header* wavHeader) 
 {
         printf("ChunkID: %u\n",wavHeader->chunkID);
@@ -175,7 +194,7 @@ void list_wave(struct wave_header* wavHeader)
         printf("Subchunk2Size: %d\n",wavHeader->subchunk2Size);
  
 }
-
+*/
 
 
 /* From Chris  */
