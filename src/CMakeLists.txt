@@ -52,14 +52,20 @@ add_executable(${TARGET} blinky.cpp stm32h7xx_hal_conf.h)
 
 target_link_libraries(${TARGET}
         HAL::STM32::H7::M7::RCC
+        HAL::STM32::H7::M7::RCCEx
         HAL::STM32::H7::M7::GPIO
         HAL::STM32::H7::M7::CORTEX
+        HAL::STM32::H7::M7::SD
+        HAL::STM32::H7::M7::LL_SDMMC
         CMSIS::STM32::H750IB::M7
         STM32::NoSys
         #FreeRTOS::Timers
         #FreeRTOS::Heap::4
         #FreeRTOS::ARM_CM4F
         #TODO your object libraries go here
+        fatfs-interface-driver
+        fatfs
+        sdmmc-driver
     )
 
 # TODO if you want a linker script
@@ -102,6 +108,8 @@ add_compile_options(
     )
 
 # TODO add_subdirectory(folder-name) goes here for all folders!
+add_subdirectory(drivers)
+add_subdirectory(FatFS)
 
 add_library(core-conf 
     INTERFACE

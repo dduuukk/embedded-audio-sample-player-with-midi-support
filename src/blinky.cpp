@@ -1,4 +1,5 @@
 
+#include "fatfs.h"
 #include <stm32h7xx_hal.h>
 
 #define LED_PORT GPIOC
@@ -49,6 +50,9 @@ int main(void) {
   // 1kHz ticks
   HAL_SYSTICK_Config(SystemCoreClock / 1000);
   HAL_InitTick(1UL << (__NVIC_PRIO_BITS - 1));
+
+  FatFsIntf fs = FatFsIntf();
+
   while (1)
     ;
   return 0;

@@ -8,7 +8,6 @@ public:
   SDMMC();
 
 private:
-  SD_HandleTypeDef hsd1;
 };
 
 #endif // SDMMC_DRIVER_H
