@@ -5,7 +5,30 @@
 extern "C" void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
 {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
-    if(hi2c->Instance==I2C2)
+    if(hi2c->Instance==I2C1)
+    {
+        __HAL_RCC_GPIOB_CLK_ENABLE();
+        /**I2C2 GPIO Configuration
+        PB8     ------> I2C1_SCL
+        PB9     ------> I2C1_SDA
+        */
+        GPIO_InitStruct.Mode  = GPIO_MODE_AF_OD;
+        GPIO_InitStruct.Pull  = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+        GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
+
+        GPIO_InitStruct.Pin = GPIO_PIN_8 | GPIO_PIN_9;
+        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+        __HAL_RCC_I2C1_CLK_ENABLE();
+
+        //__HAL_RCC_DMA1_CLK_ENABLE(); //from Daisy
+
+        // HAL_NVIC_SetPriority(I2C2_EV_IRQn, 0, 0); //from Daisy
+        // HAL_NVIC_EnableIRQ(I2C2_EV_IRQn); //from Daisy
+     }
+
+     if(hi2c->Instance==I2C2)
     {
         __HAL_RCC_GPIOB_CLK_ENABLE();
         __HAL_RCC_GPIOH_CLK_ENABLE();
@@ -15,7 +38,7 @@ extern "C" void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
         */
         GPIO_InitStruct.Mode  = GPIO_MODE_AF_OD;
         GPIO_InitStruct.Pull  = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
         GPIO_InitStruct.Alternate = GPIO_AF4_I2C2;
 
         GPIO_InitStruct.Pin = GPIO_PIN_4;
@@ -31,20 +54,24 @@ extern "C" void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
 
         // HAL_NVIC_SetPriority(I2C2_EV_IRQn, 0, 0); //from Daisy
         // HAL_NVIC_EnableIRQ(I2C2_EV_IRQn); //from Daisy
-
-        // FOR TESTING
-        // GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
-
-        // GPIO_InitStruct.Pin = GPIO_PIN_8 | GPIO_PIN_9;
-        // HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-        // __HAL_RCC_I2C1_CLK_ENABLE();
-        // FOR TESTING
      }
 }
 
 WM8731::WM8731()
 {
+    //config initialization, configure as desired for initial startup
+    dev_address = ADDR0;
+    reg_LeftLineIn_Config = LINE_IN_0DB_VOL | SIMULTANEOUS_LOAD;
+    reg_RightLineIn_Config = LINE_IN_0DB_VOL | SIMULTANEOUS_LOAD;
+    reg_LeftHPOut_Config = HP_OUT_MUTE | SIMULTANEOUS_LOAD;
+    reg_RightHPOut_Config = HP_OUT_MUTE | SIMULTANEOUS_LOAD;
+    reg_AnalogRouting_Config = MIC_MUTE_ENABLE | ADC_SEL_LINE_INPUT | SELECT_DAC;
+    reg_DigitalRouting_Config = NO_DEEMP;
+    reg_PowerDownCtrl_Config = MIC_IN_PWR_DOWN | OSC_PWR_DOWN | CLKOUT_PWR_DOWN;
+    reg_DigitalFormat_Config = FORMAT_I2S;
+    reg_SamplingCtrl_Config = SAMPLE_MODE_NORM | BOSR_NORM | ADC_48k_DAC_48k;
+    
+    //I2C initialization
     hi2c2.Instance = I2C2;
     if(HAL_RCC_GetPCLK1Freq() == 120000000) //from Daisy
     {
@@ -76,25 +103,25 @@ void WM8731::init()
 
     //go through core list of initial setup
     //Left line in control, copies to right line in
-    registerWrite(REG_LEFT_LINE_IN, LINE_IN_0DB_VOL | SIMULTANEOUS_LOAD);
+    registerWrite(REG_LEFT_LINE_IN, reg_LeftLineIn_Config);
 
     //Left headphone out control, copies to right headphone out
-    registerWrite(REG_LEFT_HP_OUT, HP_OUT_MUTE | SIMULTANEOUS_LOAD);
+    registerWrite(REG_LEFT_HP_OUT, reg_LeftHPOut_Config);
 
     //Analog path control
-    registerWrite(REG_ANALOG_ROUTING, MIC_MUTE_ENABLE | ADC_SEL_LINE_INPUT | SELECT_DAC);
+    registerWrite(REG_ANALOG_ROUTING, reg_AnalogRouting_Config);
 
     //Digital path control
-    registerWrite(REG_DIGITAL_ROUTING, NO_DEEMP);
+    registerWrite(REG_DIGITAL_ROUTING, reg_DigitalRouting_Config);
 
     //Power down control
-    registerWrite(REG_POWER_DOWN_CTRL, MIC_IN_PWR_DOWN | OSC_PWR_DOWN | CLKOUT_PWR_DOWN);
+    registerWrite(REG_POWER_DOWN_CTRL, reg_PowerDownCtrl_Config);
 
     //Digital audio interface format control
-    registerWrite(REG_DIGITAL_FORMAT, FORMAT_I2S); //LOOK INTO THIS ONE
+    registerWrite(REG_DIGITAL_FORMAT, reg_DigitalFormat_Config); //LOOK INTO THIS ONE
 
     //Sampling control
-    registerWrite(REG_SAMPLING_CTRL, SAMPLE_MODE_NORM | BOSR_NORM | ADC_48k_DAC_48k);
+    registerWrite(REG_SAMPLING_CTRL, reg_SamplingCtrl_Config);
 
     enable();
 }

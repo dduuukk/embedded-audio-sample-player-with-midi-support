@@ -104,6 +104,7 @@
 #define OUT_CLOCK_NORM      0x00
 #define OUT_CLOCK_DIV2      0x80
 
+#define INACTIVE_VALUE      0x00
 #define ACTIVE_VALUE        0x01
 
 #define RESET_VALUE         0x00
@@ -124,7 +125,15 @@ public:
 private:
     I2C_HandleTypeDef hi2c2 = {};
     uint8_t dev_address;
-    uint8_t reg_address;
+    uint16_t reg_LeftLineIn_Config;
+    uint16_t reg_RightLineIn_Config;
+    uint16_t reg_LeftHPOut_Config;
+    uint16_t reg_RightHPOut_Config;
+    uint16_t reg_AnalogRouting_Config;
+    uint16_t reg_DigitalRouting_Config;
+    uint16_t reg_PowerDownCtrl_Config;
+    uint16_t reg_DigitalFormat_Config;
+    uint16_t reg_SamplingCtrl_Config;
 
 };
 
