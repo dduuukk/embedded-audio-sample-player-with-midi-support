@@ -68,7 +68,7 @@ void initDMA(SAI_HandleTypeDef* hsai) {
     hdma.Init.Mode = DMA_CIRCULAR; // Circular mode (emulate FIFO with more control)
     hdma.Init.Priority = DMA_PRIORITY_HIGH; // High priority
     // Enable built in 8 word FIFO (pre-circular buffer)
-    hdma.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
+    hdma.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
 
     // Initialize the DMA
     if(HAL_DMA_Init(&hdma) != HAL_OK) {
