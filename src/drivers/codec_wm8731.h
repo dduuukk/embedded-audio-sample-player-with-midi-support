@@ -9,7 +9,7 @@
 #define ADDR0 0b0011010
 #define ADDR1 0b0011011
 
-//register definitions (all are left justified to leave space for the one byte of data also sent)
+//register definitions (all are left justified to leave space for the one byte of data also sent with it)
 #define REG_LEFT_LINE_IN    0x00
 #define REG_RIGHT_LINE_IN   0x02
 #define REG_LEFT_HP_OUT     0x04
@@ -115,19 +115,96 @@ class WM8731
 public:
     WM8731();
 
+    /**
+    * Codec initialization
+    * 
+    * Initializes the codec with parameters defined in the function. Designed
+    * to be called to bulk-configure all parameters of the codec at the very 
+    * begining. Configure the function to fit your needs.
+    */
     void init();
 
+    /**
+    * Codec enable
+    */
     void enable();
+
+    /**
+    * Codec disable
+    */
     void disable();
+
+    /**
+    * Codec reset
+    *
+    * Resets codec to it's default values
+    */
     void reset();
 
+    /**
+    * Quick configuration of the analog bypass
+    *
+    * Allows for quick configuration of the analog bypass mode, which sends
+    * input data directly to the codec's output. Input parameter can be plain
+    * hex or the defined macros BYPASS_ENABLE/BYPASS_DISABLE. Function only writes
+    * to the bits specific to the bypass mode.
+    *
+    * @param bypass Bypass mode, 0x00 for disabled bypass, 0x08 for enabled bypass
+    */
     void configureBypass(uint8_t bypass);
 
+    /**
+    * Quick configuration of the audio data format
+    *
+    * Allows for quick configuration of the audio data format. Input parameter can 
+    * be plain hex or the defined macros. Function only writes to the bits specific
+    * to the audio data format.
+    *
+    * @param format Data format, 0x00 for MSB-first right justfied, 
+    *                            0x01 for MSB-first left justfied,
+    *                            0x02 for I2S format MSB-first left-1 justified,
+    *                            0x03 for DSP mode frame sync + 2 data packed words
+    */
     void configureAudioDataFormat(uint8_t format);
+
+    /**
+    * Quick configuration of the input data length
+    *
+    * Allows for quick configuration of the input data length. Variable input length
+    * is only available for I2S or left justified modes. Input parameter can be plain
+    * hex or the defined macros. Function only writes to the bits specific to the 
+    * bypass mode.
+    *
+    * @param length Input data length, 0x00 for 16-bits, 
+    *                                  0x04 for 20-bits,
+    *                                  0x08 for 24-bits,
+    *                                  0x0B for 32-bits
+    */
     void configureInputDataLength(uint8_t length);
 
+    /**
+    * Quick configuration of the codec sample rate
+    *
+    * Allows for quick configuration of the sample rate for the codec's DAC and ADC. 
+    * Input parameter can be plain hex or the defined macros. Refer to the datasheet 
+    * for detailed information about setting the sample rates. Function only writes
+    * to the bits specific to the bypass mode.
+    *
+    * @param sampleRate Sample rate mode of the DAC and ADC
+    */
     void configureSampleRate(uint8_t sampleRate);
 
+    /**
+    * A simple register write function
+    *
+    * Writes specified value to a specified register. Register addresses must be left
+    * justified to account for a 9th bit of data used by some registers. Values are
+    * 16-bit to account for the extra bit of data as well. Function handles bit 
+    * manipulation for sent data automatically.
+    *
+    * @param reg   Register address
+    * @param value Value to be written to the address
+    */
     void registerWrite(uint8_t reg, uint16_t value);
 
 private:
