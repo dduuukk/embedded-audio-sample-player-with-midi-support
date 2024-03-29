@@ -9,6 +9,37 @@
 
 DMA_HandleTypeDef hdma;
 
+// Setup a DMA TX for SAI
+void initDMA(SAI_HandleTypeDef* hsai) {
+    // Initialize DMA for SAI
+    hdma.Instance = DMA1_Stream0;
+
+    // Perform all init operations
+    // TODO: ADD 
+    hdma.Init.Request = DMA_REQUEST_SAI1_A; // Request a DMA with connection to SAI1_A
+    hdma.Init.Direction = DMA_MEMORY_TO_PERIPH; // TX from DMA to SAI (this will always be TX, even with other SAI blocks)
+    hdma.Init.PeriphInc = DMA_PINC_DISABLE; // Peripheral increment disabled
+    // Increment through data in the audio input buffer
+    // Set up the DMA to take and output audio words
+    hdma.Init.MemInc = DMA_MINC_ENABLE; // Memory increment enabled
+    hdma.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD; // Peripheral data alignment is word
+    hdma.Init.MemDataAlignment = DMA_MDATAALIGN_WORD; // Memory data alignment is word
+    hdma.Init.Mode = DMA_CIRCULAR; // Circular mode (emulate FIFO with more control)
+    hdma.Init.Priority = DMA_PRIORITY_HIGH; // High priority
+    // Enable built in 8 word FIFO (pre-circular buffer)
+    hdma.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+
+    // Initialize the DMA
+    if(HAL_DMA_Init(&hdma) != HAL_OK) {
+        __asm__ __volatile__("bkpt #2");
+    }
+
+    // hsai->hdmatx = &hdma;
+
+    // Link DMA to SAI
+    __HAL_LINKDMA(hsai, hdmatx, hdma);
+}
+
 // Initializer
 SAIDriver::SAIDriver() {
     // Set SAI instance
@@ -48,38 +79,12 @@ SAIDriver::SAIDriver() {
         // TODO: SOME SORT OF ERROR HANDLING
         __asm__ __volatile__("bkpt #0");
     }
+
+    // Init DMA
+    initDMA(&hsai);
 }
 
-// Setup a DMA TX for SAI
-void initDMA(SAI_HandleTypeDef* hsai) {
-    // Initialize DMA for SAI
-    hdma.Instance = DMA1_Stream0;
 
-    // Perform all init operations
-    // TODO: ADD 
-    hdma.Init.Request = DMA_REQUEST_SAI1_A; // Request a DMA with connection to SAI1_A
-    hdma.Init.Direction = DMA_MEMORY_TO_PERIPH; // TX from DMA to SAI (this will always be TX, even with other SAI blocks)
-    hdma.Init.PeriphInc = DMA_PINC_DISABLE; // Peripheral increment disabled
-    // Increment through data in the audio input buffer
-    // Set up the DMA to take and output audio words
-    hdma.Init.MemInc = DMA_MINC_ENABLE; // Memory increment enabled
-    hdma.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD; // Peripheral data alignment is word
-    hdma.Init.MemDataAlignment = DMA_MDATAALIGN_WORD; // Memory data alignment is word
-    hdma.Init.Mode = DMA_CIRCULAR; // Circular mode (emulate FIFO with more control)
-    hdma.Init.Priority = DMA_PRIORITY_HIGH; // High priority
-    // Enable built in 8 word FIFO (pre-circular buffer)
-    hdma.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-
-    // Initialize the DMA
-    if(HAL_DMA_Init(&hdma) != HAL_OK) {
-        __asm__ __volatile__("bkpt #2");
-    }
-
-    // hsai->hdmatx = &hdma;
-
-    // Link DMA to SAI
-    __HAL_LINKDMA(hsai, hdmatx, hdma);
-}
 
 void deInitDMA(SAI_HandleTypeDef* hsai) {
     // Deinitialize DMA
@@ -133,9 +138,6 @@ extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai) {
         // Enable DMA and sai interrupts
         HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
         HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
-
-        // Init DMA
-        initDMA(hsai);
 
         // Enable SAI interrupts
         // TODO: CHECK IF THIS IS NECESSARY FOR THE FIRST ITERATION

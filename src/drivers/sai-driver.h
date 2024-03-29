@@ -43,12 +43,12 @@ class SAIDriver {
 };
 
 enum gpioPinValues {
-            SAI1_SA_A = GPIO_PIN_6,
-            SAI1_SB_A = GPIO_PIN_3,
-            SAI1_FS_A = GPIO_PIN_4,
-            SAI1_SCK_A = GPIO_PIN_5,
-            SAI1_MCLK_A = GPIO_PIN_2
-        };
+    SAI1_SA_A = GPIO_PIN_6,
+    SAI1_SB_A = GPIO_PIN_3,
+    SAI1_FS_A = GPIO_PIN_4,
+    SAI1_SCK_A = GPIO_PIN_5,
+    SAI1_MCLK_A = GPIO_PIN_2
+};
 
 void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai);
 void initPins();
