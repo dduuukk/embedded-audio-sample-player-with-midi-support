@@ -61,15 +61,15 @@ WM8731::WM8731()
 {
     //config initialization, configure as desired for initial startup
     dev_address = ADDR0;
-    reg_LeftLineIn_Config = LINE_IN_0DB_VOL | SIMULTANEOUS_LOAD;
-    reg_RightLineIn_Config = LINE_IN_0DB_VOL | SIMULTANEOUS_LOAD;
-    reg_LeftHPOut_Config = HP_OUT_MUTE | SIMULTANEOUS_LOAD;
-    reg_RightHPOut_Config = HP_OUT_MUTE | SIMULTANEOUS_LOAD;
-    reg_AnalogRouting_Config = MIC_MUTE_ENABLE | ADC_SEL_LINE_INPUT | SELECT_DAC;
-    reg_DigitalRouting_Config = NO_DEEMP;
-    reg_PowerDownCtrl_Config = MIC_IN_PWR_DOWN | OSC_PWR_DOWN | CLKOUT_PWR_DOWN;
-    reg_DigitalFormat_Config = FORMAT_I2S;
-    reg_SamplingCtrl_Config = SAMPLE_MODE_NORM | BOSR_NORM | ADC_48k_DAC_48k;
+    leftLineIn_Config = LINE_IN_0DB_VOL | SIMULTANEOUS_LOAD;
+    rightLineIn_Config = LINE_IN_0DB_VOL | SIMULTANEOUS_LOAD;
+    leftHPOut_Config = HP_OUT_MUTE | SIMULTANEOUS_LOAD;
+    rightHPOut_Config = HP_OUT_MUTE | SIMULTANEOUS_LOAD;
+    analogRouting_Config = MIC_MUTE_ENABLE | ADC_SEL_LINE_INPUT | SELECT_DAC;
+    digitalRouting_Config = NO_DEEMP;
+    powerDownCtrl_Config = MIC_IN_PWR_DOWN | OSC_PWR_DOWN | CLKOUT_PWR_DOWN;
+    digitalFormat_Config = FORMAT_I2S;
+    samplingCtrl_Config = SAMPLE_MODE_NORM | BOSR_NORM | ADC_48k_DAC_48k;
     
     //I2C initialization
     hi2c2.Instance = I2C2;
@@ -103,28 +103,30 @@ void WM8731::init()
 
     //go through core list of initial setup
     //Left line in control, copies to right line in
-    registerWrite(REG_LEFT_LINE_IN, reg_LeftLineIn_Config);
+    registerWrite(REG_LEFT_LINE_IN, leftLineIn_Config);
 
     //Left headphone out control, copies to right headphone out
-    registerWrite(REG_LEFT_HP_OUT, reg_LeftHPOut_Config);
+    registerWrite(REG_LEFT_HP_OUT, leftHPOut_Config);
 
     //Analog path control
-    registerWrite(REG_ANALOG_ROUTING, reg_AnalogRouting_Config);
+    registerWrite(REG_ANALOG_ROUTING, analogRouting_Config);
 
     //Digital path control
-    registerWrite(REG_DIGITAL_ROUTING, reg_DigitalRouting_Config);
+    registerWrite(REG_DIGITAL_ROUTING, digitalRouting_Config);
 
     //Power down control
-    registerWrite(REG_POWER_DOWN_CTRL, reg_PowerDownCtrl_Config);
+    registerWrite(REG_POWER_DOWN_CTRL, powerDownCtrl_Config);
 
     //Digital audio interface format control
-    registerWrite(REG_DIGITAL_FORMAT, reg_DigitalFormat_Config); //LOOK INTO THIS ONE
+    registerWrite(REG_DIGITAL_FORMAT, digitalFormat_Config); //LOOK INTO THIS ONE
 
     //Sampling control
-    registerWrite(REG_SAMPLING_CTRL, reg_SamplingCtrl_Config);
+    registerWrite(REG_SAMPLING_CTRL, samplingCtrl_Config);
 
     enable();
 }
+
+
 
 void WM8731::enable()
 {
@@ -140,6 +142,38 @@ void WM8731::reset()
 {
     registerWrite(REG_RESET, RESET_VALUE);
 }
+
+
+
+void WM8731::configureBypass(uint8_t bypass)
+{
+    analogRouting_Config = (analogRouting_Config & 0xFFF7) | bypass;
+    registerWrite(REG_ANALOG_ROUTING, analogRouting_Config);
+}
+
+
+
+void WM8731::configureAudioDataFormat(uint8_t format)
+{
+    digitalFormat_Config = (digitalFormat_Config & 0xFFFC) | format;
+    registerWrite(REG_DIGITAL_ROUTING, digitalFormat_Config);
+}
+
+void WM8731::configureInputDataLength(uint8_t length)
+{
+    digitalFormat_Config = (digitalFormat_Config & 0xFFF3) | length;
+    registerWrite(REG_DIGITAL_ROUTING, digitalFormat_Config);
+}
+
+
+
+void WM8731::configureSampleRate(uint8_t sampleRate)
+{
+    samplingCtrl_Config = (samplingCtrl_Config & 0xFFC3) | sampleRate;
+    registerWrite(REG_DIGITAL_ROUTING, samplingCtrl_Config);
+}
+
+
 
 void WM8731::registerWrite(uint8_t reg, uint16_t data)
 {

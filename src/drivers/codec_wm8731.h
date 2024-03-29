@@ -38,9 +38,10 @@
 #define MIC_MUTE_ENABLE     0x02
 #define ADC_SEL_LINE_INPUT  0x00
 #define ADC_SEL_MIC_INPUT   0x04
-#define BYPASS_EN           0x08
+#define BYPASS_ENABLE       0x08
+#define BYPASS_DISABLE      0x00
 #define SELECT_DAC          0x10
-#define SIDETONE_EN         0x20
+#define SIDETONE_ENABLE     0x20
 #define SIDETONE_ATTN_6DB   0x00
 #define SIDETONE_ATTN_9DB   0x40
 #define SIDETONE_ATTN_12DB  0x80
@@ -120,20 +121,27 @@ public:
     void disable();
     void reset();
 
+    void configureBypass(uint8_t bypass);
+
+    void configureAudioDataFormat(uint8_t format);
+    void configureInputDataLength(uint8_t length);
+
+    void configureSampleRate(uint8_t sampleRate);
+
     void registerWrite(uint8_t reg, uint16_t value);
 
 private:
     I2C_HandleTypeDef hi2c2 = {};
     uint8_t dev_address;
-    uint16_t reg_LeftLineIn_Config;
-    uint16_t reg_RightLineIn_Config;
-    uint16_t reg_LeftHPOut_Config;
-    uint16_t reg_RightHPOut_Config;
-    uint16_t reg_AnalogRouting_Config;
-    uint16_t reg_DigitalRouting_Config;
-    uint16_t reg_PowerDownCtrl_Config;
-    uint16_t reg_DigitalFormat_Config;
-    uint16_t reg_SamplingCtrl_Config;
+    uint16_t leftLineIn_Config;
+    uint16_t rightLineIn_Config;
+    uint16_t leftHPOut_Config;
+    uint16_t rightHPOut_Config;
+    uint16_t analogRouting_Config;
+    uint16_t digitalRouting_Config;
+    uint16_t powerDownCtrl_Config;
+    uint16_t digitalFormat_Config;
+    uint16_t samplingCtrl_Config;
 
 };
 
