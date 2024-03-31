@@ -109,7 +109,7 @@ void read_wave(FILE* fp, struct wave_header* dest)
 
 
   x=fseek(fp, 24, SEEK_SET);
-  x=fread(&(dest->SampleRate), sizeof(uint32_t), 1, fp);
+  x=fread(&(dest->SampleRate), sizeof(uint32_t), 1, fp); //SAMPLE RATEEEEEEEEEEEEEEEEEEEE
   x=fseek(fp, 28, SEEK_SET);
   x=fread(&(dest->byteRate), sizeof(uint32_t), 1, fp);
 
@@ -119,7 +119,7 @@ void read_wave(FILE* fp, struct wave_header* dest)
   x=fread(&(dest->blockAlign), sizeof(uint16_t), 1, fp);
 
   x=fseek(fp, 34, SEEK_SET);
-  x=fread(&(dest->bitsPerSample), sizeof(uint16_t), 1, fp);
+  x=fread(&(dest->bitsPerSample), sizeof(uint16_t), 1, fp);  //BIT DEPTHHHHHHHHHHHHHHH
 
   x=fseek(fp, 36, SEEK_SET);
   x=fread(&(dest->subchunk2ID), sizeof(uint32_t), 1, fp);
@@ -131,16 +131,6 @@ void read_wave(FILE* fp, struct wave_header* dest)
 
   return !((dest->chunkSize + 8) == st.st_size);
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -164,6 +154,52 @@ int validate_wave(struct wave_header* wavHeader)
 
     return 0;
 }
+
+
+
+
+
+/*
+Handle Stereo and Mono Format
+Mono = 1, Stereo = 2
+
+*/
+void handleStereoMono(struct wave_header* wavHeader) {
+    if (wavHeader->numChannels == 1) //means one audio channel
+    {
+        //printf("Mono\n");
+        return 0;
+    } 
+    else if (wavHeader->numChannels == 2) //left and right audio channel
+    {
+       // printf("Stereo\n");
+       return 0;
+    } 
+    else 
+    {
+        //printf("Error\n");
+        return -1;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -197,11 +233,32 @@ void list_wave(struct wave_header* wavHeader)
 */
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* From Chris  */
 void fifo()
 {
 
 }
+
+
+
+
+
+
+
+
 
 int main(int argc, char** argv)
 {
