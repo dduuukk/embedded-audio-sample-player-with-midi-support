@@ -16,23 +16,23 @@ const float sampleRate = 48000; // Sample rate in Hz (samples per second)
 const float duration = 1.0;     // Duration of the wave in seconds
 const int maxSamples = static_cast<int>(sampleRate * duration) * 2;
 
-// Generate the sine wave
-void generateSineWave(float frequency, float amplitude, float sampleRate, float duration, int32_t* wave) {
-    const float twoPiF = 2.0 * M_PI * frequency;
-    const int numSamples = static_cast<int>(duration * sampleRate);
-    if(numSamples > maxSamples) {
-      // Error: too many samples
-      return;
-    }
-    for (int i = 0; i < numSamples; ++i) {
-      float t = i / sampleRate;
-      float sample = amplitude * sin(twoPiF * t);
-      // Normalize the sample from [-1,1] to [int32_min, int32_max]
-      wave[i] = static_cast<int32_t>(sample * INT32_MAX);
-      wave[i+1] = wave[i];
-      i += 1;
-    }
-}
+// // Generate the sine wave
+// void generateSineWave(float frequency, float amplitude, float sampleRate, float duration, int32_t* wave) {
+//     const float twoPiF = 2.0 * M_PI * frequency;
+//     const int numSamples = static_cast<int>(duration * sampleRate);
+//     if(numSamples > maxSamples) {
+//       // Error: too many samples
+//       return;
+//     }
+//     for (int i = 0; i < numSamples; ++i) {
+//       float t = i / sampleRate;
+//       float sample = amplitude * sin(twoPiF * t);
+//       // Normalize the sample from [-1,1] to [int32_min, int32_max]
+//       wave[i] = static_cast<int32_t>(sample * INT32_MAX);
+//       wave[i+1] = wave[i];
+//       i += 1;
+//     }
+// }
 
 void clocks_initialise(void) {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -189,20 +189,20 @@ int main(void) {
   // newSAIDriver.SAINBTransmit(pData, 16, 50);
   // newSAIDriver.SAINBTransmit(pData, 15, 50);
 
-  int32_t wave[maxSamples];
-  generateSineWave(frequency, amplitude, sampleRate, duration, wave);
-
+  int32_t wave[64] = { -1106268015, 1591043071, -952533937, -1866226849, 1066716749, -42586676, 526290252, -565786743, -1142983926, 1747077447, -1042276211, 1918090055, 1672949549, 1976652144, -1091578450, -9675609, 648468322, -764275322, -1367021099, -573190756, -366013572, -1115847640, -444068412, 415420984, 1353911877, -47818021, 2074751477, 1684291685, 290393192, -2129667148, 1266354118, 1081428467, 509312494, 1865871581, 1595255571, 966295610, -29112104, -37212590, -1720637641, 1364685060, 1091836073, -696286226, 1266966276, 679647088, 2083680565, -680043695, 1463560271, 490429320, 12635240, 1899115089, -394258867, -1976964618, -587376003, -1481591831, 1870749240, -1788886144, 1440269894, 1056436347, 1331704880, 1649230688, 2021819249, -631902196, -324384800, 375248534} ;
+  // generateSineWave(frequency, amplitude, sampleRate, duration, wave);
+  uint8_t* pData = reinterpret_cast<uint8_t*>(wave);
 
 
   // Get a pointer to the data
-  uint8_t* pData = reinterpret_cast<uint8_t*>(wave);
+  // uint8_t* pData = reinterpret_cast<uint8_t*>(wave);
 
   // Calculate the number of samples
   int size = static_cast<int>(sampleRate * duration);
 
   // Pass the data to the SAINBTransmit function
   while(1) {
-    newSAIDriver.SAINBTransmit(pData, size, 2000);
+    newSAIDriver.SAINBTransmit(pData, 64, 2000);
   }
   WM8731 codec = WM8731();
 
