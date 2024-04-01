@@ -55,6 +55,7 @@ target_link_libraries(${TARGET}
         HAL::STM32::H7::M7::RCCEx
         HAL::STM32::H7::M7::GPIO
         HAL::STM32::H7::M7::CORTEX
+        HAL::STM32::H7::M7::I2C
         HAL::STM32::H7::M7::PWREx
         CMSIS::STM32::H750IB::M7
         STM32::NoSys
@@ -62,6 +63,7 @@ target_link_libraries(${TARGET}
         #FreeRTOS::Heap::4
         #FreeRTOS::ARM_CM4F
         #TODO your object libraries go here
+        wm8731-driver
     )
 
 # TODO if you want a linker script
@@ -104,6 +106,7 @@ add_compile_options(
     )
 
 # TODO add_subdirectory(folder-name) goes here for all folders!
+add_subdirectory(drivers)
 
 add_library(core-conf 
     INTERFACE

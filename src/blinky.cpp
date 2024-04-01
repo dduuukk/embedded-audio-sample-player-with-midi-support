@@ -1,5 +1,6 @@
-
 #include <stm32h7xx_hal.h>
+
+#include "codec_wm8731.h"
 
 #define LED_PORT GPIOC
 #define LED_PIN GPIO_PIN_0
@@ -153,8 +154,17 @@ int main(void) {
   // 1kHz ticks
   HAL_SYSTICK_Config(SystemCoreClock / 1000);
   HAL_InitTick(1UL << (__NVIC_PRIO_BITS - 1));
+
+  WM8731 codec = WM8731();
+
+  codec.init();
+
+  codec.configureBypass(BYPASS_ENABLE);
+
   while (1)
-    ;
+  {
+    
+  }
   return 0;
 }
 
