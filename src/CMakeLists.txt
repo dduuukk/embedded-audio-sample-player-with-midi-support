@@ -52,9 +52,11 @@ add_executable(${TARGET} blinky.cpp stm32h7xx_hal_conf.h)
 
 target_link_libraries(${TARGET}
         HAL::STM32::H7::M7::RCC
+        HAL::STM32::H7::M7::RCCEx
         HAL::STM32::H7::M7::GPIO
         HAL::STM32::H7::M7::CORTEX
         HAL::STM32::H7::M7::I2C
+        HAL::STM32::H7::M7::PWREx
         CMSIS::STM32::H750IB::M7
         STM32::NoSys
         #FreeRTOS::Timers
