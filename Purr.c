@@ -69,7 +69,7 @@ void read_wave(FILE* fp, struct wave_header* dest)
 //GET BIT DEPTH AND SAMPLE RATE 
 
 
-
+//are the destination and file valid?
   if (!dest || !fp)
     {
       return -ENOENT;
@@ -152,6 +152,18 @@ int validate_wave(struct wave_header* wavHeader)
 
  
 
+
+
+
+
+
+
+
+
+
+
+
+
     return 0;
 }
 
@@ -164,7 +176,18 @@ Handle Stereo and Mono Format
 Mono = 1, Stereo = 2
 
 */
-void handleStereoMono(struct wave_header* wavHeader) {
+void handleStereoMono(struct wave_header* wavHeader) 
+{
+
+
+
+
+
+
+
+
+
+
     if (wavHeader->numChannels == 1) //means one audio channel
     {
         //printf("Mono\n");
@@ -180,6 +203,8 @@ void handleStereoMono(struct wave_header* wavHeader) {
         //printf("Error\n");
         return -1;
     }
+
+    
 }
 
 
