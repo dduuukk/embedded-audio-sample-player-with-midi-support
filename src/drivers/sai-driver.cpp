@@ -6,18 +6,26 @@
 #include "stm32h7xx_hal_dma.h"
 #include "stm32h7xx_hal_gpio.h"
 #include "stm32h7xx_hal_sai.h"
+#include <cstdint>
 
 DMA_HandleTypeDef hdma;
 
 // Initializer
-SAIDriver::SAIDriver() {
+SAIDriver::SAIDriver(bool useBlockA) {
     // Set SAI instance
-    hsai.Instance = SAI1_Block_A;
+    this->useBlockA = useBlockA;
+    if(this->useBlockA) {
+        hsai.Instance = SAI1_Block_A;
+        hsai.Init.AudioMode = SAI_MODEMASTER_TX;
+    } else {
+        hsai.Instance = SAI1_Block_B;
+        hsai.Init.AudioMode = SAI_MODESLAVE_TX;
+    }
 
     // Set up HSAI configurations such as protocol and such
     // hsai->Init.request = SAI_BLOCKA_REQUEST_ENABLE;
     // hsai->Init.direction = SAI_DIR_TX;
-    hsai.Init.AudioMode = SAI_MODEMASTER_TX;
+    
 
     hsai.Init.Synchro = SAI_ASYNCHRONOUS; // Master mode should be asynchronous
     hsai.Init.SynchroExt = SAI_SYNCEXT_DISABLE;
@@ -47,6 +55,14 @@ SAIDriver::SAIDriver() {
     if(HAL_SAI_InitProtocol(&hsai, SAI_I2S_STANDARD, SAI_PROTOCOL_DATASIZE_32BIT, 2) != HAL_OK) {
         // TODO: SOME SORT OF ERROR HANDLING
         __asm__ __volatile__("bkpt #0");
+    }
+
+    if(this->useBlockA) {
+        // Send a single word to the saiA FIFO to start the clock
+        // This is necessary to start the clock
+        uint32_t dummyData[1] = {0x00000000}; // Fix: Use initializer list for array initialization
+        uint8_t* pData = (uint8_t*)dummyData;
+        this->SAINBTransmit(pData, 1, 2000);
     }
 }
 

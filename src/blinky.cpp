@@ -205,7 +205,6 @@ void initGPIO() {
 
 int main(void) {
   HAL_Init();
-  SAIDriver newSAIDriver = SAIDriver();
   initGPIO();
 
   clocks_initialise();
@@ -218,6 +217,9 @@ int main(void) {
   codec.init();
 
   codec.configureBypass(BYPASS_DISABLE);
+
+  SAIDriver SAIADriver = SAIDriver(true);
+  SAIDriver SAIBDriver = SAIDriver(false);
 
   // uint8_t pData[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
   //                      0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
@@ -241,7 +243,7 @@ int main(void) {
 
   // Pass the data to the SAINBTransmit function
   while(1) {
-    newSAIDriver.SAINBTransmit(pData, 120, 50);
+    SAIBDriver.SAINBTransmit(pData, 120, 2000);
   }
 
 

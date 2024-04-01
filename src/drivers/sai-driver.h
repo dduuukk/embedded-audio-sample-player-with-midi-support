@@ -11,7 +11,7 @@
 class SAIDriver {
     // Declare any member variables or functions here
     public:
-        SAIDriver();
+        SAIDriver(bool useBlockA);
         ~SAIDriver();
 
         void SAINBTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout);
@@ -40,14 +40,15 @@ class SAIDriver {
         // };
         
         SAI_HandleTypeDef hsai = {};
+        bool useBlockA;
 };
 
 enum gpioPinValues {
-    SAI1_SA_A = GPIO_PIN_6,
+    SAI1_MCLK_A = GPIO_PIN_2, // SAI1_MCLK_A A2
     SAI1_SB_A = GPIO_PIN_3,
-    SAI1_FS_A = GPIO_PIN_4,
-    SAI1_SCK_A = GPIO_PIN_5,
-    SAI1_MCLK_A = GPIO_PIN_2
+    SAI1_FS_A = GPIO_PIN_4, // SAI1_SCK_A 
+    SAI1_SCK_A = GPIO_PIN_5, 
+    SAI1_SA_A = GPIO_PIN_6
 };
 
 void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai);
