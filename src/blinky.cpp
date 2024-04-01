@@ -14,16 +14,17 @@ const float sampleRate = 48000; // Sample rate in Hz (samples per second)
 const float duration = 1.0;     // Duration of the wave in seconds
 
 // Generate the sine wave
-std::vector<uint8_t> generateSineWave(float frequency, float amplitude, float sampleRate, float duration) {
-    std::vector<uint8_t> wave;
+std::vector<int32_t> generateSineWave(float frequency, float amplitude, float sampleRate, float duration) {
+    std::vector<int32_t> wave;
     const float twoPiF = 2.0 * M_PI * frequency;
     const int numSamples = static_cast<int>(duration * sampleRate);
     wave.reserve(numSamples);
     for (int i = 0; i < numSamples; ++i) {
         float t = i / sampleRate;
         float sample = amplitude * sin(twoPiF * t);
-        // Normalize to [0, 1] and scale to [0, 255]
-        wave.push_back(static_cast<uint8_t>((sample + 1.0f) / 2.0f * 255.0f));
+        // Normalize the sample from [-1,1] to [int32_min, int32_max]
+        wave.push_back(static_cast<int32_t>(sample * INT32_MAX));
+        wave.push_back(static_cast<int32_t>(sample * INT32_MAX));
     }
     return wave;
 }
@@ -183,18 +184,19 @@ int main(void) {
   // newSAIDriver.SAINBTransmit(pData, 16, 50);
   // newSAIDriver.SAINBTransmit(pData, 15, 50);
 
-  std::vector<uint8_t> wave = generateSineWave(frequency, amplitude, sampleRate, duration);
+  std::vector<int32_t> wave = generateSineWave(frequency, amplitude, sampleRate, duration);
   // Now 'wave' contains 32-bit samples of the 1-second long sine wave
 
   // Get a pointer to the data
-  uint8_t* pData = wave.data();
+  uint8_t* pData = reinterpret_cast<uint8_t*>(wave.data());
 
   // Calculate the number of samples
   int size = static_cast<int>(sampleRate * duration);
 
   // Pass the data to the SAINBTransmit function
-  newSAIDriver.SAINBTransmit(pData, size, 50);
-
+  while(1) {
+    newSAIDriver.SAINBTransmit(pData, size, 2000);
+  }
 
   while (1)
     ;
