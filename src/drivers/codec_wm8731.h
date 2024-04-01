@@ -5,9 +5,9 @@
 #include "stm32h7xx_hal.h"
 #include <stdint.h>
 
-//codec address options
-#define ADDR0 0b0011010
-#define ADDR1 0b0011011
+//codec address options (left-justified for the read/write bit)
+#define ADDR0 0b00110100
+#define ADDR1 0b00110110
 
 //register definitions (all are left justified to leave space for the one byte of data also sent with it)
 #define REG_LEFT_LINE_IN    0x00
