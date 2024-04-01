@@ -56,6 +56,7 @@ target_link_libraries(${TARGET}
         HAL::STM32::H7::M7::GPIO
         HAL::STM32::H7::M7::CORTEX
         HAL::STM32::H7::M7::SD
+        HAL::STM32::H7::M7::PWREx
         HAL::STM32::H7::M7::LL_SDMMC
         CMSIS::STM32::H750IB::M7
         STM32::NoSys
@@ -74,9 +75,9 @@ target_link_libraries(${TARGET}
 
 # Make gcc go brrrr
 Set(LINK_OPTIONS -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard --specs=nano.specs --specs=nosys.specs -Wl,-Map=${TARGET}.map,--cref -Wl,--gc-sections -Wl,--print-memory-usage -lc -lm -lnosys)
-Set(CFLAGS -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb  -O2 -Wall -Wno-missing-attributes -fasm -fdata-sections -ffunction-sections -Wno-stringop-overflow -g -ggdb -mthumb-interwork)
-Set(CPPFLAGS -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -O2 -Wall -Wno-missing-attributes -fasm -fdata-sections -ffunction-sections -Wno-stringop-overflow -g -ggdb -fno-exceptions -fasm -finline -finline-functions-called-once -fshort-enums -fno-move-loop-invariants -fno-unwind-tables -fno-rtti -Wno-register -mthumb-interwork)
-Set(ASM_FLAGS -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb  -O2  -Wall -fdata-sections -ffunction-sections -mthumb-interwork)
+Set(CFLAGS -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb  -O0 -Wall -Wno-missing-attributes -fasm -fdata-sections -ffunction-sections -Wno-stringop-overflow -g -ggdb -mthumb-interwork)
+Set(CPPFLAGS -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -O0 -Wall -Wno-missing-attributes -fasm -fdata-sections -ffunction-sections -Wno-stringop-overflow -g -ggdb -fno-exceptions -fasm -finline -finline-functions-called-once -fshort-enums -fno-move-loop-invariants -fno-unwind-tables -fno-rtti -Wno-register -mthumb-interwork)
+Set(ASM_FLAGS -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb  -O0  -Wall -fdata-sections -ffunction-sections -mthumb-interwork)
 
 target_link_options(${TARGET} INTERFACE ${LINK_OPTIONS})
 target_compile_options(${TARGET} PUBLIC
