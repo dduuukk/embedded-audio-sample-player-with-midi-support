@@ -3,6 +3,8 @@
 #include <stm32h7xx_hal.h>
 #include <cmath>
 
+#include "codec_wm8731.h"
+
 #define LED_PORT GPIOC
 #define LED_PIN GPIO_PIN_0
 #define LED_PORT_CLK_ENABLE __HAL_RCC_GPIOC_CLK_ENABLE
@@ -202,9 +204,16 @@ int main(void) {
   while(1) {
     newSAIDriver.SAINBTransmit(pData, size, 2000);
   }
+  WM8731 codec = WM8731();
+
+  codec.init();
+
+  codec.configureBypass(BYPASS_ENABLE);
 
   while (1)
-    ;
+  {
+    
+  }
   return 0;
 }
 

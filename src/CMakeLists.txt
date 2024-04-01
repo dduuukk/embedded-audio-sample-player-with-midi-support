@@ -58,6 +58,7 @@ target_link_libraries(${TARGET}
         HAL::STM32::H7::M7::SAI
         HAL::STM32::H7::M7::RCCEx
         HAL::STM32::H7::M7::DMA
+        HAL::STM32::H7::M7::I2C
         HAL::STM32::H7::M7::PWREx
         CMSIS::STM32::H750IB::M7
         STM32::NoSys
@@ -66,6 +67,7 @@ target_link_libraries(${TARGET}
         #FreeRTOS::ARM_CM4F
         #TODO your object libraries go here
         sai-driver
+        wm8731-driver
     )
 
 # TODO if you want a linker script
