@@ -73,7 +73,7 @@ void initDMA(SAI_HandleTypeDef* hsai) {
 
     // Perform all init operations
     // TODO: ADD 
-    hdma.Init.Request = DMA_REQUEST_SAI1_A; // Request a DMA with connection to SAI1_A
+    hdma.Init.Request = DMA_REQUEST_SAI1_B; // Request a DMA with connection to SAI1_A
     hdma.Init.Direction = DMA_MEMORY_TO_PERIPH; // TX from DMA to SAI (this will always be TX, even with other SAI blocks)
     hdma.Init.PeriphInc = DMA_PINC_DISABLE; // Peripheral increment disabled
     // Increment through data in the audio input buffer
@@ -161,20 +161,30 @@ extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai) {
         // Configure SAI pins
         initPins();
 
-        // // Enable DMA and sai interrupts
-        // HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
-        // HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+        
 
-        // // Enable DMA clocks
-        // // NOTE: NOT SURE THIS IS NECESSARY RIGHT NOW, WILL BE IN FUTURE
-        // __HAL_RCC_DMA1_CLK_ENABLE();
+        
+        
         // // Init DMA
-        // initDMA(hsai);
+
+        // check if hsai is block A or block B
+        if(hsai->Instance == SAI1_Block_B) {
+            // Enable DMA and sai interrupts
+            HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+
+            // Enable DMA clocks
+            // NOTE: NOT SURE THIS IS NECESSARY RIGHT NOW, WILL BE IN FUTURE
+            __HAL_RCC_DMA1_CLK_ENABLE();
+
+            // Init DMA
+            initDMA(hsai);
+        }
 
         // Enable SAI interrupts
         // TODO: CHECK IF THIS IS NECESSARY FOR THE FIRST ITERATION
-        // HAL_NVIC_SetPriority(SAI1_IRQn, 0, 0);
-        // HAL_NVIC_EnableIRQ(SAI1_IRQn);
+        HAL_NVIC_SetPriority(SAI1_IRQn, 0, 0);
+        HAL_NVIC_EnableIRQ(SAI1_IRQn);
 
         // Skipping DMA configuration for now
         // Otherwise, DMA configuration goes here
@@ -204,14 +214,14 @@ void SAIDriver::SAINBTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout) {
     // if(HAL_SAI_Transmit(&hsai, pData, Size, Timeout) != HAL_OK) {
     //     __asm__ __volatile__("bkpt #1");
     // }
-    // if(HAL_SAI_Transmit_DMA(&hsai, pData, Size) != HAL_OK) {
-    //     __asm__ __volatile__("bkpt #1");
-    // }
-
-    // Testing if DMA is causing the transmit issue
-    if(HAL_SAI_Transmit(&hsai, pData, Size, Timeout) != HAL_OK) {
-    __asm__ __volatile__("bkpt #1");
+    if(HAL_SAI_Transmit_DMA(&hsai, pData, Size) != HAL_OK) {
+        __asm__ __volatile__("bkpt #1");
     }
+
+    // // Testing if DMA is causing the transmit issue
+    // if(HAL_SAI_Transmit(&hsai, pData, Size, Timeout) != HAL_OK) {
+    // __asm__ __volatile__("bkpt #1");
+    // }
 }
 
 extern "C" void DMA1_Stream0_IRQHandler() {
