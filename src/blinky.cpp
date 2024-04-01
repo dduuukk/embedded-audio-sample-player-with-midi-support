@@ -10,11 +10,40 @@
 #define LED_PORT_CLK_ENABLE __HAL_RCC_GPIOC_CLK_ENABLE
 
 // Constants for the sine wave
-const float frequency = 440.0;  // Frequency in Hz
-const float amplitude = 1.0;    // Amplitude (max is 1.0)
-const float sampleRate = 48000; // Sample rate in Hz (samples per second)
-const float duration = 1.0;     // Duration of the wave in seconds
-const int maxSamples = static_cast<int>(sampleRate * duration) * 2;
+const int frequency = 800;  // Frequency in Hz
+const int amplitude = 2000000000;
+const int sampleRate = 48000; // Sample rate in Hz (samples per second)
+// const float duration = 1.0;     // Duration of the wave in seconds
+// const int maxSamples = static_cast<int>(sampleRate * duration) * 2;
+
+// Generate triangle wave
+void generateTriangleWave(int frequency, int amplitude, int sampleRate, int32_t* wave) {
+  const int numSamples = sampleRate / frequency;
+  const long long incrementL = (static_cast<long long>(2) * static_cast<long long>(amplitude)) / (static_cast<long long>(numSamples) / 2LL);
+  const int increment = static_cast<int>(incrementL);
+
+  int sample = 0;
+  for (int i = 0; i < numSamples / 2; ++i) {
+    wave[i] = sample;
+    wave[i + 1] = sample;
+    sample += increment;
+    i++;
+  }
+
+  for (int i = numSamples/2; i < 3 * numSamples / 2; ++i) {
+    wave[i] = sample;
+    wave[i+1] = sample;
+    sample -= increment;
+    i++;
+  }
+  
+  for (int i = 3 * numSamples / 2; i < numSamples * 2; ++i) {
+    wave[i] = sample;
+    wave[i + 1] = sample;
+    sample += increment;
+    i++;
+  }
+}
 
 // // Generate the sine wave
 // void generateSineWave(float frequency, float amplitude, float sampleRate, float duration, int32_t* wave) {
@@ -184,12 +213,22 @@ int main(void) {
   HAL_SYSTICK_Config(SystemCoreClock / 1000);
   HAL_InitTick(1UL << (__NVIC_PRIO_BITS - 1));
 
+  WM8731 codec = WM8731();
+
+  codec.init();
+
+  codec.configureBypass(BYPASS_DISABLE);
+
   // uint8_t pData[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
   //                      0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
   // newSAIDriver.SAINBTransmit(pData, 16, 50);
   // newSAIDriver.SAINBTransmit(pData, 15, 50);
 
-  int32_t wave[64] = { -1106268015, 1591043071, -952533937, -1866226849, 1066716749, -42586676, 526290252, -565786743, -1142983926, 1747077447, -1042276211, 1918090055, 1672949549, 1976652144, -1091578450, -9675609, 648468322, -764275322, -1367021099, -573190756, -366013572, -1115847640, -444068412, 415420984, 1353911877, -47818021, 2074751477, 1684291685, 290393192, -2129667148, 1266354118, 1081428467, 509312494, 1865871581, 1595255571, 966295610, -29112104, -37212590, -1720637641, 1364685060, 1091836073, -696286226, 1266966276, 679647088, 2083680565, -680043695, 1463560271, 490429320, 12635240, 1899115089, -394258867, -1976964618, -587376003, -1481591831, 1870749240, -1788886144, 1440269894, 1056436347, 1331704880, 1649230688, 2021819249, -631902196, -324384800, 375248534} ;
+  // Random wave
+  // int32_t wave[64] = { -1106268015, 1591043071, -952533937, -1866226849, 1066716749, -42586676, 526290252, -565786743, -1142983926, 1747077447, -1042276211, 1918090055, 1672949549, 1976652144, -1091578450, -9675609, 648468322, -764275322, -1367021099, -573190756, -366013572, -1115847640, -444068412, 415420984, 1353911877, -47818021, 2074751477, 1684291685, 290393192, -2129667148, 1266354118, 1081428467, 509312494, 1865871581, 1595255571, 966295610, -29112104, -37212590, -1720637641, 1364685060, 1091836073, -696286226, 1266966276, 679647088, 2083680565, -680043695, 1463560271, 490429320, 12635240, 1899115089, -394258867, -1976964618, -587376003, -1481591831, 1870749240, -1788886144, 1440269894, 1056436347, 1331704880, 1649230688, 2021819249, -631902196, -324384800, 375248534} ;
+  
+  // Triangle wave generated externally
+  int32_t wave[120] = {0, 0, 132800000, 132800000, 265600000, 265600000, 398400000, 398400000, 531200000, 531200000, 664000000, 664000000, 796800000, 796800000, 929600000, 929600000, 1062400000, 1062400000, 1195200000, 1195200000, 1328000000, 1328000000, 1460800000, 1460800000, 1593600000, 1593600000, 1726400000, 1726400000, 1859200000, 1859200000, 1992000000, 1992000000, 1859200000, 1859200000, 1726400000, 1726400000, 1593600000, 1593600000, 1460800000, 1460800000, 1328000000, 1328000000, 1195200000, 1195200000, 1062400000, 1062400000, 929600000, 929600000, 796800000, 796800000, 664000000, 664000000, 531200000, 531200000, 398400000, 398400000, 265600000, 265600000, 132800000, 132800000, 0, 0, -132800000, -132800000, -265600000, -265600000, -398400000, -398400000, -531200000, -531200000, -664000000, -664000000, -796800000, -796800000, -929600000, -929600000, -1062400000, -1062400000, -1195200000, -1195200000, -1328000000, -1328000000, -1460800000, -1460800000, -1593600000, -1593600000, -1726400000, -1726400000, -1859200000, -1859200000, -1992000000, -1992000000, -1859200000, -1859200000, -1726400000, -1726400000, -1593600000, -1593600000, -1460800000, -1460800000, -1328000000, -1328000000, -1195200000, -1195200000, -1062400000, -1062400000, -929600000, -929600000, -796800000, -796800000, -664000000, -664000000, -531200000, -531200000, -398400000, -398400000, -265600000, -265600000, -132800000, -132800000};
   // generateSineWave(frequency, amplitude, sampleRate, duration, wave);
   uint8_t* pData = reinterpret_cast<uint8_t*>(wave);
 
@@ -198,17 +237,13 @@ int main(void) {
   // uint8_t* pData = reinterpret_cast<uint8_t*>(wave);
 
   // Calculate the number of samples
-  int size = static_cast<int>(sampleRate * duration);
+  // int size = static_cast<int>(sampleRate * duration);
 
   // Pass the data to the SAINBTransmit function
   while(1) {
-    newSAIDriver.SAINBTransmit(pData, 64, 2000);
+    newSAIDriver.SAINBTransmit(pData, 120, 50);
   }
-  WM8731 codec = WM8731();
 
-  codec.init();
-
-  codec.configureBypass(BYPASS_ENABLE);
 
   while (1)
   {
