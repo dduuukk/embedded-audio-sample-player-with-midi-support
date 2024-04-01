@@ -1,7 +1,7 @@
 #include "sai-driver.h"
+#include <cstdint>
 #include <stm32h7xx_hal.h>
 #include <cmath>
-#include <vector>
 
 #define LED_PORT GPIOC
 #define LED_PIN GPIO_PIN_0
@@ -12,21 +12,24 @@ const float frequency = 440.0;  // Frequency in Hz
 const float amplitude = 1.0;    // Amplitude (max is 1.0)
 const float sampleRate = 48000; // Sample rate in Hz (samples per second)
 const float duration = 1.0;     // Duration of the wave in seconds
+const int maxSamples = static_cast<int>(sampleRate * duration) * 2;
 
 // Generate the sine wave
-std::vector<int32_t> generateSineWave(float frequency, float amplitude, float sampleRate, float duration) {
-    std::vector<int32_t> wave;
+void generateSineWave(float frequency, float amplitude, float sampleRate, float duration, int32_t* wave) {
     const float twoPiF = 2.0 * M_PI * frequency;
     const int numSamples = static_cast<int>(duration * sampleRate);
-    wave.reserve(numSamples);
-    for (int i = 0; i < numSamples; ++i) {
-        float t = i / sampleRate;
-        float sample = amplitude * sin(twoPiF * t);
-        // Normalize the sample from [-1,1] to [int32_min, int32_max]
-        wave.push_back(static_cast<int32_t>(sample * INT32_MAX));
-        wave.push_back(static_cast<int32_t>(sample * INT32_MAX));
+    if(numSamples > maxSamples) {
+      // Error: too many samples
+      return;
     }
-    return wave;
+    for (int i = 0; i < numSamples; ++i) {
+      float t = i / sampleRate;
+      float sample = amplitude * sin(twoPiF * t);
+      // Normalize the sample from [-1,1] to [int32_min, int32_max]
+      wave[i] = static_cast<int32_t>(sample * INT32_MAX);
+      wave[i+1] = wave[i];
+      i += 1;
+    }
 }
 
 void clocks_initialise(void) {
@@ -184,11 +187,13 @@ int main(void) {
   // newSAIDriver.SAINBTransmit(pData, 16, 50);
   // newSAIDriver.SAINBTransmit(pData, 15, 50);
 
-  std::vector<int32_t> wave = generateSineWave(frequency, amplitude, sampleRate, duration);
-  // Now 'wave' contains 32-bit samples of the 1-second long sine wave
+  int32_t wave[maxSamples];
+  generateSineWave(frequency, amplitude, sampleRate, duration, wave);
+
+
 
   // Get a pointer to the data
-  uint8_t* pData = reinterpret_cast<uint8_t*>(wave.data());
+  uint8_t* pData = reinterpret_cast<uint8_t*>(wave);
 
   // Calculate the number of samples
   int size = static_cast<int>(sampleRate * duration);
