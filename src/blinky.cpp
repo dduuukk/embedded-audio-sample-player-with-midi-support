@@ -55,12 +55,12 @@ int main(void) {
 
   codec.init();
 
-  codec.registerWrite(
-      REG_ANALOG_ROUTING,
-    MIC_MUTE_ENABLE | ADC_SEL_LINE_INPUT | SELECT_DAC | BYPASS_EN); // same config as the init, but enables the analog bypass
+  codec.configureBypass(BYPASS_ENABLE);
 
   while (1)
-    ;
+  {
+    
+  }
   return 0;
 }
 
