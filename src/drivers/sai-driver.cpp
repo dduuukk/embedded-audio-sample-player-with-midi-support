@@ -63,8 +63,8 @@ void initDMA(SAI_HandleTypeDef* hsai) {
     // Increment through data in the audio input buffer
     // Set up the DMA to take and output audio words
     hdma.Init.MemInc = DMA_MINC_ENABLE; // Memory increment enabled
-    hdma.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD; // Peripheral data alignment is word
-    hdma.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD; // Memory data alignment is word
+    hdma.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD; // Peripheral data alignment is word
+    hdma.Init.MemDataAlignment = DMA_MDATAALIGN_WORD; // Memory data alignment is word
     hdma.Init.Mode = DMA_CIRCULAR; // Circular mode (emulate FIFO with more control)
     hdma.Init.Priority = DMA_PRIORITY_HIGH; // High priority
     // Enable built in 8 word FIFO (pre-circular buffer)
@@ -88,19 +88,14 @@ void deInitDMA(SAI_HandleTypeDef* hsai) {
 
 // Clock source init
 void initClk() {
-    // Enable all possible necessary clocks possible for daisy
-    // Enable SAI interface clocks
-    __HAL_RCC_SAI1_CLK_ENABLE();
-
-    // Enable DMA clocks
-    // NOTE: NOT SURE THIS IS NECESSARY RIGHT NOW, WILL BE IN FUTURE
-    __HAL_RCC_DMA1_CLK_ENABLE();
-
     // Enable clocks for SAI GPIOs
     // TODO: DEPENDING ON WHERE WE INPUT/OUTPUT FOR TESTING CHANGE THIS
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOE_CLK_ENABLE();
     __HAL_RCC_GPIOG_CLK_ENABLE();
+    // Enable all possible necessary clocks possible for daisy
+    // Enable SAI interface clocks
+    __HAL_RCC_SAI1_CLK_ENABLE();
 }
 
 // SAI pins init
@@ -115,8 +110,9 @@ void initPins() {
     // Configure SAI pins as alternate function pull-up.
     GPIO_Config.Mode = GPIO_MODE_AF_PP;
     GPIO_Config.Pull = GPIO_PULLUP;
-    GPIO_Config.Speed = GPIO_SPEED_FREQ_HIGH; // TODO: CHECK OVER SPEEDS, SEE IF MEDIUM IS OK
+    GPIO_Config.Speed = GPIO_SPEED_FREQ_MEDIUM; // TODO: CHECK OVER SPEEDS, SEE IF MEDIUM IS OK
     GPIO_Config.Alternate = GPIO_AF6_SAI1;
+    
     HAL_GPIO_Init(GPIOE, &GPIO_Config);
 }
 
@@ -134,6 +130,9 @@ extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai) {
         HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
         HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
 
+        // Enable DMA clocks
+        // NOTE: NOT SURE THIS IS NECESSARY RIGHT NOW, WILL BE IN FUTURE
+        __HAL_RCC_DMA1_CLK_ENABLE();
         // Init DMA
         initDMA(hsai);
 
