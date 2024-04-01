@@ -68,7 +68,7 @@ WM8731::WM8731()
     analogRouting_Config = MIC_MUTE_ENABLE | ADC_SEL_LINE_INPUT | SELECT_DAC;
     digitalRouting_Config = NO_DEEMP;
     powerDownCtrl_Config = MIC_IN_PWR_DOWN | OSC_PWR_DOWN | CLKOUT_PWR_DOWN;
-    digitalFormat_Config = FORMAT_I2S;
+    digitalFormat_Config = FORMAT_I2S | INPUT_32BITS;
     samplingCtrl_Config = SAMPLE_MODE_NORM | BOSR_NORM | ADC_48k_DAC_48k;
     
     //I2C initialization
