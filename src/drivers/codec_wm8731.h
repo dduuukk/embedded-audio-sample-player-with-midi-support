@@ -76,7 +76,7 @@
 #define INPUT_16BITS        0x00
 #define INPUT_20BITS        0x04
 #define INPUT_24BITS        0x08
-#define INPUT_32BITS        0x0B
+#define INPUT_32BITS        0x0C
 #define LRP_EN              0x10
 #define LRSWAP_EN           0x20
 #define SLAVE_MODE_EN       0x00
