@@ -17,17 +17,19 @@ SAIDriver::SAIDriver(bool useBlockA) {
     if(this->useBlockA) {
         hsai.Instance = SAI1_Block_A;
         hsai.Init.AudioMode = SAI_MODEMASTER_TX;
+    hsai.Init.Synchro = SAI_ASYNCHRONOUS; // Master mode should be asynchronous
+
     } else {
         hsai.Instance = SAI1_Block_B;
         hsai.Init.AudioMode = SAI_MODESLAVE_TX;
+    hsai.Init.Synchro = SAI_SYNCHRONOUS; // Master mode should be asynchronous
+
     }
 
     // Set up HSAI configurations such as protocol and such
     // hsai->Init.request = SAI_BLOCKA_REQUEST_ENABLE;
     // hsai->Init.direction = SAI_DIR_TX;
-    
 
-    hsai.Init.Synchro = SAI_ASYNCHRONOUS; // Master mode should be asynchronous
     hsai.Init.SynchroExt = SAI_SYNCEXT_DISABLE;
 
     // TODO: CHECK IF NOT DEFINING MCKOUTPUT IS OK
