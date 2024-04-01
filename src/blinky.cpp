@@ -10,7 +10,7 @@
 // Constants for the sine wave
 const float frequency = 440.0;  // Frequency in Hz
 const float amplitude = 1.0;    // Amplitude (max is 1.0)
-const float sampleRate = 44100; // Sample rate in Hz (samples per second)
+const float sampleRate = 48000; // Sample rate in Hz (samples per second)
 const float duration = 1.0;     // Duration of the wave in seconds
 
 // Generate the sine wave
