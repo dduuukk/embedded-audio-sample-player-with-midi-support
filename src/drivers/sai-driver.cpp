@@ -102,17 +102,36 @@ void initClk() {
 void initPins() {
     GPIO_InitTypeDef GPIO_Config;
     // Initialize pins for SAI1
-    GPIO_Config.Pin = gpioPinValues::SAI1_FS_A |
-                      gpioPinValues::SAI1_MCLK_A |
-                      gpioPinValues::SAI1_SCK_A |
-                      gpioPinValues::SAI1_SA_A |
-                      gpioPinValues::SAI1_SB_A;
+    // GPIO_Config.Pin = gpioPinValues::SAI1_FS_A |
+    //                   gpioPinValues::SAI1_MCLK_A |
+    //                   gpioPinValues::SAI1_SCK_A |
+    //                   gpioPinValues::SAI1_SA_A |
+    //                   gpioPinValues::SAI1_SB_A;
     // Configure SAI pins as alternate function pull-up.
     GPIO_Config.Mode = GPIO_MODE_AF_PP;
     GPIO_Config.Pull = GPIO_PULLUP;
     GPIO_Config.Speed = GPIO_SPEED_FREQ_MEDIUM; // TODO: CHECK OVER SPEEDS, SEE IF MEDIUM IS OK
     GPIO_Config.Alternate = GPIO_AF6_SAI1;
     
+    // HAL_GPIO_Init(GPIOE, &GPIO_Config);
+    // Initialize pin for SAI1_FS_A
+    GPIO_Config.Pin = gpioPinValues::SAI1_FS_A;
+    HAL_GPIO_Init(GPIOE, &GPIO_Config);
+
+    // Initialize pin for SAI1_MCLK_A
+    GPIO_Config.Pin = gpioPinValues::SAI1_MCLK_A;
+    HAL_GPIO_Init(GPIOE, &GPIO_Config);
+
+    // Initialize pin for SAI1_SCK_A
+    GPIO_Config.Pin = gpioPinValues::SAI1_SCK_A;
+    HAL_GPIO_Init(GPIOE, &GPIO_Config);
+
+    // Initialize pin for SAI1_SA_A
+    GPIO_Config.Pin = gpioPinValues::SAI1_SA_A;
+    HAL_GPIO_Init(GPIOE, &GPIO_Config);
+
+    // Initialize pin for SAI1_SB_A
+    GPIO_Config.Pin = gpioPinValues::SAI1_SB_A;
     HAL_GPIO_Init(GPIOE, &GPIO_Config);
 }
 
