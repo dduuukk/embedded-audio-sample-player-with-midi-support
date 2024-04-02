@@ -15,6 +15,7 @@ class SAIDriver {
         ~SAIDriver();
 
         void SAINBTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout);
+        void SAINATransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout);
   
         void clocks_initialise(void);
         void initGPIO(void);

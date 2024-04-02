@@ -64,7 +64,7 @@ SAIDriver::SAIDriver(bool useBlockA) {
         // This is necessary to start the clock
         uint32_t dummyData[1] = {0x00000000}; // Fix: Use initializer list for array initialization
         uint8_t* pData = (uint8_t*)dummyData;
-        this->SAINBTransmit(pData, 1, 2000);
+        this->SAINATransmit(pData, 1, 2000);
     }
 }
 
@@ -170,18 +170,18 @@ extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai) {
         // // Init DMA
 
         // check if hsai is block A or block B
-        // if(hsai->Instance == SAI1_Block_B) {
-        //     // Enable DMA and sai interrupts
-        //     HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
-        //     HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+        if(hsai->Instance == SAI1_Block_B) {
+            // Enable DMA and sai interrupts
+            HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
 
-        //     // Enable DMA clocks
-        //     // NOTE: NOT SURE THIS IS NECESSARY RIGHT NOW, WILL BE IN FUTURE
-        //     __HAL_RCC_DMA1_CLK_ENABLE();
+            // Enable DMA clocks
+            // NOTE: NOT SURE THIS IS NECESSARY RIGHT NOW, WILL BE IN FUTURE
+            __HAL_RCC_DMA1_CLK_ENABLE();
 
-        //     // Init DMA
-        //     initDMA(hsai);
-        // }
+            // Init DMA
+            initDMA(hsai);
+        }
 
         // // Enable SAI interrupts
         // // TODO: CHECK IF THIS IS NECESSARY FOR THE FIRST ITERATION
@@ -220,7 +220,13 @@ void SAIDriver::SAINBTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout) {
     //     __asm__ __volatile__("bkpt #1");
     // }
 
-    // Testing if DMA is causing the transmit issue
+    // // Testing if DMA is causing the transmit issue
+    if(HAL_SAI_Transmit(&hsai, pData, Size, Timeout) != HAL_OK) {
+    __asm__ __volatile__("bkpt #1");
+    }
+}
+
+void SAIDriver::SAINATransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout) {
     if(HAL_SAI_Transmit(&hsai, pData, Size, Timeout) != HAL_OK) {
     __asm__ __volatile__("bkpt #1");
     }
