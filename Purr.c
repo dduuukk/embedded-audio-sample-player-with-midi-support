@@ -72,7 +72,7 @@ void read_wave(FILE* fp, struct wave_header* dest)
 //are the destination and file valid?
   if (!dest || !fp)
     {
-      return -ENOENT;
+      //return -ENOENT;
     }
 
   rewind(fp); //Resets the file pointer
@@ -80,8 +80,9 @@ void read_wave(FILE* fp, struct wave_header* dest)
   struct stat st;
   fstat(fileno(fp), &st);
   if(!(S_ISREG(st.st_mode) && st.st_size > 44))
-    return -1;
-
+  {
+    //return -1;
+  }
 
   //read header
   int x = 0;
@@ -109,7 +110,7 @@ void read_wave(FILE* fp, struct wave_header* dest)
 
 
   x=fseek(fp, 24, SEEK_SET);
-  x=fread(&(dest->SampleRate), sizeof(uint32_t), 1, fp); //SAMPLE RATEEEEEEEEEEEEEEEEEEEE
+  x=fread(&(dest->sampleRate), sizeof(uint32_t), 1, fp); //SAMPLE RATEEEEEEEEEEEEEEEEEEEE
   x=fseek(fp, 28, SEEK_SET);
   x=fread(&(dest->byteRate), sizeof(uint32_t), 1, fp);
 
@@ -129,7 +130,7 @@ void read_wave(FILE* fp, struct wave_header* dest)
 
   //printf("Expected file size: %d, Actual file size: %ld\n", (dest->chunkSize + 8), st.st_size);
 
-  return !((dest->chunkSize + 8) == st.st_size);
+  //return !((dest->chunkSize + 8) == st.st_size);
 }
 
 
@@ -145,28 +146,64 @@ int validate_wave(struct wave_header* wavHeader)
 
 // verify that this is a RIFF file header
   if((wavHeader->chunkID != (0x46464952)))
-    return -1;
+  {
+
+        //return -1;
+
+  }
   //verify that this is WAVE file
   if(wavHeader->format != (0x45564157))
-    return -1;
+  {
+
+        //return -1;
+
+  }
 
  
 
-
-
-
-
-
-
-
-
-
-
-
-
-    return 0;
+    //return 0;
 }
 
+
+
+
+
+
+
+
+
+// calculate buffer size for audio data depending on stereo or mono
+int8_t  buffSize(struct wave_header* wavHeader)
+{
+
+
+  int8_t totalSamples = wavHeader->sampleRate;
+  int8_t bytesPerSample = wavHeader->bitsPerSample / 8;
+  int8_t bufferSize = totalSamples * wavHeader->numChannels * bytesPerSample;
+
+
+
+  int8_t buf[(bytesPerSample) * wavHeader->numChannels];
+
+  int8_t lbuf[(bytesPerSample)];
+  int8_t rbuf[(bytesPerSample)];
+  int8_t lrbuf[(bytesPerSample)];
+
+
+  if(wavHeader->numChannels == 2) //Seperate into two different buffers for left and right, for 2-channel audio
+    {
+
+      return lrbuf[(bytesPerSample)];
+
+    }
+    else
+    {
+       return  buf[(bytesPerSample) * wavHeader->numChannels];//For the left channel and the right channel
+    }
+
+
+  return bufferSize;
+}
 
 
 
@@ -180,7 +217,7 @@ void handleStereoMono(struct wave_header* wavHeader)
 {
 
 
-
+  
 
 
 
@@ -191,17 +228,17 @@ void handleStereoMono(struct wave_header* wavHeader)
     if (wavHeader->numChannels == 1) //means one audio channel
     {
         //printf("Mono\n");
-        return 0;
+       // return 0;
     } 
     else if (wavHeader->numChannels == 2) //left and right audio channel
     {
        // printf("Stereo\n");
-       return 0;
+       //return 0;
     } 
     else 
     {
         //printf("Error\n");
-        return -1;
+        //return -1;
     }
 
     
