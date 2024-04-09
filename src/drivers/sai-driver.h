@@ -7,41 +7,37 @@
 #include <stm32h7xx_hal_dma.h>
 #include <stm32h7xx_hal_sai.h>
 
-// Define your class or struct here
 class SAIDriver {
-    // Declare any member variables or functions here
     public:
-        SAIDriver(bool useBlockA);
+        enum class BitDepth {
+            BIT_DEPTH_8,
+            BIT_DEPTH_16,
+            BIT_DEPTH_24,
+            BIT_DEPTH_32
+        };
+
+        enum class SampleRate {
+            SAMPLE_RATE_8K,
+            SAMPLE_RATE_16K,
+            SAMPLE_RATE_32K,
+            SAMPLE_RATE_48K,
+            SAMPLE_RATE_96K
+        };
+
+        SAIDriver(bool stereo = true, BitDepth bitDepth = BitDepth::BIT_DEPTH_32, SampleRate sampleRate = SampleRate::SAMPLE_RATE_48K);
         ~SAIDriver();
 
-        void SAINBTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout);
-        void SAINATransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout);
-  
-        void clocks_initialise(void);
-        void initGPIO(void);
-        
+        void txTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout);
 
     private:
-        // GPIO Pin values accoring to the daisy documentation
-        
+        SAI_HandleTypeDef hsaiA = {};
+        SAI_HandleTypeDef hsaiB = {};
+        // bool useBlockA;
+        volatile bool dmaQueueFull = true;
 
-        
-        // RCC_ClkInitTypeDef rccClkInstance = {
-        //     .ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK |
-        //                 RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2,
-        //     .SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK,
-        //     .AHBCLKDivider = RCC_SYSCLK_DIV1,
-        //     .APB1CLKDivider = RCC_HCLK_DIV1,
-        //     .APB2CLKDivider = RCC_HCLK_DIV1,
-        // };
-        // RCC_OscInitTypeDef clock_setup = {
-        //     .OscillatorType = RCC_OSCILLATORTYPE_HSE,
-        //     .HSEState = RCC_CR_HSEON,
-        //     .PLL = {.PLLState = RCC_PLL_ON, .PLLSource = RCC_PLLSOURCE_HSE}
-        // };
-        
-        SAI_HandleTypeDef hsai = {};
-        bool useBlockA;
+        // Private member functions
+        void genericHSAISetup(SAI_HandleTypeDef* hsai);
+        void SAINATransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout);
 };
 
 enum gpioPinValues {
@@ -54,10 +50,8 @@ enum gpioPinValues {
 
 void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai);
 void initPins();
-void initClk();
+void initClks();
 void initDMA(SAI_HandleTypeDef* hsai, DMA_HandleTypeDef* hdma);
 void deInitDMA(SAI_HandleTypeDef* hsai);
-
-// Declare any member variables or functions here
 
 #endif // SAI_DRIVER_H
