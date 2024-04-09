@@ -273,6 +273,16 @@ extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai) {
     }
 }
 
+
+/**
+ * @brief Transmits data to DMA which then transmits SAI to codec.
+ * 
+ * This function transmits the provided data over SAI using DMA. It waits for the DMA transfer to complete before returning.
+ * 
+ * @param pData Pointer to the data buffer.
+ * @param Size Size of the data buffer in bytes.
+ * @param Timeout Timeout value in milliseconds.
+ */
 void SAIDriver::txTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout) {
     // Transmit data over SAI
     // if(HAL_SAI_Transmit(&hsai, pData, Size, Timeout) != HAL_OK) {
@@ -283,26 +293,42 @@ void SAIDriver::txTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout) {
     // }
 
     // // Testing if DMA is causing the transmit issue
-    if(HAL_SAI_Transmit(&hsaiB, pData, Size, Timeout) != HAL_OK) {
-    __asm__ __volatile__("bkpt #2");
-    }
-
-    // while(HAL_SAI_Transmit_DMA(&hsaiB, pData, Size) == HAL_BUSY) {
-    //     // Wait for the DMA to finish
-    //     HAL_Delay(100);
+    // if(HAL_SAI_Transmit(&hsaiB, pData, Size, Timeout) != HAL_OK) {
+    // __asm__ __volatile__("bkpt #2");
     // }
+
+    while(HAL_SAI_Transmit_DMA(&hsaiB, pData, Size) == HAL_BUSY) {
+        // Wait for the DMA to finish
+        HAL_Delay(100);
+    }
 
 //     if(status == HAL_BUSY) {
 //         this->dmaQueueFull = true;
 //     }
 }
 
+/**
+ * @brief Transmits data through the SAI peripheral.
+ * 
+ * This function transmits the specified data directly through the SAI peripheral.
+ * 
+ * @param pData Pointer to the data buffer.
+ * @param Size Size of the data buffer in bytes.
+ * @param Timeout Timeout duration in milliseconds.
+ */
 void SAIDriver::SAINATransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout) {
     if(HAL_SAI_Transmit(&hsaiA, pData, Size, Timeout) != HAL_OK) {
     __asm__ __volatile__("bkpt #3");
     }
 }
 
+/**
+ * @brief DMA1 Stream0 interrupt handler.
+ *
+ * This function is the interrupt handler for DMA1 Stream0. It is called when the DMA transfer
+ * associated with Stream0 completes or encounters an error. In this function, the HAL_DMA_IRQHandler
+ * function is called to handle the interrupt.
+ */
 extern "C" void DMA1_Stream0_IRQHandler() {
     HAL_DMA_IRQHandler(&hdma);
 }
