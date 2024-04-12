@@ -105,8 +105,8 @@ int validate_wave(struct wave_header *wavHeader)
    *                                  0x0B for 32-bits
    * */
 
-  void configureInputDataLength(wavHeader->bitsPerSample);
-  void configureSampleRate(wavHeader->sampleRate);
+  configureInputDataLength(wavHeader->bitsPerSample);
+  configureSampleRate(wavHeader->sampleRate);
 
   /*
 
@@ -137,7 +137,7 @@ int validate_wave(struct wave_header *wavHeader)
 
   */
 
-  // return 0;
+  return 0;
 }
 
 uint8_t index = 0;
