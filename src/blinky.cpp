@@ -164,6 +164,24 @@ int main(void) {
   
   FatFsIntf fs = FatFsIntf();
 
+
+  /*
+  call wave parser using f open n shi
+  lab 6
+  call sainb transmit to pass though array w data
+  file sys goes in , data goes out to fifo, put data from struct into array
+  pass through bit depth and sample rate 
+  
+  
+  */
+
+
+
+
+
+
+
+
   while (1)
   {
     

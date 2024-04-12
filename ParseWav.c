@@ -45,7 +45,7 @@ void read_wave(FILE *fp, struct wave_header *dest)
   // read header
   int x = 0;
   x = fseek(fp, 0, SEEK_SET);
-  x = fread(&(dest->chunkID), sizeof(uint32_t), 1, fp);
+  x = f_read(&(dest->chunkID), sizeof(uint32_t), 1, fp);
 
   x = fseek(fp, 4, SEEK_SET);
   x = fread(&(dest->chunkSize), sizeof(uint32_t), 1, fp);
@@ -107,8 +107,64 @@ int validate_wave(struct wave_header *wavHeader)
     // return -1;
   }
 
+
+
+
+/*
+call codec. configure sample rate and pass in the sample rate
+
+codec.configure bitdepth pass in bit depth 
+
+*/
+
+
+
   // return 0;
 }
+
+
+
+/*
+void write_word(int32_t word)
+{
+  //int x = system("echo \"hello\">/dev/echo0");
+  fwrite(&word, sizeof(word), 1, fp2);
+  //;
+}
+for write word
+asking you to make array of 32 qudio words an you will fill that array with 32 audio words than call transmit
+instead of sending it one by one
+bby calling transmit ti will send it to chsis fifi
+
+
+
+from buff stays same
+
+
+
+play wave samples stays ame
+
+
+
+
+main is same basiclly just no pcm and to i2s
+
+
+
+
+
+
+
+
+
+*/
+
+
+
+
+
+
+
 
 
 // calculate buffer size for audio data depending on stereo or mono
