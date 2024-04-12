@@ -40,7 +40,7 @@ int validate_wave(struct wave_header* wavHeader);
 void write_word(int32_t word);
 
 uint32_t audio_word_from_buf(struct wave_header wavHeader, int8_t* buf);
-int8_t play_wave_samples(FIL *fp, struct wave_header *wavHeader, int sample_count, unsigned int start)
+int8_t play_wave_samples(FIL *fp, struct wave_header *wavHeader, int sample_count, unsigned int start);
 
 void handleStereoMono(struct wave_header* wavHeader);
 
