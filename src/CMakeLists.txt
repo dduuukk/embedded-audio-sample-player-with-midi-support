@@ -59,6 +59,8 @@ target_link_libraries(${TARGET}
         HAL::STM32::H7::M7::PWREx
         HAL::STM32::H7::M7::LL_SDMMC
         HAL::STM32::H7::M7::LL_DELAYBLOCK
+        HAL::STM32::H7::M7::I2C
+        HAL::STM32::H7::M7::PWREx
         CMSIS::STM32::H750IB::M7
         STM32::NoSys
         #FreeRTOS::Timers
@@ -68,6 +70,7 @@ target_link_libraries(${TARGET}
         fatfs-interface-driver
         fatfs
         sdmmc-driver
+        wm8731-driver
     )
 
 # TODO if you want a linker script
