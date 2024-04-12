@@ -48,39 +48,39 @@ void read_wave(FILE *fp, struct wave_header *dest)
   x = f_read(&(dest->chunkID), sizeof(uint32_t), 1, fp);
 
   x = fseek(fp, 4, SEEK_SET);
-  x = fread(&(dest->chunkSize), sizeof(uint32_t), 1, fp);
+  x = f_read(&(dest->chunkSize), sizeof(uint32_t), 1, fp);
 
   x = fseek(fp, 8, SEEK_SET);
-  x = fread(&(dest->format), sizeof(uint32_t), 1, fp);
+  x = f_read(&(dest->format), sizeof(uint32_t), 1, fp);
 
   x = fseek(fp, 12, SEEK_SET);
-  x = fread(&(dest->subchunk1ID), sizeof(uint32_t), 1, fp);
+  x = f_read(&(dest->subchunk1ID), sizeof(uint32_t), 1, fp);
 
   x = fseek(fp, 16, SEEK_SET);
-  x = fread(&(dest->subchunk1Size), sizeof(uint32_t), 1, fp);
+  x = f_read(&(dest->subchunk1Size), sizeof(uint32_t), 1, fp);
 
   x = fseek(fp, 20, SEEK_SET);
-  x = fread(&(dest->audioFormat), sizeof(uint16_t), 1, fp);
+  x = f_read(&(dest->audioFormat), sizeof(uint16_t), 1, fp);
 
   x = fseek(fp, 22, SEEK_SET);
-  x = fread(&(dest->numChannels), sizeof(uint16_t), 1, fp);
+  x = f_read(&(dest->numChannels), sizeof(uint16_t), 1, fp);
 
   x = fseek(fp, 24, SEEK_SET);
-  x = fread(&(dest->sampleRate), sizeof(uint32_t), 1, fp); // SAMPLE RATEEEEEEEEEEEEEEEEEEEE for CC
+  x = f_read(&(dest->sampleRate), sizeof(uint32_t), 1, fp); // SAMPLE RATEEEEEEEEEEEEEEEEEEEE for CC
   x = fseek(fp, 28, SEEK_SET);
-  x = fread(&(dest->byteRate), sizeof(uint32_t), 1, fp);
+  x = f_read(&(dest->byteRate), sizeof(uint32_t), 1, fp);
 
   x = fseek(fp, 32, SEEK_SET);
-  x = fread(&(dest->blockAlign), sizeof(uint16_t), 1, fp);
+  x = f_read(&(dest->blockAlign), sizeof(uint16_t), 1, fp);
 
   x = fseek(fp, 34, SEEK_SET);
-  x = fread(&(dest->bitsPerSample), sizeof(uint16_t), 1, fp); // BIT DEPTHHHHHHHHHHHHHHH for CC
+  x = f_read(&(dest->bitsPerSample), sizeof(uint16_t), 1, fp); // BIT DEPTHHHHHHHHHHHHHHH for CC
 
   x = fseek(fp, 36, SEEK_SET);
-  x = fread(&(dest->subchunk2ID), sizeof(uint32_t), 1, fp);
+  x = f_read(&(dest->subchunk2ID), sizeof(uint32_t), 1, fp);
 
   x = fseek(fp, 40, SEEK_SET);
-  x = fread(&(dest->subchunk2Size), sizeof(uint32_t), 1, fp);
+  x = f_read(&(dest->subchunk2Size), sizeof(uint32_t), 1, fp);
 
   // printf("Expected file size: %d, Actual file size: %ld\n", (dest->chunkSize + 8), st.st_size);
 
@@ -107,10 +107,40 @@ int validate_wave(struct wave_header *wavHeader)
     // return -1;
   }
 
-
+/*
+    * @param length Input data length, 0x00 for 16-bits, 
+    *                                  0x04 for 20-bits,
+    *                                  0x08 for 24-bits,
+    *                                  0x0B for 32-bits
+    * */
+    
+    void configureInputDataLength(wavHeader->bitsPerSample);
+    void configureSampleRate(wavHeader->sampleRate);
 
 
 /*
+
+
+    * @param length Input data length, 0x00 for 16-bits, 
+    *                                  0x04 for 20-bits,
+    *                                  0x08 for 24-bits,
+    *                                  0x0B for 32-bits
+    
+    void configureInputDataLength(uint8_t length);
+
+    /**
+    * Quick configuration of the codec sample rate
+    *
+    * Allows for quick configuration of the sample rate for the codec's DAC and ADC. 
+    * Input parameter can be plain hex or the defined macros. Refer to the datasheet 
+    * for detailed information about setting the sample rates. Function only writes
+    * to the bits specific to the bypass mode.
+    *
+    * @param sampleRate Sample rate mode of the DAC and ADC
+    
+    void configureSampleRate(uint8_t sampleRate);
+
+
 call codec. configure sample rate and pass in the sample rate
 
 codec.configure bitdepth pass in bit depth 
@@ -119,8 +149,43 @@ codec.configure bitdepth pass in bit depth
 
 
 
+
+
+
+
   // return 0;
 }
+
+
+#define index 0
+
+void write_word(int32_t word)
+{
+  int32_t fifussy[32]; //32 words in fifo then i will throw it to chris
+
+  fifussy[index] = word;
+
+  index++
+
+
+  if (sizeof(fifussy) >= 32)
+  {
+
+    f_write(words, sizeof(int32_t), sizeof(fifussy), fp2);
+
+    for (int i = 0; i < 32; i++) 
+    {
+        fifussy[i] = 0; 
+    }
+
+    
+
+  }
+
+
+
+}
+
 
 
 
@@ -134,6 +199,8 @@ void write_word(int32_t word)
 for write word
 asking you to make array of 32 qudio words an you will fill that array with 32 audio words than call transmit
 instead of sending it one by one
+
+
 bby calling transmit ti will send it to chsis fifi
 
 
@@ -248,13 +315,32 @@ void list_wave(struct wave_header* wavHeader)
 }
 */
 
-/* From Chris  */
-void fifo()
-{
-}
+
 
 int main(int argc, char **argv)
 {
 
   FILE *fp; // From Noah
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
