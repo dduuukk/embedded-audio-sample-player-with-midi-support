@@ -47,5 +47,8 @@ void read_wave(FILE* fp, struct wave_header* dest);
 int validate_wave(struct wave_header* wavHeader);
 int8_t buffSize(struct wave_header* wavHeader);
 void handleStereoMono(struct wave_header* wavHeader);
+uint32_t audio_word_from_buf(struct wave_header wavHeader, int8_t* buf);
+void write_word(int32_t word);
+
 
 #endif /* WAVE_H */

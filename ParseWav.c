@@ -107,87 +107,69 @@ int validate_wave(struct wave_header *wavHeader)
     // return -1;
   }
 
-/*
-    * @param length Input data length, 0x00 for 16-bits, 
-    *                                  0x04 for 20-bits,
-    *                                  0x08 for 24-bits,
-    *                                  0x0B for 32-bits
-    * */
-    
-    void configureInputDataLength(wavHeader->bitsPerSample);
-    void configureSampleRate(wavHeader->sampleRate);
+  /*
+   * @param length Input data length, 0x00 for 16-bits,
+   *                                  0x04 for 20-bits,
+   *                                  0x08 for 24-bits,
+   *                                  0x0B for 32-bits
+   * */
+
+  void configureInputDataLength(wavHeader->bitsPerSample);
+  void configureSampleRate(wavHeader->sampleRate);
+
+  /*
 
 
-/*
+      * @param length Input data length, 0x00 for 16-bits,
+      *                                  0x04 for 20-bits,
+      *                                  0x08 for 24-bits,
+      *                                  0x0B for 32-bits
+
+      void configureInputDataLength(uint8_t length);
+
+      /**
+      * Quick configuration of the codec sample rate
+      *
+      * Allows for quick configuration of the sample rate for the codec's DAC and ADC.
+      * Input parameter can be plain hex or the defined macros. Refer to the datasheet
+      * for detailed information about setting the sample rates. Function only writes
+      * to the bits specific to the bypass mode.
+      *
+      * @param sampleRate Sample rate mode of the DAC and ADC
+
+      void configureSampleRate(uint8_t sampleRate);
 
 
-    * @param length Input data length, 0x00 for 16-bits, 
-    *                                  0x04 for 20-bits,
-    *                                  0x08 for 24-bits,
-    *                                  0x0B for 32-bits
-    
-    void configureInputDataLength(uint8_t length);
+  call codec. configure sample rate and pass in the sample rate
 
-    /**
-    * Quick configuration of the codec sample rate
-    *
-    * Allows for quick configuration of the sample rate for the codec's DAC and ADC. 
-    * Input parameter can be plain hex or the defined macros. Refer to the datasheet 
-    * for detailed information about setting the sample rates. Function only writes
-    * to the bits specific to the bypass mode.
-    *
-    * @param sampleRate Sample rate mode of the DAC and ADC
-    
-    void configureSampleRate(uint8_t sampleRate);
+  codec.configure bitdepth pass in bit depth
 
-
-call codec. configure sample rate and pass in the sample rate
-
-codec.configure bitdepth pass in bit depth 
-
-*/
-
-
-
-
-
-
+  */
 
   // return 0;
 }
-
 
 #define index 0
 
 void write_word(int32_t word)
 {
-  int32_t fifussy[32]; //32 words in fifo then i will throw it to chris
+  int32_t fifussy[32]; // 32 words in fifo then i will throw it to chris
 
   fifussy[index] = word;
 
   index++
 
-
-  if (sizeof(fifussy) >= 32)
+      if (sizeof(fifussy) >= 32)
   {
 
     f_write(words, sizeof(int32_t), sizeof(fifussy), fp2);
 
-    for (int i = 0; i < 32; i++) 
+    for (int i = 0; i < 32; i++)
     {
-        fifussy[i] = 0; 
+      fifussy[i] = 0;
     }
-
-    
-
   }
-
-
-
 }
-
-
-
 
 /*
 void write_word(int32_t word)
@@ -203,40 +185,42 @@ instead of sending it one by one
 
 bby calling transmit ti will send it to chsis fifi
 
-
-
-from buff stays same
-
-
-
-play wave samples stays ame
-
-
-
-
-main is same basiclly just no pcm and to i2s
-
-
-
-
-
-
-
-
-
 */
 
+/* @brief Build a 32-bit audio word from a buffer
+   @param hdr WAVE header
+   @param buf a byte array
+   @return 32-bit word */
+uint32_t audio_word_from_buf(struct wave_header wavHeader, int8_t *buf)
+{
+  // build word depending on bits per sample, etc
+  uint32_t audio_word = 0;
 
+  for (int i = 0; i < hdr.bitsPerSample / 8; i++)
+  {
 
+    audio_word |= (uint32_t)((buf[i] + 127) << (8 * ((24 / hdr.bitsPerSample - 1) - i)));
+  }
 
-
-
-
-
+  return audio_word << 8;
+}
 
 // calculate buffer size for audio data depending on stereo or mono
-int8_t buffSize(struct wave_header *wavHeader)
+int8_t play_wave_samples(FILE *fp, struct wave_header *wavHeader, int sample_count, unsigned int start)
 {
+
+  if (!fp)
+  {
+    return -EINVAL;
+  }
+
+  if (hdr.numChannels != 1 && hdr.numChannels != 2)
+  {
+
+    return -EINVAL;
+  }
+
+  int x = fseek(fp, 44 + start, SEEK_SET);
 
   int8_t totalSamples = wavHeader->sampleRate;
   int8_t bytesPerSample = wavHeader->bitsPerSample / 8;
@@ -246,20 +230,53 @@ int8_t buffSize(struct wave_header *wavHeader)
 
   int8_t lbuf[(bytesPerSample)];
   int8_t rbuf[(bytesPerSample)];
-  int8_t lrbuf[(bytesPerSample)];
 
-  if (wavHeader->numChannels == 2) // Seperate into two different buffers for left and right, for 2-channel audio
+  while (sample_count > 0)
   {
-    // mono
-    return lrbuf[(bytesPerSample)];
-  }
-  else // stereo
-  {
-    return buf[(bytesPerSample)*wavHeader->numChannels]; // For the left channel and the right channel
+
+    x = fread(buf, sizeof(int8_t), ((bytesPerSample)) * wavHeader->numChannels, fp);
+
+    if (wavHeader->numChannels == 2) // Seperate into two different buffers for left and right, for 2-channel audio
+    {
+      // mono
+
+      for (int i = 0; i < (bytesPerSample)*wavHeader->numChannels; i += 2)
+      {
+        lbuf[i] = buf[i];
+        rbuf[i] = buf[i + 1];
+      }
+
+      write_word(audio_word_from_buf(wavHeader, lbuf));
+      write_word(audio_word_from_buf(wavHeader, rbuf));
+      sample_count -= 1;
+
+      return lrbuf[(bytesPerSample)];
+    }
+    else // stereo
+    {
+
+      write_word(audio_word_from_buf(wavHeader, buf)); // For the left channel
+      write_word(audio_word_from_buf(wavHeader, buf)); // For the right channel
+
+      sample_count -= 1;
+      i += 2;
+
+      // return buf[(bytesPerSample)*wavHeader->numChannels]; // For the left channel and the right channel
+    }
   }
 
-  return bufferSize;
+  return 0;
 }
+
+/*
+
+from buff stays same
+
+
+
+play wave samples stays ame
+
+*/
 
 /*
 Handle Stereo and Mono Format
@@ -315,7 +332,12 @@ void list_wave(struct wave_header* wavHeader)
 }
 */
 
+/*
 
+main is same basiclly just no pcm and to i2s
+
+
+*/
 
 int main(int argc, char **argv)
 {
@@ -326,21 +348,5 @@ int main(int argc, char **argv)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  
 }
