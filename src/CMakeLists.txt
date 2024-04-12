@@ -114,12 +114,9 @@ add_compile_options(
     )
 
 # TODO add_subdirectory(folder-name) goes here for all folders!
-<<<<<<< HEAD
 add_subdirectory(wav-parser)
-=======
 add_subdirectory(drivers)
 add_subdirectory(FatFS)
->>>>>>> 220deb9537eca9c719989399cb9bae91ee12bff7
 
 add_library(core-conf 
     INTERFACE

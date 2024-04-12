@@ -1,9 +1,9 @@
 #include "fatfs.h"
 #include <stm32h7xx_hal.h>
 
-
-#include "ParseWav.h"
 #include "codec_wm8731.h"
+#include "ff.h"
+#include "wav-parser.h"
 
 #define LED_PORT GPIOC
 #define LED_PIN GPIO_PIN_0
@@ -163,68 +163,45 @@ int main(void) {
   codec.init();
 
   codec.configureBypass(BYPASS_ENABLE);
-  
-  FatFsIntf fs = FatFsIntf();
 
+  FatFsIntf fsIntf = FatFsIntf();
+
+  FIL *fp;
 
   wave_header parse = wave_header();
-  FILE *fp = f_open(fs, "my_wav.wav",FA_OPEN_EXISTING|FA_READ);
-
-
+  f_open(fp, "my_wav.wav", FA_OPEN_EXISTING | FA_READ);
 
   struct wave_header wavHeader;
 
   unsigned int sample_rate;
 
-
-// read file header
-  if(read_wave_header(fp, &wave_header.wavHeader) != 0)
-  {
+  // read file header
+  if (read_wave_header(fp, wavHeader) != 0) {
     return -1;
   }
 
   // parse file header, verify that is wave
-  if(validate_wave(&wave_header.waveHeader) != 0)
-  {
+  if (validate_wave(&wavHeader) != 0) {
     return -1;
   }
 
-
- 
-
   // TODO play sound (from pre-lab 5a)
   play_wave_samples(fp, wavHeader, -1, 0);
-  
 
   f_close(fp);
-  
-
-
-
-
-
 
   /*
   call wave parser using f open n shi
   lab 6
 
 
-  
 
-  
-  
+
+
+
   */
 
-
-
-
-
-
-
-
-  while (1)
-  {
-    
+  while (1) {
   }
   return 0;
 }

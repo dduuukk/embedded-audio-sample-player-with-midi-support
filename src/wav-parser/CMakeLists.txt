@@ -9,6 +9,11 @@ INTERFACE
 
 target_link_libraries(wav-parser-intf
 INTERFACE
+fatfs-intf
+fatfs-driver-intf
+wm8731-driver-intf
+hal-intf
+core-conf
 )
 
 add_library(wav-parser
