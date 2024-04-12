@@ -4,7 +4,6 @@
 #include "stm32h7xx_hal.h"
 #include <stdint.h>
 
-
 /** @addtogroup utility
     @{
     */
@@ -48,7 +47,7 @@ typedef struct {
 #define SD_TRANSFER_BUSY ((uint8_t)0x01)         /**< & */
 #define SD_PRESENT ((uint8_t)0x01)               /**< & */
 #define SD_NOT_PRESENT ((uint8_t)0x00)           /**< & */
-#define SD_DATATIMEOUT ((uint32_t)100000000)     /**< & */
+#define SD_DATATIMEOUT ((uint32_t)100000000000)  /**< & */
 
 // Functions internal for diskIO
 uint8_t BSP_SD_Init(void);     /**< \return card state, ERROR, etc.*/

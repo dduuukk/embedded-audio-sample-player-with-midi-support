@@ -58,6 +58,7 @@ target_link_libraries(${TARGET}
         HAL::STM32::H7::M7::SD
         HAL::STM32::H7::M7::PWREx
         HAL::STM32::H7::M7::LL_SDMMC
+        HAL::STM32::H7::M7::LL_DELAYBLOCK
         CMSIS::STM32::H750IB::M7
         STM32::NoSys
         #FreeRTOS::Timers
