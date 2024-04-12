@@ -1,3 +1,4 @@
+#include "fatfs.h"
 #include <stm32h7xx_hal.h>
 
 #include "codec_wm8731.h"
@@ -160,6 +161,8 @@ int main(void) {
   codec.init();
 
   codec.configureBypass(BYPASS_ENABLE);
+  
+  FatFsIntf fs = FatFsIntf();
 
   while (1)
   {
