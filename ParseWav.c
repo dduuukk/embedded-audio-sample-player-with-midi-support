@@ -43,53 +43,47 @@ void read_wave(FILE *fp, struct wave_header *dest)
     // return -ENOENT;
   }
 
-  rewind(fp); // Resets the file pointer
 
-  struct stat st;
-  fstat(fileno(fp), &st);
-  if (!(S_ISREG(st.st_mode) && st.st_size > 44))
-  {
-    // return -1;
-  }
+  
 
   // read header
   int x = 0;
-  x = fseek(fp, 0, SEEK_SET);
+  x = f_seek(fp, 0, SEEK_SET);
   x = f_read(&(dest->chunkID), sizeof(uint32_t), 1, fp);
 
-  x = fseek(fp, 4, SEEK_SET);
+  x = f_seek(fp, 4, SEEK_SET);
   x = f_read(&(dest->chunkSize), sizeof(uint32_t), 1, fp);
 
-  x = fseek(fp, 8, SEEK_SET);
+  x = f_seek(fp, 8, SEEK_SET);
   x = f_read(&(dest->format), sizeof(uint32_t), 1, fp);
 
-  x = fseek(fp, 12, SEEK_SET);
+  x = f_seek(fp, 12, SEEK_SET);
   x = f_read(&(dest->subchunk1ID), sizeof(uint32_t), 1, fp);
 
-  x = fseek(fp, 16, SEEK_SET);
+  x = f_seek(fp, 16, SEEK_SET);
   x = f_read(&(dest->subchunk1Size), sizeof(uint32_t), 1, fp);
 
-  x = fseek(fp, 20, SEEK_SET);
+  x = f_seek(fp, 20, SEEK_SET);
   x = f_read(&(dest->audioFormat), sizeof(uint16_t), 1, fp);
 
-  x = fseek(fp, 22, SEEK_SET);
+  x = f_seek(fp, 22, SEEK_SET);
   x = f_read(&(dest->numChannels), sizeof(uint16_t), 1, fp);
 
-  x = fseek(fp, 24, SEEK_SET);
+  x = f_seek(fp, 24, SEEK_SET);
   x = f_read(&(dest->sampleRate), sizeof(uint32_t), 1, fp); // SAMPLE RATEEEEEEEEEEEEEEEEEEEE for CC
-  x = fseek(fp, 28, SEEK_SET);
+  x = f_seek(fp, 28, SEEK_SET);
   x = f_read(&(dest->byteRate), sizeof(uint32_t), 1, fp);
 
-  x = fseek(fp, 32, SEEK_SET);
+  x = f_seek(fp, 32, SEEK_SET);
   x = f_read(&(dest->blockAlign), sizeof(uint16_t), 1, fp);
 
-  x = fseek(fp, 34, SEEK_SET);
+  x = f_seek(fp, 34, SEEK_SET);
   x = f_read(&(dest->bitsPerSample), sizeof(uint16_t), 1, fp); // BIT DEPTHHHHHHHHHHHHHHH for CC
 
-  x = fseek(fp, 36, SEEK_SET);
+  x = f_seek(fp, 36, SEEK_SET);
   x = f_read(&(dest->subchunk2ID), sizeof(uint32_t), 1, fp);
 
-  x = fseek(fp, 40, SEEK_SET);
+  x = f_seek(fp, 40, SEEK_SET);
   x = f_read(&(dest->subchunk2Size), sizeof(uint32_t), 1, fp);
 
   // printf("Expected file size: %d, Actual file size: %ld\n", (dest->chunkSize + 8), st.st_size);
@@ -161,24 +155,30 @@ int validate_wave(struct wave_header *wavHeader)
 
 #define index 0
 
-void write_word(int32_t word)
+void write_word(uint32_t word)
 {
-  int32_t fifussy[32]; // 32 words in fifo then i will throw it to chris
+  uint32_t fifussy[32]; // 32 words in fifo then i will throw it to chris
 
   fifussy[index] = word;
 
+
+  if (index >= 32)
+  {
+/*
+  call sainb transmit to pass though array w data
+  file sys goes in , data goes out to fifo, put data from struct into array
+  pass through bit depth and sample rate 
+  
+  */
+
+    SAIBDriver.SAINBTransmit(fifussy, sizeof(uint32_t)*32, 2000);
+
+
+    index = 0;
+  }
+
   index++
 
-      if (sizeof(fifussy) >= 32)
-  {
-
-    f_write(words, sizeof(int32_t), sizeof(fifussy), fp2);
-
-    for (int i = 0; i < 32; i++)
-    {
-      fifussy[i] = 0;
-    }
-  }
 }
 
 /*
@@ -224,17 +224,16 @@ int8_t play_wave_samples(FILE *fp, struct wave_header *wavHeader, int sample_cou
     return -EINVAL;
   }
 
-  if (hdr.numChannels != 1 && hdr.numChannels != 2)
+  if (wavHeader->numChannels != 1 && wavHeader->numChannels != 2)
   {
 
     return -EINVAL;
   }
 
-  int x = fseek(fp, 44 + start, SEEK_SET);
+  int x = f_seek(fp, 44 + start, SEEK_SET);
 
   int8_t totalSamples = wavHeader->sampleRate;
   int8_t bytesPerSample = wavHeader->bitsPerSample / 8;
-  int8_t bufferSize = totalSamples * wavHeader->numChannels * bytesPerSample;
 
   int8_t buf[(bytesPerSample)*wavHeader->numChannels];
 
@@ -244,7 +243,7 @@ int8_t play_wave_samples(FILE *fp, struct wave_header *wavHeader, int sample_cou
   while (sample_count > 0)
   {
 
-    x = fread(buf, sizeof(int8_t), ((bytesPerSample)) * wavHeader->numChannels, fp);
+    x = f_read(buf, sizeof(int8_t), ((bytesPerSample)) * wavHeader->numChannels, fp);
 
     if (wavHeader->numChannels == 2) // Seperate into two different buffers for left and right, for 2-channel audio
     {
@@ -343,77 +342,3 @@ void list_wave(struct wave_header* wavHeader)
 */
 
 
-
-/*
-
-main is same basiclly just no pcm and to i2s
-
-
-*/
-
-int main(int argc, char **argv)
-{
-
-
-  int err;
-
-  FILE *fp; // From Noah
-
-
-  struct wave_header wavHeader;
-
-  unsigned int sample_rate;
-
-    if (argc < 2)
-    {
-      // fail, print usage
-      pr_usage(argv[0]);
-      return 1;
-    }
-  
-  
-  // open file
-  fp = fopen(argv[1], "r");
-
-
-
-// read file header
-  if(read_wave_header(fp, &wavHeader) != 0)
-  {
-    printf("Error: Incorrect File Format\n");
-    return -1;
-  }
-
-  // parse file header, verify that is wave
-  if(parse_wave_header(wavHeader) != 0)
-  {
-    printf("Error: Incorrect WAV format\n");
-    return -1;
-  }
-
-
- 
-
-  // TODO play sound (from pre-lab 5a)
-  play_wave_samples(fp, wavHeader, -1, 0);
-  
-
-  fclose(fp);
-  
-
-
-  return 0;
-
-
-
-
-
-
-
-
-
-
-
-
-
-}

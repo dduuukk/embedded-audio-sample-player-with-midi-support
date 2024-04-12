@@ -1,6 +1,8 @@
 #include "fatfs.h"
 #include <stm32h7xx_hal.h>
 
+
+#include "ParseWav.h"
 #include "codec_wm8731.h"
 
 #define LED_PORT GPIOC
@@ -165,12 +167,50 @@ int main(void) {
   FatFsIntf fs = FatFsIntf();
 
 
+  wave_header parse = wave_header();
+  FILE *fp = f_open(fs, "my_wav.wav",FA_OPEN_EXISTING|FA_READ);
+
+
+
+  struct wave_header wavHeader;
+
+  unsigned int sample_rate;
+
+
+// read file header
+  if(read_wave_header(fp, &wave_header.wavHeader) != 0)
+  {
+    return -1;
+  }
+
+  // parse file header, verify that is wave
+  if(validate_wave(&wave_header.waveHeader) != 0)
+  {
+    return -1;
+  }
+
+
+ 
+
+  // TODO play sound (from pre-lab 5a)
+  play_wave_samples(fp, wavHeader, -1, 0);
+  
+
+  f_close(fp);
+  
+
+
+
+
+
+
   /*
   call wave parser using f open n shi
   lab 6
-  call sainb transmit to pass though array w data
-  file sys goes in , data goes out to fifo, put data from struct into array
-  pass through bit depth and sample rate 
+
+
+  
+
   
   
   */
