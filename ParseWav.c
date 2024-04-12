@@ -1,4 +1,4 @@
-#include "wave.h"
+#include "ParseWav.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +17,16 @@
 #include <libzed/mmap_regs.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+
+
+void pr_usage(char* pname)
+{
+  //printf("usage: %s WAV_FILE\n", pname);
+}
+
+
+
+
 
 /*
 reads the file and puts correcct information into the struct
@@ -332,6 +342,8 @@ void list_wave(struct wave_header* wavHeader)
 }
 */
 
+
+
 /*
 
 main is same basiclly just no pcm and to i2s
@@ -342,11 +354,66 @@ main is same basiclly just no pcm and to i2s
 int main(int argc, char **argv)
 {
 
+
+  int err;
+
   FILE *fp; // From Noah
 
 
+  struct wave_header wavHeader;
 
+  unsigned int sample_rate;
 
-
+    if (argc < 2)
+    {
+      // fail, print usage
+      pr_usage(argv[0]);
+      return 1;
+    }
   
+  
+  // open file
+  fp = fopen(argv[1], "r");
+
+
+
+// read file header
+  if(read_wave_header(fp, &wavHeader) != 0)
+  {
+    printf("Error: Incorrect File Format\n");
+    return -1;
+  }
+
+  // parse file header, verify that is wave
+  if(parse_wave_header(wavHeader) != 0)
+  {
+    printf("Error: Incorrect WAV format\n");
+    return -1;
+  }
+
+
+ 
+
+  // TODO play sound (from pre-lab 5a)
+  play_wave_samples(fp, wavHeader, -1, 0);
+  
+
+  fclose(fp);
+  
+
+
+  return 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

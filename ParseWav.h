@@ -49,6 +49,7 @@ int8_t buffSize(struct wave_header* wavHeader);
 void handleStereoMono(struct wave_header* wavHeader);
 uint32_t audio_word_from_buf(struct wave_header wavHeader, int8_t* buf);
 void write_word(int32_t word);
+void pr_usage(char* pname)
 
 
 #endif /* WAVE_H */
