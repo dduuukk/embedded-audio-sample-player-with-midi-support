@@ -32,13 +32,17 @@ struct wave_header
                           // is the number of bytes in the data.  4
 };
 
-void read_wave(FIL* fp, struct wave_header* dest);
-int validate_wave(struct wave_header* wavHeader);
-int8_t buffSize(struct wave_header* wavHeader);
-void handleStereoMono(struct wave_header* wavHeader);
-uint32_t audio_word_from_buf(struct wave_header wavHeader, int8_t* buf);
-void write_word(int32_t word);
+
 void pr_usage(char* pname);
+void read_wave(FIL* fp, struct wave_header* dest);
+
+int validate_wave(struct wave_header* wavHeader);
+void write_word(int32_t word);
+
+uint32_t audio_word_from_buf(struct wave_header wavHeader, int8_t* buf);
+int8_t play_wave_samples(FIL *fp, struct wave_header *wavHeader, int sample_count, unsigned int start)
+
+void handleStereoMono(struct wave_header* wavHeader);
 
 
 #endif /* WAVE_H */

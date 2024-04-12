@@ -176,7 +176,7 @@ int main(void) {
   unsigned int sample_rate;
 
   // read file header
-  if (read_wave_header(fp, wavHeader) != 0) {
+  if (read_wave(fp, wavHeader) != 0) {
     return -1;
   }
 
