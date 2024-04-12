@@ -52,8 +52,15 @@ add_executable(${TARGET} blinky.cpp stm32h7xx_hal_conf.h)
 
 target_link_libraries(${TARGET}
         HAL::STM32::H7::M7::RCC
+        HAL::STM32::H7::M7::RCCEx
         HAL::STM32::H7::M7::GPIO
         HAL::STM32::H7::M7::CORTEX
+        HAL::STM32::H7::M7::SD
+        HAL::STM32::H7::M7::PWREx
+        HAL::STM32::H7::M7::LL_SDMMC
+        HAL::STM32::H7::M7::LL_DELAYBLOCK
+        HAL::STM32::H7::M7::I2C
+        HAL::STM32::H7::M7::PWREx
         CMSIS::STM32::H750IB::M7
         STM32::NoSys
         #FreeRTOS::Timers
@@ -61,6 +68,10 @@ target_link_libraries(${TARGET}
         #FreeRTOS::ARM_CM4F
         #TODO your object libraries go here
         wav-parser
+        fatfs-interface-driver
+        fatfs
+        sdmmc-driver
+        wm8731-driver
     )
 
 # TODO if you want a linker script
@@ -69,9 +80,9 @@ target_link_libraries(${TARGET}
 
 # Make gcc go brrrr
 Set(LINK_OPTIONS -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard --specs=nano.specs --specs=nosys.specs -Wl,-Map=${TARGET}.map,--cref -Wl,--gc-sections -Wl,--print-memory-usage -lc -lm -lnosys)
-Set(CFLAGS -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb  -O2 -Wall -Wno-missing-attributes -fasm -fdata-sections -ffunction-sections -Wno-stringop-overflow -g -ggdb -mthumb-interwork)
-Set(CPPFLAGS -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -O2 -Wall -Wno-missing-attributes -fasm -fdata-sections -ffunction-sections -Wno-stringop-overflow -g -ggdb -fno-exceptions -fasm -finline -finline-functions-called-once -fshort-enums -fno-move-loop-invariants -fno-unwind-tables -fno-rtti -Wno-register -mthumb-interwork)
-Set(ASM_FLAGS -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb  -O2  -Wall -fdata-sections -ffunction-sections -mthumb-interwork)
+Set(CFLAGS -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb  -O0 -Wall -Wno-missing-attributes -fasm -fdata-sections -ffunction-sections -Wno-stringop-overflow -g -ggdb -mthumb-interwork)
+Set(CPPFLAGS -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -O0 -Wall -Wno-missing-attributes -fasm -fdata-sections -ffunction-sections -Wno-stringop-overflow -g -ggdb -fno-exceptions -fasm -finline -finline-functions-called-once -fshort-enums -fno-move-loop-invariants -fno-unwind-tables -fno-rtti -Wno-register -mthumb-interwork)
+Set(ASM_FLAGS -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb  -O0  -Wall -fdata-sections -ffunction-sections -mthumb-interwork)
 
 target_link_options(${TARGET} INTERFACE ${LINK_OPTIONS})
 target_compile_options(${TARGET} PUBLIC
@@ -103,7 +114,12 @@ add_compile_options(
     )
 
 # TODO add_subdirectory(folder-name) goes here for all folders!
+<<<<<<< HEAD
 add_subdirectory(wav-parser)
+=======
+add_subdirectory(drivers)
+add_subdirectory(FatFS)
+>>>>>>> 220deb9537eca9c719989399cb9bae91ee12bff7
 
 add_library(core-conf 
     INTERFACE
