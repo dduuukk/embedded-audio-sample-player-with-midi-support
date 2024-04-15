@@ -237,8 +237,6 @@ int32_t wave[120] = {
     -664000000,  -664000000,  -531200000,  -531200000,  -398400000,
     -398400000,  -265600000,  -265600000,  -132800000,  -132800000};
 
-
-
 int main(void) {
   HAL_Init();
   initGPIO();
@@ -259,7 +257,7 @@ int main(void) {
                                      SAIDriver::SampleRate::SAMPLE_RATE_48K);
 
   // generateSineWave(frequency, amplitude, sampleRate, duration, wave);
-  uint8_t *pData = reinterpret_cast<uint8_t *>(wavCopy);
+  uint8_t *pData = reinterpret_cast<uint8_t *>(wave);
 
   // Get a pointer to the data
   // uint8_t* pData = reinterpret_cast<uint8_t*>(wave);
