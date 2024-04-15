@@ -81,3 +81,47 @@ target_link_libraries(wm8731-driver
     core-conf
     hal-intf
     )
+
+add_library(midi-handler-intf
+    INTERFACE
+    )
+
+target_include_directories(midi-handler-intf
+    INTERFACE
+    .
+    )
+
+target_link_libraries(midi-handler-intf
+    INTERFACE
+    hal-intf
+    core-conf
+    circular-buffer-intf
+    )
+
+add_library(midi-parser-intf
+    INTERFACE
+    )
+
+target_include_directories(midi-parser-intf
+    INTERFACE
+    .
+    )
+
+target_link_libraries(midi-parser-intf
+    INTERFACE
+    hal-intf
+    circular-buffer-intf
+    )
+
+add_library(midi-parser
+    OBJECT
+    MIDI_parser.cpp
+    )
+
+target_link_libraries(midi-parser
+    PUBLIC
+    midi-parser-intf
+    PRIVATE
+    core-conf
+    hal-intf
+    )
