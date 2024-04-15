@@ -5,7 +5,6 @@
 #include "sdmmc-driver.h"
 #include <cstdint>
 
-uint8_t FATFS_BUFFER_MEM_SECTION buff[512];
 FATFS FATFS_BUFFER_MEM_SECTION mfs;
 
 FatFsIntf::FatFsIntf() : sd() {
@@ -56,17 +55,6 @@ FatFsIntf::FatFsIntf() : sd() {
 
   default:
     break;
-  }
-
-  FIL fp;
-
-  UINT bRead;
-
-  if (f_open(&fp, "my_wav.wav", FA_READ | FA_OPEN_EXISTING) != FR_OK) {
-    __asm__ __volatile__("bkpt #0");
-  }
-  if (f_read(&fp, buff, 512, &bRead) != FR_OK) {
-    __asm__ __volatile__("bkpt #0");
   }
 }
 

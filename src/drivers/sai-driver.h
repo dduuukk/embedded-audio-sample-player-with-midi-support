@@ -28,7 +28,7 @@ class SAIDriver {
         SAIDriver(bool stereo = true, BitDepth bitDepth = BitDepth::BIT_DEPTH_32, SampleRate sampleRate = SampleRate::SAMPLE_RATE_48K);
         ~SAIDriver();
 
-        int txTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout);
+        int txTransmit(uint8_t* pData, uint32_t Size, uint32_t Timeout);
 
         // static bool dmaQueueFull;
 

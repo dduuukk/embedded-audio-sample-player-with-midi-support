@@ -1,16 +1,17 @@
 #include "fatfs.h"
+#include "ff.h"
 #include "sai-driver.h"
-#include <cmath>
 #include <cstdint>
-#include <cstring>
 #include <stm32h7xx_hal.h>
 
 #include "codec_wm8731.h"
-#include "stm32h7xx_hal_conf.h"
 
 #define LED_PORT GPIOC
 #define LED_PIN GPIO_PIN_0
 #define LED_PORT_CLK_ENABLE __HAL_RCC_GPIOC_CLK_ENABLE
+
+// The buffer to read samples into
+uint8_t FATFS_BUFFER_MEM_SECTION buff[163840];
 
 // Constants for the sine wave
 const int frequency = 800; // Frequency in Hz
@@ -266,13 +267,26 @@ int main(void) {
   // int size = static_cast<int>(sampleRate * duration);
 
   // Pass the data to the SAINBTransmit function
-  while (1) {
-    newSaiDriver.txTransmit(pData, 120, 2000);
-  }
+  // while (1) {
+  //   newSaiDriver.txTransmit(pData, 120, 2000);
+  // }
 
   FatFsIntf fs = FatFsIntf();
 
+  FIL fp;
+
+  UINT bRead;
+
+  if (f_open(&fp, "my_wav.wav", FA_READ | FA_OPEN_EXISTING) != FR_OK) {
+    __asm__ __volatile__("bkpt #0");
+  }
   while (1) {
+    while (f_size(&fp) > 0) {
+      if (f_read(&fp, buff, 163840, &bRead) != FR_OK) {
+        __asm__ __volatile__("bkpt #0");
+      }
+      newSaiDriver.txTransmit(buff, 163840, 2000);
+    }
   }
   return 0;
 }

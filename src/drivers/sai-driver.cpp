@@ -2,15 +2,10 @@
 #include "Legacy/stm32_hal_legacy.h"
 #include "stm32h750xx.h"
 #include "stm32h7xx_hal.h"
-#include "stm32h7xx_hal_cortex.h"
-#include "stm32h7xx_hal_def.h"
-#include "stm32h7xx_hal_dma.h"
-#include "stm32h7xx_hal_gpio.h"
-#include "stm32h7xx_hal_sai.h"
 #include <cstdint>
 
 DMA_HandleTypeDef hdma;
-uint8_t DMA_BUFFER_MEM_SECTION dmaRamBuffer[1024];
+uint8_t DMA_BUFFER_MEM_SECTION dmaRamBuffer[163840];
 
 /**
  * @brief Constructs a new SAIDriver object.
@@ -299,7 +294,7 @@ extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef *hsai) {
  * @param Timeout Timeout value in milliseconds.
  * @return 0 if transmit successful, 1 if DMA queue is full.
  */
-int SAIDriver::txTransmit(uint8_t *pData, uint16_t Size, uint32_t Timeout) { 
+int SAIDriver::txTransmit(uint8_t *pData, uint32_t Size, uint32_t Timeout) {
   // Block transmission while the DMA is transferring
   while (hsaiB.hdmatx->State == HAL_DMA_STATE_BUSY) {
     // Polling block
@@ -307,10 +302,11 @@ int SAIDriver::txTransmit(uint8_t *pData, uint16_t Size, uint32_t Timeout) {
   }
 
   // Copy the data to the DMA buffer in RAM
-  memcpy(dmaRamBuffer, pData, 1024 * sizeof(uint8_t));
+  memcpy(dmaRamBuffer, pData, 163840);
 
   // Transmit data through DMA to SAI
-  if (HAL_SAI_Transmit(&hsaiB, dmaRamBuffer, Size, Timeout) != HAL_OK) {
+  if (HAL_SAI_Transmit(&hsaiB, dmaRamBuffer, Size / sizeof(uint32_t),
+                       Timeout) != HAL_OK) {
     __asm__ __volatile__("bkpt #0");
     return 1;
   }
