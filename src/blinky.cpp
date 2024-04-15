@@ -1,5 +1,6 @@
 #include "sai-driver.h"
 #include <cstdint>
+#include "fatfs.h"
 #include <stm32h7xx_hal.h>
 #include <cmath>
 
@@ -239,9 +240,9 @@ int main(void) {
   }
 
 
-  while (1)
-  {
-    
+  FatFsIntf fs = FatFsIntf();
+
+  while (1) {
   }
   return 0;
 }

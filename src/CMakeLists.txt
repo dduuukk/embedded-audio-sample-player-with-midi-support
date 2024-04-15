@@ -58,6 +58,10 @@ target_link_libraries(${TARGET}
         HAL::STM32::H7::M7::SAI
         HAL::STM32::H7::M7::RCCEx
         HAL::STM32::H7::M7::DMA
+        HAL::STM32::H7::M7::SD
+        HAL::STM32::H7::M7::PWREx
+        HAL::STM32::H7::M7::LL_SDMMC
+        HAL::STM32::H7::M7::LL_DELAYBLOCK
         HAL::STM32::H7::M7::I2C
         HAL::STM32::H7::M7::PWREx
         CMSIS::STM32::H750IB::M7
@@ -67,11 +71,14 @@ target_link_libraries(${TARGET}
         #FreeRTOS::ARM_CM4F
         #TODO your object libraries go here
         sai-driver
+        fatfs-interface-driver
+        fatfs
+        sdmmc-driver
         wm8731-driver
     )
 
 # TODO if you want a linker script
-# stm32_add_linker_script(${TARGET} PUBLIC deps/libDaisy/core/STM32H750IB_flash.lds)
+stm32_add_linker_script(${TARGET} PUBLIC STM32H750IB_sram.lds)
 
 
 # Make gcc go brrrr
@@ -111,6 +118,7 @@ add_compile_options(
 
 # TODO add_subdirectory(folder-name) goes here for all folders!
 add_subdirectory(drivers)
+add_subdirectory(FatFS)
 
 add_library(core-conf 
     INTERFACE
