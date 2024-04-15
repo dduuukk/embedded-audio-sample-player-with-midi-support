@@ -161,12 +161,10 @@ int main(void) {
   codec.init();
 
   codec.configureBypass(BYPASS_ENABLE);
-  
+
   FatFsIntf fs = FatFsIntf();
 
-  while (1)
-  {
-    
+  while (1) {
   }
   return 0;
 }

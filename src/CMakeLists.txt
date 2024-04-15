@@ -74,7 +74,7 @@ target_link_libraries(${TARGET}
     )
 
 # TODO if you want a linker script
-# stm32_add_linker_script(${TARGET} PUBLIC deps/libDaisy/core/STM32H750IB_flash.lds)
+stm32_add_linker_script(${TARGET} PUBLIC STM32H750IB_sram.lds)
 
 
 # Make gcc go brrrr

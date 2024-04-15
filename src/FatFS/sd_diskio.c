@@ -50,7 +50,7 @@
  * Notice: This is applicable only for cortex M7 based platform.
  */
 
-#define ENABLE_SD_DMA_CACHE_MAINTENANCE 1
+#define ENABLE_SD_DMA_CACHE_MAINTENANCE 0
 
 /* Private variables ---------------------------------------------------------*/
 /* Disk status */

@@ -3,6 +3,7 @@
 #include "ff_gen_drv.h"
 #include "sd_diskio.h"
 #include "sdmmc-driver.h"
+#include <cstdint>
 
 FatFsIntf::FatFsIntf() : sd(), fs() {
 
@@ -10,16 +11,13 @@ FatFsIntf::FatFsIntf() : sd(), fs() {
     __asm__ __volatile__("bkpt #0");
   }
 
-  FRESULT s = f_mount(&fs, my_path, 1);
+  FRESULT s = f_mount(&fs, my_path, 0);
 
   if (s) {
     __asm__ __volatile__("bkpt #0");
   }
 
   switch (s) {
-  case FR_OK:
-    __asm__ __volatile__("bkpt #0");
-    break;
   case FR_DISK_ERR:
     __asm__ __volatile__("bkpt #0");
     break;
@@ -53,6 +51,18 @@ FatFsIntf::FatFsIntf() : sd(), fs() {
 
   default:
     break;
+  }
+
+  FIL fp;
+
+  uint8_t buff[512];
+  UINT bRead;
+
+  if (f_open(&fp, "my_wav.wav", FA_READ | FA_OPEN_EXISTING) != FR_OK) {
+    __asm__ __volatile__("bkpt #0");
+  }
+  if (f_read(&fp, buff, 512, &bRead) != FR_OK) {
+    __asm__ __volatile__("bkpt #0");
   }
 }
 
