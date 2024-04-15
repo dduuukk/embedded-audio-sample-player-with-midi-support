@@ -265,7 +265,7 @@ foreach(COMP ${CMSIS_FIND_COMPONENTS_FAMILIES})
         
         add_library(CMSIS::STM32::${DEVICE}${CORE_C} INTERFACE IMPORTED)
         target_link_libraries(CMSIS::STM32::${DEVICE}${CORE_C} INTERFACE CMSIS::STM32::${TYPE}${CORE_C})
-        cmsis_generate_default_linker_script(${FAMILY} ${DEVICE} "${CORE}")
+        # cmsis_generate_default_linker_script(${FAMILY} ${DEVICE} "${CORE}")
     endforeach()
 
     if(STM_DEVICES_FOUND)
