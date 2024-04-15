@@ -259,7 +259,7 @@ int main(void) {
                                      SAIDriver::SampleRate::SAMPLE_RATE_48K);
 
   // generateSineWave(frequency, amplitude, sampleRate, duration, wave);
-  uint8_t *pData = reinterpret_cast<uint8_t *>(wave);
+  uint8_t *pData = reinterpret_cast<uint8_t *>(wavCopy);
 
   // Get a pointer to the data
   // uint8_t* pData = reinterpret_cast<uint8_t*>(wave);
