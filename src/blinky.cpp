@@ -1,26 +1,30 @@
-#include "sai-driver.h"
-#include <cstdint>
 #include "fatfs.h"
-#include <stm32h7xx_hal.h>
+#include "sai-driver.h"
 #include <cmath>
+#include <cstdint>
+#include <stm32h7xx_hal.h>
 
 #include "codec_wm8731.h"
+#include "stm32h7xx_hal_conf.h"
 
 #define LED_PORT GPIOC
 #define LED_PIN GPIO_PIN_0
 #define LED_PORT_CLK_ENABLE __HAL_RCC_GPIOC_CLK_ENABLE
 
 // Constants for the sine wave
-const int frequency = 800;  // Frequency in Hz
+const int frequency = 800; // Frequency in Hz
 const int amplitude = 2000000000;
 const int sampleRate = 48000; // Sample rate in Hz (samples per second)
 // const float duration = 1.0;     // Duration of the wave in seconds
 // const int maxSamples = static_cast<int>(sampleRate * duration) * 2;
 
 // Generate triangle wave
-void generateTriangleWave(int frequency, int amplitude, int sampleRate, int32_t* wave) {
+void generateTriangleWave(int frequency, int amplitude, int sampleRate,
+                          int32_t *wave) {
   const int numSamples = sampleRate / frequency;
-  const long long incrementL = (static_cast<long long>(2) * static_cast<long long>(amplitude)) / (static_cast<long long>(numSamples) / 2LL);
+  const long long incrementL =
+      (static_cast<long long>(2) * static_cast<long long>(amplitude)) /
+      (static_cast<long long>(numSamples) / 2LL);
   const int increment = static_cast<int>(incrementL);
 
   int sample = 0;
@@ -31,13 +35,13 @@ void generateTriangleWave(int frequency, int amplitude, int sampleRate, int32_t*
     i++;
   }
 
-  for (int i = numSamples/2; i < 3 * numSamples / 2; ++i) {
+  for (int i = numSamples / 2; i < 3 * numSamples / 2; ++i) {
     wave[i] = sample;
-    wave[i+1] = sample;
+    wave[i + 1] = sample;
     sample -= increment;
     i++;
   }
-  
+
   for (int i = 3 * numSamples / 2; i < numSamples * 2; ++i) {
     wave[i] = sample;
     wave[i + 1] = sample;
@@ -47,7 +51,8 @@ void generateTriangleWave(int frequency, int amplitude, int sampleRate, int32_t*
 }
 
 // // Generate the sine wave
-// void generateSineWave(float frequency, float amplitude, float sampleRate, float duration, int32_t* wave) {
+// void generateSineWave(float frequency, float amplitude, float sampleRate,
+// float duration, int32_t* wave) {
 //     const float twoPiF = 2.0 * M_PI * frequency;
 //     const int numSamples = static_cast<int>(duration * sampleRate);
 //     if(numSamples > maxSamples) {
@@ -204,6 +209,33 @@ void initGPIO() {
   HAL_GPIO_Init(LED_PORT, &GPIO_Config);
 }
 
+// Triangle wave generated externally
+int32_t DMA_BUFFER_MEM_SECTION wave[120] = {
+    0,           0,           132800000,   132800000,   265600000,
+    265600000,   398400000,   398400000,   531200000,   531200000,
+    664000000,   664000000,   796800000,   796800000,   929600000,
+    929600000,   1062400000,  1062400000,  1195200000,  1195200000,
+    1328000000,  1328000000,  1460800000,  1460800000,  1593600000,
+    1593600000,  1726400000,  1726400000,  1859200000,  1859200000,
+    1992000000,  1992000000,  1859200000,  1859200000,  1726400000,
+    1726400000,  1593600000,  1593600000,  1460800000,  1460800000,
+    1328000000,  1328000000,  1195200000,  1195200000,  1062400000,
+    1062400000,  929600000,   929600000,   796800000,   796800000,
+    664000000,   664000000,   531200000,   531200000,   398400000,
+    398400000,   265600000,   265600000,   132800000,   132800000,
+    0,           0,           -132800000,  -132800000,  -265600000,
+    -265600000,  -398400000,  -398400000,  -531200000,  -531200000,
+    -664000000,  -664000000,  -796800000,  -796800000,  -929600000,
+    -929600000,  -1062400000, -1062400000, -1195200000, -1195200000,
+    -1328000000, -1328000000, -1460800000, -1460800000, -1593600000,
+    -1593600000, -1726400000, -1726400000, -1859200000, -1859200000,
+    -1992000000, -1992000000, -1859200000, -1859200000, -1726400000,
+    -1726400000, -1593600000, -1593600000, -1460800000, -1460800000,
+    -1328000000, -1328000000, -1195200000, -1195200000, -1062400000,
+    -1062400000, -929600000,  -929600000,  -796800000,  -796800000,
+    -664000000,  -664000000,  -531200000,  -531200000,  -398400000,
+    -398400000,  -265600000,  -265600000,  -132800000,  -132800000};
+
 int main(void) {
   HAL_Init();
   initGPIO();
@@ -220,13 +252,11 @@ int main(void) {
   codec.configureBypass(BYPASS_DISABLE);
 
   // New initialization code
-  SAIDriver newSaiDriver = SAIDriver(true, SAIDriver::BitDepth::BIT_DEPTH_32, SAIDriver::SampleRate::SAMPLE_RATE_48K);
+  SAIDriver newSaiDriver = SAIDriver(true, SAIDriver::BitDepth::BIT_DEPTH_32,
+                                     SAIDriver::SampleRate::SAMPLE_RATE_48K);
 
-  // Triangle wave generated externally
-  int32_t wave[120] = {0, 0, 132800000, 132800000, 265600000, 265600000, 398400000, 398400000, 531200000, 531200000, 664000000, 664000000, 796800000, 796800000, 929600000, 929600000, 1062400000, 1062400000, 1195200000, 1195200000, 1328000000, 1328000000, 1460800000, 1460800000, 1593600000, 1593600000, 1726400000, 1726400000, 1859200000, 1859200000, 1992000000, 1992000000, 1859200000, 1859200000, 1726400000, 1726400000, 1593600000, 1593600000, 1460800000, 1460800000, 1328000000, 1328000000, 1195200000, 1195200000, 1062400000, 1062400000, 929600000, 929600000, 796800000, 796800000, 664000000, 664000000, 531200000, 531200000, 398400000, 398400000, 265600000, 265600000, 132800000, 132800000, 0, 0, -132800000, -132800000, -265600000, -265600000, -398400000, -398400000, -531200000, -531200000, -664000000, -664000000, -796800000, -796800000, -929600000, -929600000, -1062400000, -1062400000, -1195200000, -1195200000, -1328000000, -1328000000, -1460800000, -1460800000, -1593600000, -1593600000, -1726400000, -1726400000, -1859200000, -1859200000, -1992000000, -1992000000, -1859200000, -1859200000, -1726400000, -1726400000, -1593600000, -1593600000, -1460800000, -1460800000, -1328000000, -1328000000, -1195200000, -1195200000, -1062400000, -1062400000, -929600000, -929600000, -796800000, -796800000, -664000000, -664000000, -531200000, -531200000, -398400000, -398400000, -265600000, -265600000, -132800000, -132800000};
   // generateSineWave(frequency, amplitude, sampleRate, duration, wave);
-  uint8_t* pData = reinterpret_cast<uint8_t*>(wave);
-
+  uint8_t *pData = reinterpret_cast<uint8_t *>(wave);
 
   // Get a pointer to the data
   // uint8_t* pData = reinterpret_cast<uint8_t*>(wave);
@@ -235,10 +265,9 @@ int main(void) {
   // int size = static_cast<int>(sampleRate * duration);
 
   // Pass the data to the SAINBTransmit function
-  while(1) {
+  while (1) {
     newSaiDriver.txTransmit(pData, 120, 2000);
   }
-
 
   FatFsIntf fs = FatFsIntf();
 

@@ -8,7 +8,8 @@ MEMORY
 {
     FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 128K
     RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 128K
-	AXI_SRAM  (RWX) : ORIGIN = 0x24000000, LENGTH = 32K
+	AXI_SRAM  (RWX) : ORIGIN = 0x24000000, LENGTH = 512K - 32K
+	RAM_D2_DMA  (RWX) : ORIGIN = 0x30000000, LENGTH = 32K
 }
 
 SECTIONS
@@ -129,6 +130,20 @@ SECTIONS
 
 		PROVIDE(__axi_sram1_bss_end__ = _eaxi_sram1_bss);
 	} > AXI_SRAM
+
+	.sram1_bss (NOLOAD) :
+	{
+		. = ALIGN(4);
+		_ssram1_bss = .;
+
+		PROVIDE(__sram1_bss_start__ = _sram1_bss);
+		*(.sram1_bss)
+		*(.sram1_bss*)
+		. = ALIGN(4);
+		_esram1_bss = .;
+
+		PROVIDE(__sram1_bss_end__ = _esram1_bss);
+	} > RAM_D2_DMA
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
 
