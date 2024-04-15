@@ -286,22 +286,18 @@ extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai) {
  * @return 0 if transmit successful, 1 if DMA queue is full.
  */
 int SAIDriver::txTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout) {
-    // Check if the queue is full
-    if(dmaQueueFull) {
-        // Return without transmitting
+    // Block transmission while the DMA is transferring
+    while(hsaiB.hdmatx->State == HAL_DMA_STATE_BUSY) {
+        // Polling block
+        // HAL_Delay(1); // TODO: OPTIMIZE THIS DELAY
+    }
+
+    // Transmit data through DMA to SAI
+    if(HAL_SAI_Transmit_DMA(&hsaiB, pData, Size) != HAL_OK) {
         return 1;
     }
-    else if (hsaiB.hdmatx->State == HAL_DMA_STATE_BUSY) {
-        // Set the queue flag to true
-        dmaQueueFull = true;
-        return 1;
-    }
-    else {
-        if(HAL_SAI_Transmit_DMA(&hsaiB, pData, Size) != HAL_OK) {
-            __asm__ __volatile__("bkpt #3");
-        }
-        return 0;
-    }
+
+    return 0;
 }
 
 /**
@@ -329,11 +325,11 @@ void SAIDriver::SAINATransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout) {
 extern "C" void DMA1_Stream0_IRQHandler() {
     HAL_DMA_IRQHandler(&hdma);
 
-    // Check if transfer is complete
-    if(__HAL_DMA_GET_FLAG(&hdma, DMA_FLAG_TCIF0_4)) {
-        // Set the queue flag to false
-        SAIDriver::dmaQueueFull = false;
-    }
+    // // Check if transfer is complete
+    // if(__HAL_DMA_GET_FLAG(&hdma, DMA_FLAG_TCIF0_4)) {
+    //     // Set the queue flag to false
+    //     SAIDriver::dmaQueueFull = false;
+    // }
 }
 
 /**
