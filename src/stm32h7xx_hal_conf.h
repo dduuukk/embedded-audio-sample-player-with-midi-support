@@ -28,6 +28,9 @@ extern "C"
 {
 #endif
 
+#define FATFS_BUFFER_MEM_SECTION __attribute__((section(".axi_sram1_bss")))
+
+
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 

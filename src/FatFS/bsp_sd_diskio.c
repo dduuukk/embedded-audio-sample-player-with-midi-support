@@ -244,7 +244,6 @@ void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
   */
 void HAL_SD_RxCpltCallback(SD_HandleTypeDef *hsd)
 {
-  __asm__ __volatile__("bkpt #0");
     BSP_SD_ReadCpltCallback();
 }
 

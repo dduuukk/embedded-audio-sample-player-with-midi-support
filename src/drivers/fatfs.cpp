@@ -5,13 +5,18 @@
 #include "sdmmc-driver.h"
 #include <cstdint>
 
-FatFsIntf::FatFsIntf() : sd(), fs() {
+uint8_t FATFS_BUFFER_MEM_SECTION buff[512];
+FATFS FATFS_BUFFER_MEM_SECTION mfs;
+
+FatFsIntf::FatFsIntf() : sd() {
+
+  fs = &mfs;
 
   if (FATFS_LinkDriver(&SD_Driver, my_path) != FR_OK) {
     __asm__ __volatile__("bkpt #0");
   }
 
-  FRESULT s = f_mount(&fs, my_path, 0);
+  FRESULT s = f_mount(fs, my_path, 0);
 
   if (s) {
     __asm__ __volatile__("bkpt #0");
@@ -55,7 +60,6 @@ FatFsIntf::FatFsIntf() : sd(), fs() {
 
   FIL fp;
 
-  uint8_t buff[512];
   UINT bRead;
 
   if (f_open(&fp, "my_wav.wav", FA_READ | FA_OPEN_EXISTING) != FR_OK) {
