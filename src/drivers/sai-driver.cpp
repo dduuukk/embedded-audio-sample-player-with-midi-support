@@ -10,6 +10,7 @@
 #include <cstdint>
 
 DMA_HandleTypeDef hdma;
+bool SAIDriver::dmaQueueFull = false;
 
 /**
  * @brief Constructs a new SAIDriver object.
@@ -282,29 +283,25 @@ extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai) {
  * @param pData Pointer to the data buffer.
  * @param Size Size of the data buffer in bytes.
  * @param Timeout Timeout value in milliseconds.
+ * @return 0 if transmit successful, 1 if DMA queue is full.
  */
-void SAIDriver::txTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout) {
-    // Transmit data over SAI
-    // if(HAL_SAI_Transmit(&hsai, pData, Size, Timeout) != HAL_OK) {
-    //     __asm__ __volatile__("bkpt #1");
-    // }
-    // if(HAL_SAI_Transmit_DMA(&hsai, pData, Size) != HAL_OK) {
-    //     __asm__ __volatile__("bkpt #1");
-    // }
-
-    // // Testing if DMA is causing the transmit issue
-    // if(HAL_SAI_Transmit(&hsaiB, pData, Size, Timeout) != HAL_OK) {
-    // __asm__ __volatile__("bkpt #2");
-    // }
-
-    while(HAL_SAI_Transmit_DMA(&hsaiB, pData, Size) == HAL_BUSY) {
-        // Wait for the DMA to finish
-        HAL_Delay(100);
+int SAIDriver::txTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout) {
+    // Check if the queue is full
+    if(dmaQueueFull) {
+        // Return without transmitting
+        return 1;
     }
-
-//     if(status == HAL_BUSY) {
-//         this->dmaQueueFull = true;
-//     }
+    else if (hsaiB.hdmatx->State == HAL_DMA_STATE_BUSY) {
+        // Set the queue flag to true
+        dmaQueueFull = true;
+        return 1;
+    }
+    else {
+        if(HAL_SAI_Transmit_DMA(&hsaiB, pData, Size) != HAL_OK) {
+            __asm__ __volatile__("bkpt #3");
+        }
+        return 0;
+    }
 }
 
 /**
@@ -331,6 +328,12 @@ void SAIDriver::SAINATransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout) {
  */
 extern "C" void DMA1_Stream0_IRQHandler() {
     HAL_DMA_IRQHandler(&hdma);
+
+    // Check if transfer is complete
+    if(__HAL_DMA_GET_FLAG(&hdma, DMA_FLAG_TCIF0_4)) {
+        // Set the queue flag to false
+        SAIDriver::dmaQueueFull = false;
+    }
 }
 
 /**
