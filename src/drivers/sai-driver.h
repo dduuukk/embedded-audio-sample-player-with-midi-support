@@ -36,7 +36,8 @@ class SAIDriver {
         SAI_HandleTypeDef hsaiA = {};
         SAI_HandleTypeDef hsaiB = {};
         // bool useBlockA;
-        
+        uint32_t bitDepth;
+        uint32_t sampleRate;
 
         // Private member functions
         void genericHSAISetup(SAI_HandleTypeDef* hsai);
