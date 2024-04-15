@@ -261,17 +261,20 @@ extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai) {
 
         // Initialize DMA for block B
         if(hsai->Instance == SAI1_Block_B) {
-            // Enable DMA and sai interrupts
-            HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
-            HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
 
             // Enable DMA clock 
             __HAL_RCC_DMA1_CLK_ENABLE();
 
+            // Enable DMA and sai interrupts
+            HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+
             // Init DMA
             initDMA(hsai);
-        }  
-    }
+        }
+
+        HAL_NVIC_SetPriority(SAI1_IRQn, 0, 0);
+        HAL_NVIC_EnableIRQ(SAI1_IRQn);}
 }
 
 
@@ -294,6 +297,7 @@ int SAIDriver::txTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout) {
 
     // Transmit data through DMA to SAI
     if(HAL_SAI_Transmit_DMA(&hsaiB, pData, Size) != HAL_OK) {
+        __asm__ __volatile__("bkpt #0");
         return 1;
     }
 
