@@ -42,25 +42,25 @@ SAIDriver::SAIDriver(bool stereo, BitDepth bitDepth, SampleRate sampleRate) {
 
     // Set the bit depth
     switch(bitDepth) {
-        case BitDepth::BIT_DEPTH_8:
-            bitDepthValue = SAI_DATASIZE_8;
+        case BitDepth::BIT_DEPTH_16:
+            bitDepthValue = SAI_PROTOCOL_DATASIZE_16BIT;
             protocolValue = SAI_I2S_STANDARD;
             break;
-        case BitDepth::BIT_DEPTH_16:
-            bitDepthValue = SAI_DATASIZE_16;
+        case BitDepth::BIT_DEPTH_16_EXTENDED:
+            bitDepthValue = SAI_PROTOCOL_DATASIZE_16BITEXTENDED;
             protocolValue = SAI_I2S_STANDARD;
             break;
         case BitDepth::BIT_DEPTH_24:
-            bitDepthValue = SAI_DATASIZE_24;
+            bitDepthValue = SAI_PROTOCOL_DATASIZE_24BIT;
             // TODO: CHECK IF 24 BIT CAN BE STD ON DAISY
             protocolValue = SAI_I2S_MSBJUSTIFIED;
             break;
         case BitDepth::BIT_DEPTH_32:
-            bitDepthValue = SAI_DATASIZE_32;
+            bitDepthValue = SAI_PROTOCOL_DATASIZE_32BIT;
             protocolValue = SAI_I2S_STANDARD;
             break;
         default:
-            bitDepthValue = SAI_DATASIZE_32;
+            bitDepthValue = SAI_PROTOCOL_DATASIZE_32BIT;
             protocolValue = SAI_I2S_STANDARD;
             break;
     }

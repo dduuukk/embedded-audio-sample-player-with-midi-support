@@ -10,8 +10,8 @@
 class SAIDriver {
     public:
         enum class BitDepth {
-            BIT_DEPTH_8,
             BIT_DEPTH_16,
+            BIT_DEPTH_16_EXTENDED,
             BIT_DEPTH_24,
             BIT_DEPTH_32
         };
