@@ -10,7 +10,7 @@
 #include <cstdint>
 
 DMA_HandleTypeDef hdma;
-bool SAIDriver::dmaQueueFull = false;
+uint8_t DMA_BUFFER_MEM_SECTION dmaRamBuffer[1024];
 
 /**
  * @brief Constructs a new SAIDriver object.
@@ -299,15 +299,18 @@ extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef *hsai) {
  * @param Timeout Timeout value in milliseconds.
  * @return 0 if transmit successful, 1 if DMA queue is full.
  */
-int SAIDriver::txTransmit(uint8_t *pData, uint16_t Size, uint32_t Timeout) {
+int SAIDriver::txTransmit(uint8_t *pData, uint16_t Size, uint32_t Timeout) { 
   // Block transmission while the DMA is transferring
   while (hsaiB.hdmatx->State == HAL_DMA_STATE_BUSY) {
     // Polling block
     // HAL_Delay(1); // TODO: OPTIMIZE THIS DELAY
   }
 
+  // Copy the data to the DMA buffer in RAM
+  memcpy(dmaRamBuffer, pData, 1024 * sizeof(uint8_t));
+
   // Transmit data through DMA to SAI
-  if (HAL_SAI_Transmit(&hsaiB, pData, Size, Timeout) != HAL_OK) {
+  if (HAL_SAI_Transmit(&hsaiB, dmaRamBuffer, Size, Timeout) != HAL_OK) {
     __asm__ __volatile__("bkpt #0");
     return 1;
   }

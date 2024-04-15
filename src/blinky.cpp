@@ -211,7 +211,7 @@ void initGPIO() {
 }
 
 // Triangle wave generated externally
-const int32_t wave[120] = {
+int32_t wave[120] = {
     0,           0,           132800000,   132800000,   265600000,
     265600000,   398400000,   398400000,   531200000,   531200000,
     664000000,   664000000,   796800000,   796800000,   929600000,
@@ -237,7 +237,7 @@ const int32_t wave[120] = {
     -664000000,  -664000000,  -531200000,  -531200000,  -398400000,
     -398400000,  -265600000,  -265600000,  -132800000,  -132800000};
 
-int32_t DMA_BUFFER_MEM_SECTION wavCopy[120];
+
 
 int main(void) {
   HAL_Init();
@@ -257,8 +257,6 @@ int main(void) {
   // New initialization code
   SAIDriver newSaiDriver = SAIDriver(true, SAIDriver::BitDepth::BIT_DEPTH_32,
                                      SAIDriver::SampleRate::SAMPLE_RATE_48K);
-
-  memcpy(wavCopy, wave, 120 * sizeof(uint32_t));
 
   // generateSineWave(frequency, amplitude, sampleRate, duration, wave);
   uint8_t *pData = reinterpret_cast<uint8_t *>(wave);

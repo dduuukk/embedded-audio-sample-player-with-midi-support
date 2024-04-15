@@ -4,6 +4,7 @@
 // Include any necessary headers here
 #include "stm32h7xx_hal.h"
 #include <cstdint>
+#include <cstring>
 #include <stm32h7xx_hal_dma.h>
 #include <stm32h7xx_hal_sai.h>
 
@@ -29,7 +30,7 @@ class SAIDriver {
 
         int txTransmit(uint8_t* pData, uint16_t Size, uint32_t Timeout);
 
-        static bool dmaQueueFull;
+        // static bool dmaQueueFull;
 
     private:
         SAI_HandleTypeDef hsaiA = {};
