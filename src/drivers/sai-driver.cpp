@@ -74,7 +74,8 @@ SAIDriver::SAIDriver(bool stereo, BitDepth bitDepth, SampleRate sampleRate) {
   }
   hsaiA.Init.DataSize = bitDepthValue;
   hsaiB.Init.DataSize = bitDepthValue;
-  
+  // Set publicly available buffer size
+  this->dmaBufferWordSize = DMARAMBUFFERSIZE / (this->bitDepth / 8);
 
   // Set the sample rate
   switch (sampleRate) {
@@ -313,19 +314,19 @@ extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef *hsai) {
  * @param Timeout Timeout value in milliseconds.
  * @return 0 if transmit successful, 1 if DMA queue is full.
  */
-int SAIDriver::txTransmit(uint8_t *pData, uint32_t Size, uint32_t Timeout) { 
-  uint32_t dmaBufferWordSize = DMARAMBUFFERSIZE / (this->bitDepth / 8);
+int SAIDriver::txTransmit(uint8_t *pData, uint32_t Size, uint32_t Timeout) {
+
   // Ensure the size passed in is less than the size of the DMA buffer
-    if (Size > dmaBufferWordSize) {
-        return 1;
-    }
+  if (Size > this->dmaBufferWordSize) {
+    return 1;
+  }
   // Block transmission while the DMA is transferring
   while (hsaiB.hdmatx->State == HAL_DMA_STATE_BUSY) {
     // Polling block
     // HAL_Delay(1); // TODO: OPTIMIZE THIS DELAY
   }
   // Take the minimum of the size of DMA buffer or the size of the data
-    Size = MIN(Size, dmaBufferWordSize);
+  Size = MIN(Size, this->dmaBufferWordSize);
 
   // Copy the data to the DMA buffer in RAM
   memcpy(dmaRamBuffer, pData, Size * (this->bitDepth / 8));
