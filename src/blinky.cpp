@@ -198,7 +198,7 @@ int main(void) {
   switch (wavHeader.sampleRate) {
   case 44100:
     codec.configureSampleRate(ADC_44k1_DAC_44k1);
-    sample_rate = SAIDriver::SampleRate::SAMPLE_RATE_48K;
+    sample_rate = SAIDriver::SampleRate::SAMPLE_RATE_44K;
     break;
   case 8000:
     codec.configureSampleRate(ADC_8k_DAC_8k);
