@@ -34,7 +34,7 @@ struct wave_header
 
 
 void pr_usage(char* pname);
-void read_wave(FIL* fp, struct wave_header* dest);
+void read_wave(uint8_t* fp, struct wave_header* dest);
 
 int validate_wave(struct wave_header* wavHeader);
 void write_word(int32_t word);

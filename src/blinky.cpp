@@ -285,9 +285,7 @@ int main(void) {
   // }
 
   // read file header
-  if (read_wave(fp, wavHeader) != 0) {
-    return -1;
-  }
+  read_wave(buff, &wavHeader);
 
   // parse file header, verify that is wave
   if (validate_wave(&wavHeader) != 0) {
@@ -297,7 +295,7 @@ int main(void) {
   // TODO play sound (from pre-lab 5a)
   play_wave_samples(fp, wavHeader, -1, 0);
 
-  f_close(fp);
+  f_close(&fp);
 
   return 0;
 }
