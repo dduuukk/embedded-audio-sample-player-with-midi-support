@@ -15,64 +15,6 @@
 // The buffer to read samples into
 uint8_t FATFS_BUFFER_MEM_SECTION buff[163840];
 
-// Constants for the sine wave
-const int frequency = 800; // Frequency in Hz
-const int amplitude = 2000000000;
-const int sampleRate = 48000; // Sample rate in Hz (samples per second)
-// const float duration = 1.0;     // Duration of the wave in seconds
-// const int maxSamples = static_cast<int>(sampleRate * duration) * 2;
-
-// Generate triangle wave
-void generateTriangleWave(int frequency, int amplitude, int sampleRate,
-                          int32_t *wave) {
-  const int numSamples = sampleRate / frequency;
-  const long long incrementL =
-      (static_cast<long long>(2) * static_cast<long long>(amplitude)) /
-      (static_cast<long long>(numSamples) / 2LL);
-  const int increment = static_cast<int>(incrementL);
-
-  int sample = 0;
-  for (int i = 0; i < numSamples / 2; ++i) {
-    wave[i] = sample;
-    wave[i + 1] = sample;
-    sample += increment;
-    i++;
-  }
-
-  for (int i = numSamples / 2; i < 3 * numSamples / 2; ++i) {
-    wave[i] = sample;
-    wave[i + 1] = sample;
-    sample -= increment;
-    i++;
-  }
-
-  for (int i = 3 * numSamples / 2; i < numSamples * 2; ++i) {
-    wave[i] = sample;
-    wave[i + 1] = sample;
-    sample += increment;
-    i++;
-  }
-}
-
-// // Generate the sine wave
-// void generateSineWave(float frequency, float amplitude, float sampleRate,
-// float duration, int32_t* wave) {
-//     const float twoPiF = 2.0 * M_PI * frequency;
-//     const int numSamples = static_cast<int>(duration * sampleRate);
-//     if(numSamples > maxSamples) {
-//       // Error: too many samples
-//       return;
-//     }
-//     for (int i = 0; i < numSamples; ++i) {
-//       float t = i / sampleRate;
-//       float sample = amplitude * sin(twoPiF * t);
-//       // Normalize the sample from [-1,1] to [int32_min, int32_max]
-//       wave[i] = static_cast<int32_t>(sample * INT32_MAX);
-//       wave[i+1] = wave[i];
-//       i += 1;
-//     }
-// }
-
 void clocks_initialise(void) {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
@@ -213,33 +155,6 @@ void initGPIO() {
   HAL_GPIO_Init(LED_PORT, &GPIO_Config);
 }
 
-// Triangle wave generated externally
-int32_t wave[120] = {
-    0,           0,           132800000,   132800000,   265600000,
-    265600000,   398400000,   398400000,   531200000,   531200000,
-    664000000,   664000000,   796800000,   796800000,   929600000,
-    929600000,   1062400000,  1062400000,  1195200000,  1195200000,
-    1328000000,  1328000000,  1460800000,  1460800000,  1593600000,
-    1593600000,  1726400000,  1726400000,  1859200000,  1859200000,
-    1992000000,  1992000000,  1859200000,  1859200000,  1726400000,
-    1726400000,  1593600000,  1593600000,  1460800000,  1460800000,
-    1328000000,  1328000000,  1195200000,  1195200000,  1062400000,
-    1062400000,  929600000,   929600000,   796800000,   796800000,
-    664000000,   664000000,   531200000,   531200000,   398400000,
-    398400000,   265600000,   265600000,   132800000,   132800000,
-    0,           0,           -132800000,  -132800000,  -265600000,
-    -265600000,  -398400000,  -398400000,  -531200000,  -531200000,
-    -664000000,  -664000000,  -796800000,  -796800000,  -929600000,
-    -929600000,  -1062400000, -1062400000, -1195200000, -1195200000,
-    -1328000000, -1328000000, -1460800000, -1460800000, -1593600000,
-    -1593600000, -1726400000, -1726400000, -1859200000, -1859200000,
-    -1992000000, -1992000000, -1859200000, -1859200000, -1726400000,
-    -1726400000, -1593600000, -1593600000, -1460800000, -1460800000,
-    -1328000000, -1328000000, -1195200000, -1195200000, -1062400000,
-    -1062400000, -929600000,  -929600000,  -796800000,  -796800000,
-    -664000000,  -664000000,  -531200000,  -531200000,  -398400000,
-    -398400000,  -265600000,  -265600000,  -132800000,  -132800000};
-
 int main(void) {
   HAL_Init();
   initGPIO();
@@ -258,9 +173,6 @@ int main(void) {
   // New initialization code
   SAIDriver newSaiDriver = SAIDriver(true, SAIDriver::BitDepth::BIT_DEPTH_32,
                                      SAIDriver::SampleRate::SAMPLE_RATE_48K);
-
-  // generateSineWave(frequency, amplitude, sampleRate, duration, wave);
-  uint8_t *pData = reinterpret_cast<uint8_t *>(wave);
 
   wave_header parse = wave_header();
 
