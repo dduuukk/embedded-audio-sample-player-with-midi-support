@@ -4,6 +4,7 @@
 #include "fatfs.h"
 #include "codec_wm8731.h"
 
+uint32_t DMA_BUFFER_MEM_SECTION fifussy[256000/4];
 
 void pr_usage(char* pname) 
 {
@@ -179,20 +180,26 @@ int validate_wave(struct wave_header *wavHeader)
 uint8_t index = 0;
 
 void write_word(uint32_t word) 
+
+// instead of fifussy i will have array and wwhen the end of the file it will be written 
 {
-  uint32_t fifussy[32]; // 32 words in fifo then i will throw it to chris
+
+
+
 
   fifussy[index] = word;
+  index++;
 
+  /*
   
-  if (index >= 32)
+  if (index >= 43)
    {
-    /*
+  
       call sainb transmit to pass though array w data
       file sys goes in , data goes out to fifo, put data from struct into array
       pass through bit depth and sample rate
 
-      */
+    
 
     SAIBDriver.SAINBTransmit(fifussy, sizeof(uint32_t) * 32, 2000);
 
@@ -200,6 +207,10 @@ void write_word(uint32_t word)
   }
 
   index++;
+  
+  */
+
+  
 
 }
 
@@ -237,7 +248,10 @@ uint32_t audio_word_from_buf(struct wave_header wavHeader, int8_t *buf) {
 
 // calculate buffer size for audio data depending on stereo or mono
 int8_t play_wave_samples(FIL *fp, struct wave_header *wavHeader,
-                         int sample_count, unsigned int start) {
+                         int sample_count, unsigned int start) 
+  {
+                          uint8_t index = 0;
+
 
   if (!fp) {
     return -1;
@@ -272,21 +286,26 @@ int8_t play_wave_samples(FIL *fp, struct wave_header *wavHeader,
         rbuf[i] = buf[i + 1];
       }
 
-      write_word(audio_word_from_buf(*wavHeader, lbuf));
-      write_word(audio_word_from_buf(*wavHeader, rbuf));
+    write_word(audio_word_from_buf(*wavHeader, lbuf));
+    write_word(audio_word_from_buf(*wavHeader, rbuf));
       sample_count -= 1;
 
     } else // mono
     {
 
-      write_word(audio_word_from_buf(*wavHeader, buf)); // For the left channel
-      write_word(audio_word_from_buf(*wavHeader, buf)); // For the right channel
+    write_word(audio_word_from_buf(*wavHeader, buf)); // For the left channel
+    write_word(audio_word_from_buf(*wavHeader, buf)); // For the right channel
 
       sample_count -= 1;
 
       // return buf[(bytesPerSample)*wavHeader->numChannels]; // For the left
       // channel and the right channel
     }
+
+
+
+    SAIBDriver.SAINBTransmit(fifussy, sizeof(uint32_t) * 32, 2000);
+
   }
 
   return 0;
