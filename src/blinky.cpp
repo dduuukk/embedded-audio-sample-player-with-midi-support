@@ -285,7 +285,10 @@ int main(void) {
       if (f_read(&fp, buff, 163840, &bRead) != FR_OK) {
         __asm__ __volatile__("bkpt #0");
       }
-      newSaiDriver.txTransmit(buff, 163840, 2000);
+      if (newSaiDriver.txTransmit(buff, 163840 / 4, 2000) == 1) {
+        __asm__ __volatile__("bkpt #0");
+      }
+      f_rewind(&fp);
     }
   }
   return 0;
