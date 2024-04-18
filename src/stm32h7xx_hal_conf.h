@@ -28,6 +28,11 @@ extern "C"
 {
 #endif
 
+#define FATFS_BUFFER_MEM_SECTION __attribute__((section(".axi_sram1_bss")))
+#define DMA_BUFFER_MEM_SECTION __attribute__((section(".axi_sram1_bss")))
+
+
+
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 
@@ -166,7 +171,7 @@ extern "C"
 #define VDD_VALUE ((uint32_t)3300)         /*!< Value of VDD in mv */
 #define TICK_INT_PRIORITY ((uint32_t)0x0E) /*!< tick interrupt priority */
 #define USE_RTOS 0
-#define USE_SD_TRANSCEIVER 1U /*!< use uSD Transceiver */
+#define USE_SD_TRANSCEIVER 0U /*!< use uSD Transceiver */
 
 #define USE_HAL_ADC_REGISTER_CALLBACKS \
     0U /* ADC register callback disabled     */

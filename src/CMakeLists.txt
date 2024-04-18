@@ -55,6 +55,9 @@ target_link_libraries(${TARGET}
         HAL::STM32::H7::M7::RCCEx
         HAL::STM32::H7::M7::GPIO
         HAL::STM32::H7::M7::CORTEX
+        HAL::STM32::H7::M7::SAI
+        HAL::STM32::H7::M7::RCCEx
+        HAL::STM32::H7::M7::DMA
         HAL::STM32::H7::M7::SD
         HAL::STM32::H7::M7::PWREx
         HAL::STM32::H7::M7::LL_SDMMC
@@ -68,6 +71,7 @@ target_link_libraries(${TARGET}
         #FreeRTOS::ARM_CM4F
         #TODO your object libraries go here
         wav-parser
+        sai-driver
         fatfs-interface-driver
         fatfs
         sdmmc-driver
@@ -75,7 +79,7 @@ target_link_libraries(${TARGET}
     )
 
 # TODO if you want a linker script
-# stm32_add_linker_script(${TARGET} PUBLIC deps/libDaisy/core/STM32H750IB_flash.lds)
+stm32_add_linker_script(${TARGET} PUBLIC STM32H750IB_sram.lds)
 
 
 # Make gcc go brrrr

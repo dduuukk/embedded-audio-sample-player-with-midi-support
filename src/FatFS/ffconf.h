@@ -164,7 +164,7 @@ This option configures support of relative path.                               \
 / Drive/Volume Configurations
 /----------------------------------------------------------------------------*/
 
-#define _VOLUMES 2 /**< Number of volumes (logical drives) to be used. */
+#define _VOLUMES 1 /**< Number of volumes (logical drives) to be used. */
 
 /* USER CODE BEGIN Volumes */
 #define _STR_VOLUME_ID                                                         \

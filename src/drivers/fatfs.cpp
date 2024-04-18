@@ -3,23 +3,25 @@
 #include "ff_gen_drv.h"
 #include "sd_diskio.h"
 #include "sdmmc-driver.h"
+#include <cstdint>
 
-FatFsIntf::FatFsIntf() : sd(), fs() {
+FATFS FATFS_BUFFER_MEM_SECTION mfs;
+
+FatFsIntf::FatFsIntf() : sd() {
+
+  fs = &mfs;
 
   if (FATFS_LinkDriver(&SD_Driver, my_path) != FR_OK) {
     __asm__ __volatile__("bkpt #0");
   }
 
-  FRESULT s = f_mount(&fs, my_path, 1);
+  FRESULT s = f_mount(fs, my_path, 0);
 
   if (s) {
     __asm__ __volatile__("bkpt #0");
   }
 
   switch (s) {
-  case FR_OK:
-    __asm__ __volatile__("bkpt #0");
-    break;
   case FR_DISK_ERR:
     __asm__ __volatile__("bkpt #0");
     break;
