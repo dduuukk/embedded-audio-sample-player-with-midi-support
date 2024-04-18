@@ -30,7 +30,7 @@ class SAIDriver {
 
         int txTransmit(uint8_t* pData, uint32_t Size, uint32_t Timeout);
 
-        // static bool dmaQueueFull;
+        uint32_t dmaBufferWordSize = 0;
 
     private:
         SAI_HandleTypeDef hsaiA = {};
