@@ -18,7 +18,7 @@ void pr_usage(char* pname)
 reads the file and puts correcct information into the struct
 
 */
-void read_wave(FIL *fp, struct wave_header *dest) {
+void read_wave(uint8_t *fp, struct wave_header *dest) {
 
   // GET BIT DEPTH AND SAMPLE RATE
 
@@ -29,6 +29,33 @@ void read_wave(FIL *fp, struct wave_header *dest) {
 
 
 
+  //going through the array instead of a file now
+  // something like desk.chunk->fp[0] slighty werid thins is theuint 32 to uint 8 combination
+  // uint32 means 4 uint 8 combines, bytes 0,1,2,3 put together ...
+
+  dest->chunkID = fp[0] | (fp[1] << 8) | (fp[2] << 16) | (fp[3] << 24);
+  dest->chunkSize = fp[4] | (fp[5] << 8) | (fp[6] << 16) | (fp[7] << 24);
+  dest->format = fp[8] | (fp[9] << 8) | (fp[10] << 16) | (fp[11] << 24);
+  dest->subchunk1ID = fp[12] | (fp[13] << 8) | (fp[14] << 16) | (fp[15] << 24);
+  dest->subchunk1Size = fp[16] | (fp[17] << 8) | (fp[18] << 16) | (fp[19] << 24);
+
+
+  dest->audioFormat = fp[20] | (fp[21] << 8) ;
+  dest->numChannels = fp[22] | (fp[23] << 8) ;
+
+  dest->sampleRate = fp[24] | (fp[25] << 8) | (fp[26] << 16) | (fp[27] << 24);
+  dest->byteRate = fp[28] | (fp[29] << 8) | (fp[30] << 16) | (fp[31] << 24);
+
+
+  dest->blockAlign = fp[32] | (fp[33] << 8) ;
+  dest->bitsPerSample = fp[34] | (fp[35] << 8) ;
+
+
+  
+  dest->subchunk2ID = fp[36] | (fp[37] << 8) | (fp[38] << 16) | (fp[39] << 24);
+  dest->subchunk2Size = fp[40] | (fp[41] << 8) | (fp[42] << 16) | (fp[43] << 24);
+
+/*
 
   // read header
   int x = 0;
@@ -47,17 +74,24 @@ void read_wave(FIL *fp, struct wave_header *dest) {
   x = f_lseek(fp, 16);
   x = f_read(fp, &(dest->subchunk1Size), sizeof(uint32_t), NULL);
 
+
+
   x = f_lseek(fp, 20);
   x = f_read(fp, &(dest->audioFormat), sizeof(uint16_t), NULL);
 
   x = f_lseek(fp, 22);
   x = f_read(fp, &(dest->numChannels), sizeof(uint16_t), NULL);
 
+
+
+
   x = f_lseek(fp, 24);
   x = f_read(fp, &(dest->sampleRate), sizeof(uint32_t),
              NULL); // SAMPLE RATEEEEEEEEEEEEEEEEEEEE for CC
   x = f_lseek(fp, 28);
   x = f_read(fp, &(dest->byteRate), sizeof(uint32_t), NULL);
+
+
 
   x = f_lseek(fp, 32);
   x = f_read(fp, &(dest->blockAlign), sizeof(uint16_t), NULL);
@@ -66,12 +100,14 @@ void read_wave(FIL *fp, struct wave_header *dest) {
   x = f_read(fp, &(dest->bitsPerSample), sizeof(uint16_t),
              NULL); // BIT DEPTHHHHHHHHHHHHHHH for CC
 
+
+
   x = f_lseek(fp, 36);
   x = f_read(fp, &(dest->subchunk2ID), sizeof(uint32_t), NULL);
 
   x = f_lseek(fp, 40);
   x = f_read(fp, &(dest->subchunk2Size), sizeof(uint32_t), NULL);
-
+*/
   // printf("Expected file size: %d, Actual file size: %ld\n", (dest->chunkSize
   // + 8), st.st_size);
 
