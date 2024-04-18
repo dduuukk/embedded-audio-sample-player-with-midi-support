@@ -9,11 +9,7 @@
 #include "stm32h7xx_hal_sai.h"
 #include <cstdint>
 
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define DMARAMBUFFERSIZE 163840
-
 DMA_HandleTypeDef hdma;
-uint8_t DMA_BUFFER_MEM_SECTION dmaRamBuffer[DMARAMBUFFERSIZE];
 
 /**
  * @brief Constructs a new SAIDriver object.
@@ -75,7 +71,7 @@ SAIDriver::SAIDriver(bool stereo, BitDepth bitDepth, SampleRate sampleRate) {
   hsaiA.Init.DataSize = bitDepthValue;
   hsaiB.Init.DataSize = bitDepthValue;
   // Set publicly available buffer size
-  this->dmaBufferWordSize = DMARAMBUFFERSIZE / (this->bitDepth / 8);
+  this->dmaBufferWordSize = DMA_RAM_BUFFER_SIZE / (this->bitDepth / 8);
 
   // Set the sample rate
   switch (sampleRate) {
@@ -315,7 +311,6 @@ extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef *hsai) {
  * @return 0 if transmit successful, 1 if DMA queue is full.
  */
 int SAIDriver::txTransmit(uint8_t *pData, uint32_t Size, uint32_t Timeout) {
-
   // Ensure the size passed in is less than the size of the DMA buffer
   if (Size > this->dmaBufferWordSize) {
     return 1;
@@ -325,14 +320,9 @@ int SAIDriver::txTransmit(uint8_t *pData, uint32_t Size, uint32_t Timeout) {
     // Polling block
     // HAL_Delay(1); // TODO: OPTIMIZE THIS DELAY
   }
-  // Take the minimum of the size of DMA buffer or the size of the data
-  Size = MIN(Size, this->dmaBufferWordSize);
-
-  // Copy the data to the DMA buffer in RAM
-  memcpy(dmaRamBuffer, pData, Size * (this->bitDepth / 8));
 
   // Transmit data through DMA to SAI
-  if (HAL_SAI_Transmit(&hsaiB, dmaRamBuffer, Size, Timeout) != HAL_OK) {
+  if (HAL_SAI_Transmit_DMA(&hsaiB, pData, Size) != HAL_OK) {
     __asm__ __volatile__("bkpt #0");
     return 1;
   }

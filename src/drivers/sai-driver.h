@@ -8,6 +8,8 @@
 #include <stm32h7xx_hal_dma.h>
 #include <stm32h7xx_hal_sai.h>
 
+#define DMA_RAM_BUFFER_SIZE 256 * 1024 // 256KB of RAM for DMA access
+
 class SAIDriver {
     public:
         enum class BitDepth {
