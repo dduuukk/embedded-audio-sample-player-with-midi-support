@@ -80,15 +80,30 @@ SAIDriver::SAIDriver(bool stereo, BitDepth bitDepth, SampleRate sampleRate) {
     hsaiB.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_8K;
     this->sampleRate = 8000; // 8k
     break;
+  case SampleRate::SAMPLE_RATE_11K:
+    hsaiA.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_11K;
+    hsaiB.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_11K;
+    this->sampleRate = 11025; // 11k
+    break;
   case SampleRate::SAMPLE_RATE_16K:
     hsaiA.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_16K;
     hsaiB.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_16K;
     this->sampleRate = 16000; // 16k
     break;
+  case SampleRate::SAMPLE_RATE_22K:
+    hsaiA.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_22K;
+    hsaiB.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_22K;
+    this->sampleRate = 22050; // 22k
+    break;
   case SampleRate::SAMPLE_RATE_32K:
     hsaiA.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_32K;
     hsaiB.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_32K;
     this->sampleRate = 32000; // 32k
+    break;
+  case SampleRate::SAMPLE_RATE_44K:
+    hsaiA.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_44K;
+    hsaiB.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_44K;
+    this->sampleRate = 44100; // 44k
     break;
   case SampleRate::SAMPLE_RATE_48K:
     hsaiA.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_48K;
@@ -99,6 +114,11 @@ SAIDriver::SAIDriver(bool stereo, BitDepth bitDepth, SampleRate sampleRate) {
     hsaiA.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_96K;
     hsaiB.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_96K;
     this->sampleRate = 96000; // 96k
+    break;
+  case SampleRate::SAMPLE_RATE_192K:
+    hsaiA.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_192K;
+    hsaiB.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_192K;
+    this->sampleRate = 192000; // 192k
     break;
   }
 

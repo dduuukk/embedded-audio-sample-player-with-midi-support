@@ -21,10 +21,14 @@ class SAIDriver {
 
         enum class SampleRate {
             SAMPLE_RATE_8K,
+            SAMPLE_RATE_11K,
             SAMPLE_RATE_16K,
+            SAMPLE_RATE_22K,
             SAMPLE_RATE_32K,
+            SAMPLE_RATE_44K,
             SAMPLE_RATE_48K,
-            SAMPLE_RATE_96K
+            SAMPLE_RATE_96K,
+            SAMPLE_RATE_192K
         };
 
         SAIDriver(bool stereo = true, BitDepth bitDepth = BitDepth::BIT_DEPTH_32, SampleRate sampleRate = SampleRate::SAMPLE_RATE_48K);
