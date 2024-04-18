@@ -164,21 +164,7 @@ int main(void) {
   HAL_SYSTICK_Config(SystemCoreClock / 1000);
   HAL_InitTick(1UL << (__NVIC_PRIO_BITS - 1));
 
-  WM8731 codec = WM8731();
-
-  codec.init();
-
-  codec.configureBypass(BYPASS_DISABLE);
-
-  // New initialization code
-  SAIDriver newSaiDriver = SAIDriver(true, SAIDriver::BitDepth::BIT_DEPTH_32,
-                                     SAIDriver::SampleRate::SAMPLE_RATE_48K);
-
-  wave_header parse = wave_header();
-
   struct wave_header wavHeader;
-
-  unsigned int sample_rate;
 
   FatFsIntf fs = FatFsIntf();
 
@@ -204,8 +190,39 @@ int main(void) {
     return -1;
   }
 
+  WM8731 codec = WM8731();
+
+  codec.init();
+  SAIDriver::SampleRate sample_rate;
+
+  switch (wavHeader.sampleRate) {
+  case 44100:
+    codec.configureSampleRate(ADC_44k1_DAC_44k1);
+    sample_rate = SAIDriver::SampleRate::SAMPLE_RATE_48K;
+    break;
+  case 8000:
+    codec.configureSampleRate(ADC_8k_DAC_8k);
+    sample_rate = SAIDriver::SampleRate::SAMPLE_RATE_8K;
+    break;
+  case 48000:
+    codec.configureSampleRate(ADC_48k_DAC_48k);
+    sample_rate = SAIDriver::SampleRate::SAMPLE_RATE_48K;
+    break;
+  default:
+    codec.configureSampleRate(ADC_48k_DAC_48k);
+    sample_rate = SAIDriver::SampleRate::SAMPLE_RATE_48K;
+  }
+
+  codec.configureInputDataLength(INPUT_24BITS);
+
+  codec.configureBypass(BYPASS_DISABLE);
+
+  // New initialization code
+  SAIDriver newSaiDriver =
+      SAIDriver(true, SAIDriver::BitDepth::BIT_DEPTH_24, sample_rate);
+
   // TODO play sound (from pre-lab 5a)
-  play_wave_samples(fp, wavHeader, -1, 0);
+  play_wave_samples(buff, &wavHeader, -1, 0, newSaiDriver);
 
   f_close(&fp);
 

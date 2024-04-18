@@ -10,7 +10,7 @@ INTERFACE
 target_link_libraries(wav-parser-intf
 INTERFACE
 fatfs-intf
-fatfs-driver-intf
+fatfs-intf
 wm8731-driver-intf
 hal-intf
 core-conf
@@ -24,4 +24,5 @@ wav-parser.cpp
 target_link_libraries(wav-parser
 PUBLIC
 wav-parser-intf
+PRIVATE
 )

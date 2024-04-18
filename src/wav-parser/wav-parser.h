@@ -4,6 +4,7 @@
 
 #include "fatfs.h"
 #include "codec_wm8731.h"
+#include "sai-driver.h"
 #include <cstdint>
 
 struct wave_header
@@ -23,7 +24,7 @@ struct wave_header
   uint32_t byteRate;      //= SampleRate * NumChannels * BitsPerSample/8  4
 
   uint16_t blockAlign;    //= NumChannels * BitsPerSample/8   The number of bytes
-                          // for one sample including all channels  2
+                       // for one sample including all channels  2
   uint16_t bitsPerSample; // 8 bits = 8, 16 bits = 16, etc.  2
 
   // data subchunk that contains the size of the data and the actual sound
@@ -40,7 +41,9 @@ int validate_wave(struct wave_header* wavHeader);
 void write_word(int32_t word);
 
 uint32_t audio_word_from_buf(struct wave_header wavHeader, int8_t* buf);
-int8_t play_wave_samples(FIL *fp, struct wave_header *wavHeader, int sample_count, unsigned int start);
+int8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
+                         int sample_count, unsigned int start,
+                         SAIDriver &SAIBDriver);
 
 void handleStereoMono(struct wave_header* wavHeader);
 

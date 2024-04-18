@@ -3,6 +3,8 @@
 
 #include "fatfs.h"
 #include "codec_wm8731.h"
+#include "sai-driver.h"
+#include <cstdint>
 
 uint32_t DMA_BUFFER_MEM_SECTION fifussy[256000/4];
 
@@ -52,63 +54,63 @@ void read_wave(uint8_t *fp, struct wave_header *dest) {
   dest->bitsPerSample = fp[34] | (fp[35] << 8) ;
 
 
-  
+
   dest->subchunk2ID = fp[36] | (fp[37] << 8) | (fp[38] << 16) | (fp[39] << 24);
   dest->subchunk2Size = fp[40] | (fp[41] << 8) | (fp[42] << 16) | (fp[43] << 24);
 
-/*
+  /*
 
-  // read header
-  int x = 0;
-  x = f_lseek(fp, 0);
-  x = f_read(fp, &(dest->chunkID), sizeof(uint32_t), NULL);
+    // read header
+    int x = 0;
+    x = f_lseek(fp, 0);
+    x = f_read(fp, &(dest->chunkID), sizeof(uint32_t), NULL);
 
-  x = f_lseek(fp, 4);
-  x = f_read(fp, &(dest->chunkSize), sizeof(uint32_t), NULL);
+    x = f_lseek(fp, 4);
+    x = f_read(fp, &(dest->chunkSize), sizeof(uint32_t), NULL);
 
-  x = f_lseek(fp, 8);
-  x = f_read(fp, &(dest->format), sizeof(uint32_t), NULL);
+    x = f_lseek(fp, 8);
+    x = f_read(fp, &(dest->format), sizeof(uint32_t), NULL);
 
-  x = f_lseek(fp, 12);
-  x = f_read(fp, &(dest->subchunk1ID), sizeof(uint32_t), NULL);
+    x = f_lseek(fp, 12);
+    x = f_read(fp, &(dest->subchunk1ID), sizeof(uint32_t), NULL);
 
-  x = f_lseek(fp, 16);
-  x = f_read(fp, &(dest->subchunk1Size), sizeof(uint32_t), NULL);
-
-
-
-  x = f_lseek(fp, 20);
-  x = f_read(fp, &(dest->audioFormat), sizeof(uint16_t), NULL);
-
-  x = f_lseek(fp, 22);
-  x = f_read(fp, &(dest->numChannels), sizeof(uint16_t), NULL);
+    x = f_lseek(fp, 16);
+    x = f_read(fp, &(dest->subchunk1Size), sizeof(uint32_t), NULL);
 
 
 
+    x = f_lseek(fp, 20);
+    x = f_read(fp, &(dest->audioFormat), sizeof(uint16_t), NULL);
 
-  x = f_lseek(fp, 24);
-  x = f_read(fp, &(dest->sampleRate), sizeof(uint32_t),
-             NULL); // SAMPLE RATEEEEEEEEEEEEEEEEEEEE for CC
-  x = f_lseek(fp, 28);
-  x = f_read(fp, &(dest->byteRate), sizeof(uint32_t), NULL);
-
-
-
-  x = f_lseek(fp, 32);
-  x = f_read(fp, &(dest->blockAlign), sizeof(uint16_t), NULL);
-
-  x = f_lseek(fp, 34);
-  x = f_read(fp, &(dest->bitsPerSample), sizeof(uint16_t),
-             NULL); // BIT DEPTHHHHHHHHHHHHHHH for CC
+    x = f_lseek(fp, 22);
+    x = f_read(fp, &(dest->numChannels), sizeof(uint16_t), NULL);
 
 
 
-  x = f_lseek(fp, 36);
-  x = f_read(fp, &(dest->subchunk2ID), sizeof(uint32_t), NULL);
 
-  x = f_lseek(fp, 40);
-  x = f_read(fp, &(dest->subchunk2Size), sizeof(uint32_t), NULL);
-*/
+    x = f_lseek(fp, 24);
+    x = f_read(fp, &(dest->sampleRate), sizeof(uint32_t),
+               NULL); // SAMPLE RATEEEEEEEEEEEEEEEEEEEE for CC
+    x = f_lseek(fp, 28);
+    x = f_read(fp, &(dest->byteRate), sizeof(uint32_t), NULL);
+
+
+
+    x = f_lseek(fp, 32);
+    x = f_read(fp, &(dest->blockAlign), sizeof(uint16_t), NULL);
+
+    x = f_lseek(fp, 34);
+    x = f_read(fp, &(dest->bitsPerSample), sizeof(uint16_t),
+               NULL); // BIT DEPTHHHHHHHHHHHHHHH for CC
+
+
+
+    x = f_lseek(fp, 36);
+    x = f_read(fp, &(dest->subchunk2ID), sizeof(uint32_t), NULL);
+
+    x = f_lseek(fp, 40);
+    x = f_read(fp, &(dest->subchunk2Size), sizeof(uint32_t), NULL);
+  */
   // printf("Expected file size: %d, Actual file size: %ld\n", (dest->chunkSize
   // + 8), st.st_size);
 
@@ -142,9 +144,6 @@ int validate_wave(struct wave_header *wavHeader)
    *                                  0x0B for 32-bits
    * */
 
-  configureInputDataLength(wavHeader->bitsPerSample);
-  configureSampleRate(wavHeader->sampleRate);
-
   /*
 
 
@@ -177,29 +176,26 @@ int validate_wave(struct wave_header *wavHeader)
   return 0;
 }
 
-uint8_t index = 0;
+uint32_t indx = 0;
 
-void write_word(uint32_t word) 
+void write_word(uint32_t word)
 
 // instead of fifussy i will have array and wwhen the end of the file it will be written 
 {
 
-
-
-
-  fifussy[index] = word;
-  index++;
+  fifussy[indx] = word;
+  indx++;
 
   /*
-  
+
   if (index >= 43)
    {
-  
+
       call sainb transmit to pass though array w data
       file sys goes in , data goes out to fifo, put data from struct into array
       pass through bit depth and sample rate
 
-    
+
 
     SAIBDriver.SAINBTransmit(fifussy, sizeof(uint32_t) * 32, 2000);
 
@@ -207,7 +203,7 @@ void write_word(uint32_t word)
   }
 
   index++;
-  
+
   */
 
   
@@ -247,11 +243,9 @@ uint32_t audio_word_from_buf(struct wave_header wavHeader, int8_t *buf) {
 }
 
 // calculate buffer size for audio data depending on stereo or mono
-int8_t play_wave_samples(FIL *fp, struct wave_header *wavHeader,
-                         int sample_count, unsigned int start) 
-  {
-                          uint8_t index = 0;
-
+int8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
+                         int sample_count, unsigned int start,
+                         SAIDriver &SAIBDriver) {
 
   if (!fp) {
     return -1;
@@ -262,39 +256,37 @@ int8_t play_wave_samples(FIL *fp, struct wave_header *wavHeader,
     return -1;
   }
 
-  int x = f_lseek(fp, 44 + start);
-
-  int8_t totalSamples = wavHeader->sampleRate;
   int8_t bytesPerSample = wavHeader->bitsPerSample / 8;
 
-  int8_t buf[(bytesPerSample)*wavHeader->numChannels];
-
-  int8_t lbuf[bytesPerSample];
-  int8_t rbuf[bytesPerSample];
+  int8_t lbuf[4];
+  int8_t rbuf[4];
 
   while (sample_count > 0) {
-
-    x = f_read(fp, buf, ((bytesPerSample)) * wavHeader->numChannels, NULL);
 
     if (wavHeader->numChannels == 2) // Seperate into two different buffers for
                                      // left and right, for 2-channel audio
     {
       // stereo
 
-      for (int i = 0; i < (bytesPerSample)*wavHeader->numChannels; i += 2) {
-        lbuf[i] = buf[i];
-        rbuf[i] = buf[i + 1];
+      for (int i = 0; i < wavHeader->bitsPerSample / 8; i++) {
+        lbuf[i] = fp[start + 2 * indx * wavHeader->bitsPerSample / 8 + i];
+        rbuf[i] = fp[start + 2 * indx * wavHeader->bitsPerSample / 8 + i +
+                     wavHeader->bitsPerSample / 8];
       }
 
-    write_word(audio_word_from_buf(*wavHeader, lbuf));
-    write_word(audio_word_from_buf(*wavHeader, rbuf));
+      write_word(audio_word_from_buf(*wavHeader, lbuf));
+      write_word(audio_word_from_buf(*wavHeader, rbuf));
       sample_count -= 1;
 
     } else // mono
     {
 
-    write_word(audio_word_from_buf(*wavHeader, buf)); // For the left channel
-    write_word(audio_word_from_buf(*wavHeader, buf)); // For the right channel
+      for (int i = 0; i < wavHeader->bitsPerSample / 8; i++) {
+        lbuf[i] = fp[start + indx * wavHeader->bitsPerSample + i];
+      }
+
+      write_word(audio_word_from_buf(*wavHeader, lbuf)); // For the l channel
+      write_word(audio_word_from_buf(*wavHeader, lbuf)); // For the r channel
 
       sample_count -= 1;
 
@@ -302,10 +294,8 @@ int8_t play_wave_samples(FIL *fp, struct wave_header *wavHeader,
       // channel and the right channel
     }
 
-
-
-    SAIBDriver.SAINBTransmit(fifussy, sizeof(uint32_t) * 32, 2000);
-
+    SAIBDriver.txTransmit(reinterpret_cast<uint8_t *>(fifussy), sample_count,
+                          2000);
   }
 
   return 0;
