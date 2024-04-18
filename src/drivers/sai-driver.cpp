@@ -13,6 +13,7 @@
 #define DMARAMBUFFERSIZE 163840
 
 DMA_HandleTypeDef hdma;
+
 uint8_t DMA_BUFFER_MEM_SECTION dmaRamBuffer[DMARAMBUFFERSIZE];
 
 /**
@@ -146,7 +147,7 @@ void SAIDriver::genericHSAISetup(SAI_HandleTypeDef *hsai) {
   hsai->Init.OutputDrive = SAI_OUTPUTDRIVE_DISABLED;
   hsai->Init.NoDivider = SAI_MASTERDIVIDER_ENABLE;
   hsai->Init.FIFOThreshold = SAI_FIFOTHRESHOLD_EMPTY;
-  hsai->Init.AudioFrequency = SAI_AUDIO_FREQUENCY_48K;
+  // hsai->Init.AudioFrequency = SAI_AUDIO_FREQUENCY_48K;
   // TODO: CHECK IF NOT DEFINING THIS IS OK
   // hsai->Init.Mckdiv = 0;
   // TODO: OVERSAMPLING
@@ -154,8 +155,8 @@ void SAIDriver::genericHSAISetup(SAI_HandleTypeDef *hsai) {
   hsai->Init.MonoStereoMode = SAI_STEREOMODE;
   hsai->Init.CompandingMode = SAI_NOCOMPANDING;
   hsai->Init.TriState = SAI_OUTPUT_NOTRELEASED;
-  hsai->Init.Protocol = SAI_I2S_STANDARD;
-  hsai->Init.DataSize = SAI_DATASIZE_32;
+  // hsai->Init.Protocol = SAI_I2S_STANDARD;
+  // hsai->Init.DataSize = SAI_DATASIZE_32;
 }
 
 /**
