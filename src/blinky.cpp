@@ -175,7 +175,11 @@ int main(void) {
 
   unsigned int sample_rate;
 
-  // read file header
+  // read file header 
+  
+  //in readwave insead of taking in fp it will take in a unit 18 pointer 
+
+
   if (read_wave(fp, wavHeader) != 0) {
     return -1;
   }
