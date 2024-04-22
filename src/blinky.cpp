@@ -1,7 +1,12 @@
+#include "MIDI_event.h"
 #include "fatfs.h"
 #include <stm32h7xx_hal.h>
+#include <stm32h7xx_hal_gpio.h>
 
 #include "codec_wm8731.h"
+#include "MIDI_handler.h"
+
+#include "UART.h"
 
 #define LED_PORT GPIOC
 #define LED_PIN GPIO_PIN_0
@@ -150,11 +155,14 @@ void initGPIO() {
 int main(void) {
   HAL_Init();
   initGPIO();
+  initUART1();
 
   clocks_initialise();
   // 1kHz ticks
   HAL_SYSTICK_Config(SystemCoreClock / 1000);
   HAL_InitTick(1UL << (__NVIC_PRIO_BITS - 1));
+
+  HAL_UART_Receive_IT(&huart1, rx_buff, 1);
 
   WM8731 codec = WM8731();
 
@@ -162,9 +170,26 @@ int main(void) {
 
   codec.configureBypass(BYPASS_ENABLE);
 
-  FatFsIntf fs = FatFsIntf();
+  while (1) 
+  {
+    if (midi_handler.midiRecieveCheckEmpty() == false)
+    {
+      midi_handler.parse(midi_handler.dequeueByte());
+    }
 
-  while (1) {
+    if (midi_handler.midiEventCheckEmpty() == false)
+    {
+      MidiEvent event = midi_handler.dequeueEvent();
+
+      if (event.channel == 0 && event.messageType == ControlChange && event.data[0] == 0 && event.data[1] > 0)
+      {
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+      }
+      else if (event.channel == 0 && event.messageType == ControlChange && event.data[0] == 0 && event.data[1] == 0)
+      {
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+      }
+    }
   }
   return 0;
 }

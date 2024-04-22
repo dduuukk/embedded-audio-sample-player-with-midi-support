@@ -61,6 +61,8 @@ target_link_libraries(${TARGET}
         HAL::STM32::H7::M7::LL_DELAYBLOCK
         HAL::STM32::H7::M7::I2C
         HAL::STM32::H7::M7::UART
+        HAL::STM32::H7::M7::UARTEx
+        HAL::STM32::H7::M7::DMA
         HAL::STM32::H7::M7::PWREx
         CMSIS::STM32::H750IB::M7
         STM32::NoSys
@@ -73,6 +75,7 @@ target_link_libraries(${TARGET}
         sdmmc-driver
         wm8731-driver
         midi-parser
+        uart-driver
         
     )
 
@@ -119,6 +122,7 @@ add_compile_options(
 add_subdirectory(drivers)
 add_subdirectory(FatFS)
 add_subdirectory(util)
+add_subdirectory(per)
 
 add_library(core-conf 
     INTERFACE
