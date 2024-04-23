@@ -4,7 +4,7 @@
 #include "sai-driver.h"
 #include <cstdint>
 
-uint32_t DMA_BUFFER_MEM_SECTION outputBuffer[163840 / 4];
+uint32_t DMA_BUFFER_MEM_SECTION outputBuffer[UINT16_MAX];
 
 /*
 reads the file and puts correcct information into the struct
@@ -55,11 +55,25 @@ int validate_wave(struct wave_header *wavHeader) {
 }
 
 uint32_t indx = 0;
+uint32_t indxOut = 0;
 
-void write_word(uint32_t word) {
+void write_word(uint32_t lWord, uint32_t rWord, SAIDriver &SAIBDriver) {
+  // Check if the output buffer is full (i.e. the buffer is uint16 MAX)
+  if (indxOut >= UINT16_MAX) {
+    // Transmit the buffer to the DMA
+    SAIBDriver.txTransmit(reinterpret_cast<uint8_t *>(outputBuffer), UINT16_MAX, 0);
+    // Wait for the DMA to finish
+    while(SAIBDriver.returnDMABusy()) {
+      // Block and wait
+    }
+    // Clear the output buffer
+    indxOut = 0;
+  }
 
-  outputBuffer[indx] = word;
-  indx++;
+  outputBuffer[indxOut] = lWord;
+  indxOut++;
+  outputBuffer[indxOut] = rWord;
+  indxOut++;
 }
 
 /* @brief Build a 32-bit audio word from a buffer
@@ -106,8 +120,7 @@ int8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
         rbuf[i] = fp[start + 2 * indx * bytesPerSample + i + bytesPerSample];
       }
 
-      write_word(audio_word_from_buf(*wavHeader, lbuf));
-      write_word(audio_word_from_buf(*wavHeader, rbuf));
+      write_word(audio_word_from_buf(*wavHeader, lbuf), audio_word_from_buf(*wavHeader, rbuf), SAIBDriver);
       sample_count -= 1;
 
     } else // mono
@@ -116,11 +129,11 @@ int8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
         lbuf[i] = fp[start + indx * bytesPerSample + i];
       }
 
-      write_word(audio_word_from_buf(*wavHeader, lbuf)); // For the l channel
-      write_word(audio_word_from_buf(*wavHeader, lbuf)); // For the r channel
+       write_word(audio_word_from_buf(*wavHeader, lbuf), audio_word_from_buf(*wavHeader, rbuf), SAIBDriver);
 
       sample_count -= 1;
     }
+    indx++;
   }
 
   SAIBDriver.txTransmit(reinterpret_cast<uint8_t *>(outputBuffer), 20000, 2000);

@@ -35,6 +35,7 @@ class SAIDriver {
         ~SAIDriver();
 
         int txTransmit(uint8_t* pData, uint32_t Size, uint32_t Timeout);
+        bool returnDMABusy();
 
         uint32_t dmaBufferWordSize = 0;
 

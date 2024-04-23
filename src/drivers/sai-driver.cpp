@@ -316,6 +316,10 @@ extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef *hsai) {
   }
 }
 
+bool SAIDriver::returnDMABusy() {
+  return this->hsaiB.hdmatx->State == HAL_DMA_STATE_BUSY;
+}
+
 /**
  * @brief Transmits data to DMA which then transmits SAI to codec.
  *
@@ -333,7 +337,7 @@ int SAIDriver::txTransmit(uint8_t *pData, uint32_t Size, uint32_t Timeout) {
     return 1;
   }
   // Block transmission while the DMA is transferring
-  while (hsaiB.hdmatx->State == HAL_DMA_STATE_BUSY) {
+  while (returnDMABusy()) {
     // Polling block
     // HAL_Delay(1); // TODO: OPTIMIZE THIS DELAY
   }
