@@ -5,10 +5,34 @@ What, what, status.
 What is the objective in this lab? Describe the lab technical aspects, show its aim and the main
 findings.
 
+
+This project involves the development of a FreeRTOS-based audio streaming system on an STM32 development board. The system integrates various components, including an audio codec, SD card reader, STM32 microprocessor, H7 DMA modules, and a headphone amplifier. Utilizing an SD card for data storage, the system employs a FATFS file system for file access. A .WAV parser within the STM32 MCU interprets .WAV file headers and audio data from the SD card, facilitating audio playback. Communication between the MCU and the codec is established through the STM32 Serial Audio Interface (SAI) peripheral, utilizing I2S compatibility. Additionally, an I2C connection configures the codec. The primary objective is to parse and play .WAV files stored on the SD card. A potential stretch goal involves implementing a user interface with buttons and an OLED screen for enhanced interaction.
+
+
+
+
 ## Intro
 Briefly outline the area your project applies to.
 Highlight what is missing in current approaches.
 Define the problem you want to solve and why it's important.
+
+The project delves into the realm of embedded systems, focusing specifically on the development of an audio streaming system using FreeRTOS on an STM32 development board. In embedded systems, integrating audio streaming capabilities poses significant challenges, especially concerning resource utilization and system complexity.
+
+Current approaches often lack a.....
+
+
+The integration of audio streaming capabilities into embedded systems presents a complex challenge, particularly in environments with stringent resource constraints. In this project, we embark on the development of a sophisticated audio streaming system using a FreeRTOS-based approach on an STM32 development board. Central to the system architecture are components such as an audio codec, SD card reader, STM32 microprocessor, H7 DMA modules, and a headphone amplifier. Leveraging the capabilities of the STM32 MCU and its peripherals, including the Serial Audio Interface (SAI) and Inter-Integrated Circuit (I2C), our goal is to create a robust platform for parsing and playing .WAV files stored on an SD card. This introductory overview provides a glimpse into the intricacies of our system design, highlighting key components and objectives. Additionally, we outline a potential stretch goal involving the implementation of a user interface for enhanced user interaction. Through meticulous integration and software development, we aim to achieve seamless audio playback functionality while exploring avenues for further feature enhancements.
+
+
+
+
+
+
+
+
+
+
+
 
 ## Related Work
 Highlight similar approaches.
@@ -31,6 +55,10 @@ A system diagram that highlights the interaction between these different compone
 Who did what with links to where you can find the design documentation for each component.
 
 @dduuukk (Christian Bender) was responsible for completing the audio driver. The design, implementation, and operation of the audio driver is discussed in more detail [here](src/drivers/sai-design.md).
+
+Katherine Cloutier locked in doing the [WAV file parser](src/wav-parser/Readme-wav-parser.md).
+
+
 
 ## Implementation Progress
 Assess our goals in the project, were our goals met? Where did we fall short?
