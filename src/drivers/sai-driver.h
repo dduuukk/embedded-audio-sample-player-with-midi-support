@@ -8,6 +8,8 @@
 #include <stm32h7xx_hal_dma.h>
 #include <stm32h7xx_hal_sai.h>
 
+#define DMA_RAM_BUFFER_SIZE 256 * 1024 // 256KB of RAM for DMA access
+
 class SAIDriver {
     public:
         enum class BitDepth {
@@ -19,16 +21,21 @@ class SAIDriver {
 
         enum class SampleRate {
             SAMPLE_RATE_8K,
+            SAMPLE_RATE_11K,
             SAMPLE_RATE_16K,
+            SAMPLE_RATE_22K,
             SAMPLE_RATE_32K,
+            SAMPLE_RATE_44K,
             SAMPLE_RATE_48K,
-            SAMPLE_RATE_96K
+            SAMPLE_RATE_96K,
+            SAMPLE_RATE_192K
         };
 
         SAIDriver(bool stereo = true, BitDepth bitDepth = BitDepth::BIT_DEPTH_32, SampleRate sampleRate = SampleRate::SAMPLE_RATE_48K);
         ~SAIDriver();
 
         int txTransmit(uint8_t* pData, uint32_t Size, uint32_t Timeout);
+        bool returnDMABusy();
 
         uint32_t dmaBufferWordSize = 0;
 

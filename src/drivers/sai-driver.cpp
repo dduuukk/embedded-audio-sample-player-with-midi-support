@@ -9,12 +9,7 @@
 #include "stm32h7xx_hal_sai.h"
 #include <cstdint>
 
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define DMARAMBUFFERSIZE 163840
-
 DMA_HandleTypeDef hdma;
-
-uint8_t DMA_BUFFER_MEM_SECTION dmaRamBuffer[DMARAMBUFFERSIZE];
 
 /**
  * @brief Constructs a new SAIDriver object.
@@ -59,7 +54,7 @@ SAIDriver::SAIDriver(bool stereo, BitDepth bitDepth, SampleRate sampleRate) {
   case BitDepth::BIT_DEPTH_24:
     bitDepthValue = SAI_PROTOCOL_DATASIZE_24BIT;
     // TODO: CHECK IF 24 BIT CAN BE STD ON DAISY
-    protocolValue = SAI_I2S_MSBJUSTIFIED;
+    protocolValue = SAI_I2S_STANDARD;
     this->bitDepth = 24;
     break;
   case BitDepth::BIT_DEPTH_32:
@@ -76,7 +71,7 @@ SAIDriver::SAIDriver(bool stereo, BitDepth bitDepth, SampleRate sampleRate) {
   hsaiA.Init.DataSize = bitDepthValue;
   hsaiB.Init.DataSize = bitDepthValue;
   // Set publicly available buffer size
-  this->dmaBufferWordSize = DMARAMBUFFERSIZE / (this->bitDepth / 8);
+  this->dmaBufferWordSize = DMA_RAM_BUFFER_SIZE / (this->bitDepth / 8);
 
   // Set the sample rate
   switch (sampleRate) {
@@ -85,15 +80,30 @@ SAIDriver::SAIDriver(bool stereo, BitDepth bitDepth, SampleRate sampleRate) {
     hsaiB.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_8K;
     this->sampleRate = 8000; // 8k
     break;
+  case SampleRate::SAMPLE_RATE_11K:
+    hsaiA.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_11K;
+    hsaiB.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_11K;
+    this->sampleRate = 11025; // 11k
+    break;
   case SampleRate::SAMPLE_RATE_16K:
     hsaiA.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_16K;
     hsaiB.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_16K;
     this->sampleRate = 16000; // 16k
     break;
+  case SampleRate::SAMPLE_RATE_22K:
+    hsaiA.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_22K;
+    hsaiB.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_22K;
+    this->sampleRate = 22050; // 22k
+    break;
   case SampleRate::SAMPLE_RATE_32K:
     hsaiA.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_32K;
     hsaiB.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_32K;
     this->sampleRate = 32000; // 32k
+    break;
+  case SampleRate::SAMPLE_RATE_44K:
+    hsaiA.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_44K;
+    hsaiB.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_44K;
+    this->sampleRate = 44100; // 44k
     break;
   case SampleRate::SAMPLE_RATE_48K:
     hsaiA.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_48K;
@@ -104,6 +114,11 @@ SAIDriver::SAIDriver(bool stereo, BitDepth bitDepth, SampleRate sampleRate) {
     hsaiA.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_96K;
     hsaiB.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_96K;
     this->sampleRate = 96000; // 96k
+    break;
+  case SampleRate::SAMPLE_RATE_192K:
+    hsaiA.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_192K;
+    hsaiB.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_192K;
+    this->sampleRate = 192000; // 192k
     break;
   }
 
@@ -147,7 +162,6 @@ void SAIDriver::genericHSAISetup(SAI_HandleTypeDef *hsai) {
   hsai->Init.OutputDrive = SAI_OUTPUTDRIVE_DISABLED;
   hsai->Init.NoDivider = SAI_MASTERDIVIDER_ENABLE;
   hsai->Init.FIFOThreshold = SAI_FIFOTHRESHOLD_EMPTY;
-  // hsai->Init.AudioFrequency = SAI_AUDIO_FREQUENCY_48K;
   // TODO: CHECK IF NOT DEFINING THIS IS OK
   // hsai->Init.Mckdiv = 0;
   // TODO: OVERSAMPLING
@@ -155,8 +169,6 @@ void SAIDriver::genericHSAISetup(SAI_HandleTypeDef *hsai) {
   hsai->Init.MonoStereoMode = SAI_STEREOMODE;
   hsai->Init.CompandingMode = SAI_NOCOMPANDING;
   hsai->Init.TriState = SAI_OUTPUT_NOTRELEASED;
-  // hsai->Init.Protocol = SAI_I2S_STANDARD;
-  // hsai->Init.DataSize = SAI_DATASIZE_32;
 }
 
 /**
@@ -247,9 +259,9 @@ void initDMA(SAI_HandleTypeDef *hsai) {
   // Set up the DMA to take and output audio words
   hdma.Init.MemInc = DMA_MINC_ENABLE; // Memory increment enabled
   hdma.Init.PeriphDataAlignment =
-      DMA_PDATAALIGN_WORD; // Peripheral data alignment is word
+      DMA_PDATAALIGN_HALFWORD; // Peripheral data alignment is word
   hdma.Init.MemDataAlignment =
-      DMA_MDATAALIGN_WORD; // Memory data alignment is word
+      DMA_MDATAALIGN_HALFWORD; // Memory data alignment is word
   hdma.Init.Mode =
       DMA_CIRCULAR; // Circular mode (emulate FIFO with more control)
   hdma.Init.Priority = DMA_PRIORITY_HIGH; // High priority
@@ -299,9 +311,13 @@ extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef *hsai) {
       initDMA(hsai);
     }
 
-    HAL_NVIC_SetPriority(SAI1_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(SAI1_IRQn);
+    // HAL_NVIC_SetPriority(SAI1_IRQn, 0, 0);
+    // HAL_NVIC_EnableIRQ(SAI1_IRQn);
   }
+}
+
+bool SAIDriver::returnDMABusy() {
+  return this->hsaiB.hdmatx->State == HAL_DMA_STATE_BUSY;
 }
 
 /**
@@ -316,24 +332,18 @@ extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef *hsai) {
  * @return 0 if transmit successful, 1 if DMA queue is full.
  */
 int SAIDriver::txTransmit(uint8_t *pData, uint32_t Size, uint32_t Timeout) {
-
   // Ensure the size passed in is less than the size of the DMA buffer
   if (Size > this->dmaBufferWordSize) {
     return 1;
   }
   // Block transmission while the DMA is transferring
-  while (hsaiB.hdmatx->State == HAL_DMA_STATE_BUSY) {
+  while (returnDMABusy()) {
     // Polling block
     // HAL_Delay(1); // TODO: OPTIMIZE THIS DELAY
   }
-  // Take the minimum of the size of DMA buffer or the size of the data
-  Size = MIN(Size, this->dmaBufferWordSize);
-
-  // Copy the data to the DMA buffer in RAM
-  memcpy(dmaRamBuffer, pData, Size * (this->bitDepth / 8));
 
   // Transmit data through DMA to SAI
-  if (HAL_SAI_Transmit(&hsaiB, dmaRamBuffer, Size, Timeout) != HAL_OK) {
+  if (HAL_SAI_Transmit_DMA(&hsaiB, pData, Size) != HAL_OK) {
     __asm__ __volatile__("bkpt #0");
     return 1;
   }

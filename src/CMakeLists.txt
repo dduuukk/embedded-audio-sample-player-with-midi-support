@@ -70,6 +70,7 @@ target_link_libraries(${TARGET}
         #FreeRTOS::Heap::4
         #FreeRTOS::ARM_CM4F
         #TODO your object libraries go here
+        wav-parser
         sai-driver
         fatfs-interface-driver
         fatfs
@@ -117,6 +118,7 @@ add_compile_options(
     )
 
 # TODO add_subdirectory(folder-name) goes here for all folders!
+add_subdirectory(wav-parser)
 add_subdirectory(drivers)
 add_subdirectory(FatFS)
 

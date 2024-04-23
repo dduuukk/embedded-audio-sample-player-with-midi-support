@@ -1,0 +1,71 @@
+
+Refrence module for microcontroller and peripherals 
+https://www.st.com/resource/en/reference_manual/dm00314099-stm32h742-stm32h743-753-and-stm32h750-value-line-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf
+
+From prelab 5
+http://soundfile.sapp.org/doc/WaveFormat/
+https://docs.xilinx.com/v/u/46kAupo7FNMOd4IaMKjwwA
+http://www.analog.com/media/en/technical-documentation/data-sheets/ADAU1761.pdf
+
+Audio setup for zed
+https://neu-ece-4534.github.io/audio.html 
+
+### Katherine Cloutier: Parsing wave
+
+1. Research WAV File Format
+- look at past labs that delt with this
+- find resources and documentation that may be helful
+2. Design WAV File Header Structure
+- define a data struct for WAV file
+3. Validate WAV File Integrity
+- validation checks to ensure the WAV file is intact and valid
+4. Implement Header Parsing Function
+- create a function to parse the header of a WAV file
+5. Extract Audio Format Information
+- extract audio format details from the WAV file header
+6. Get Sample Rate and Bit Depth
+- extract sample rate and bit depth information from the WAV file header
+7. Handle Stereo and Mono Format
+- compatibility with both stereo and mono audio formats
+8. Implement Error Handling for WAV Parsing
+- error conditions and implement error handling
+9. Buffer Management for Audio Data
+- storing audio data read from the WAV file
+10. Handle Endianness and Data Alignment
+- big endian and little endian endianness and data alignment in the WAV file
+11. Integrate Parsing with Audio Playback
+- parsing with audio playback functionality
+
+
+
+
+
+
+
+
+The system architecture utilizes an SD card which interfaces with the STM32 MCU through SDIO. A FATFS file system will be implemented for SD card file access. The MCU will host a .WAV parser responsible for interpreting the header and audio data of the .WAV file from the SD card, transforming it into audio words for playback. This parsed data will then be sent to the codec through a DMA FIFO and an SAI peripheral.
+
+
+
+The primary objective is to parse a .WAV file stored on an SD card and play it through the headphone output. Achieving this involves sending .WAV data from the SD card to the MCU, processing that data and sending it to the DMA FIFO, and then sending that data to the codec over SAI/I2S. Additionally, if there is time, there is a stretch goal that will involve implementing a user interface with buttons and an OLED screen for enhanced user interaction.
+
+
+Noah gonna give you a FILE* that you read from, you’re gonna send data into a FIFO provided by Chris
+
+
+3/25/24 notes:
+- need to set up compiler with help from noah
+- get bit depth and sample rate
+https://stackoverflow.com/questions/21567920/how-to-read-bit-rate-of-wav-file-in-c-sharp 
+https://forum.arduino.cc/t/wav-to-c-program/293973/6
+https://discuss.cakewalk.com/index.php?/topic/16397-win-10-users-how-to-find-audio-bitsample-rate/ 
+- no print
+- make your file an include 
+
+
+
+
+Brain dump:
+- Look at 
+Prelab 5 through end of lab 6
+
