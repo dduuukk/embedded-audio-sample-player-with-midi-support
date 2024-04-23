@@ -70,13 +70,13 @@ uint32_t audio_word_from_buf(struct wave_header wavHeader, int8_t *buf) {
   // build word depending on bits per sample, etc
   uint32_t audio_word = 0;
 
+  // Loop through the number of bytes in a sample, perform shifting
   for (int i = 0; i < wavHeader.bitsPerSample / 8; i++) {
-
-    audio_word |= (uint32_t)((buf[i] + 127)
-                             << (8 * ((24 / wavHeader.bitsPerSample - 1) - i)));
+    audio_word |= (buf[i] << (3 - (i * 8)));
+    // audio_word |= (buf[i] << (i * 8));
   }
 
-  return audio_word << 8;
+  return audio_word;
 }
 
 // calculate buffer size for audio data depending on stereo or mono
