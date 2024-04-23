@@ -259,9 +259,9 @@ void initDMA(SAI_HandleTypeDef *hsai) {
   // Set up the DMA to take and output audio words
   hdma.Init.MemInc = DMA_MINC_ENABLE; // Memory increment enabled
   hdma.Init.PeriphDataAlignment =
-      DMA_PDATAALIGN_WORD; // Peripheral data alignment is word
+      DMA_PDATAALIGN_HALFWORD; // Peripheral data alignment is word
   hdma.Init.MemDataAlignment =
-      DMA_MDATAALIGN_WORD; // Memory data alignment is word
+      DMA_MDATAALIGN_HALFWORD; // Memory data alignment is word
   hdma.Init.Mode =
       DMA_CIRCULAR; // Circular mode (emulate FIFO with more control)
   hdma.Init.Priority = DMA_PRIORITY_HIGH; // High priority

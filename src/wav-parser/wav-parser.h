@@ -37,7 +37,7 @@ void read_wave(uint8_t *fp, struct wave_header *dest);
 int validate_wave(struct wave_header *wavHeader);
 void write_word(int32_t word);
 
-uint32_t audio_word_from_buf(struct wave_header wavHeader, int8_t *buf);
+uint16_t audio_word_from_buf(struct wave_header wavHeader, int8_t *buf);
 int8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
                          uint32_t sample_count, unsigned int start,
                          SAIDriver &SAIBDriver);

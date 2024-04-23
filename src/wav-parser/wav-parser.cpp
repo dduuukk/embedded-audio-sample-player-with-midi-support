@@ -4,7 +4,7 @@
 #include "sai-driver.h"
 #include <cstdint>
 
-uint32_t DMA_BUFFER_MEM_SECTION outputBuffer[UINT16_MAX];
+uint16_t DMA_BUFFER_MEM_SECTION outputBuffer[UINT16_MAX];
 
 /*
 reads the file and puts correcct information into the struct
@@ -57,7 +57,7 @@ int validate_wave(struct wave_header *wavHeader) {
 uint32_t indx = 0;
 uint32_t indxOut = 0;
 
-void write_word(uint32_t lWord, uint32_t rWord, SAIDriver &SAIBDriver) {
+void write_word(uint16_t lWord, uint16_t rWord, SAIDriver &SAIBDriver) {
   // Check if the output buffer is full (i.e. the buffer is uint16 MAX)
   if (indxOut >= UINT16_MAX) {
     // Transmit the buffer to the DMA
@@ -81,15 +81,16 @@ void write_word(uint32_t lWord, uint32_t rWord, SAIDriver &SAIBDriver) {
    @param hdr WAVE header
    @param buf a byte array
    @return 32-bit word */
-uint32_t audio_word_from_buf(struct wave_header wavHeader, int8_t *buf) {
+uint16_t audio_word_from_buf(struct wave_header wavHeader, int8_t *buf) {
   // build word depending on bits per sample, etc
-  uint32_t audio_word = 0;
+  uint16_t audio_word = 0;
+  audio_word = (buf[0]) | (buf[1] << 8);
 
-  // Loop through the number of bytes in a sample, perform shifting
-  for (int i = 0; i < wavHeader.bitsPerSample / 8; i++) {
-    // audio_word |= (buf[i] << (24 - (i * 8)));
-    audio_word |= (buf[i] << ((i * 8) + 16));
-  }
+  // // Loop through the number of bytes in a sample, perform shifting
+  // for (int i = 0; i < wavHeader.bitsPerSample / 8; i++) {
+  //   // audio_word |= (buf[i] << (24 - (i * 8)));
+  //   audio_word |= (buf[i] << ((i * 8) + 16));
+  // }
   // volatile uint8_t byte1 = buf[0];
   // volatile uint8_t byte2 = buf[1];
   // __asm__ __volatile__("bkpt #0");
@@ -110,10 +111,10 @@ int8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
   }
 
   int8_t bytesPerSample = wavHeader->bitsPerSample / 8;
-  int8_t lbuf[4];
-  int8_t rbuf[4];
+  int8_t lbuf[2];
+  int8_t rbuf[2];
 
-  while (sample_count > 0) {
+  while (indx < sample_count) {
     if (wavHeader->numChannels == 2) // Seperate into two different buffers for
                                      // left and right, for 2-channel audio
     {
@@ -125,8 +126,6 @@ int8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
 
       write_word(audio_word_from_buf(*wavHeader, lbuf),
                  audio_word_from_buf(*wavHeader, rbuf), SAIBDriver);
-      sample_count -= 1;
-
     } else // mono
     {
       for (int i = 0; i < bytesPerSample; i++) {
@@ -134,14 +133,13 @@ int8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
       }
 
       write_word(audio_word_from_buf(*wavHeader, lbuf),
-                 audio_word_from_buf(*wavHeader, rbuf), SAIBDriver);
-
-      sample_count -= 1;
+                 audio_word_from_buf(*wavHeader, lbuf), SAIBDriver);
     }
     indx++;
   }
 
-  SAIBDriver.txTransmit(reinterpret_cast<uint8_t *>(outputBuffer), 65000, 2000);
+  SAIBDriver.txTransmit(reinterpret_cast<uint8_t *>(outputBuffer), sample_count,
+                        2000);
 
   return 0;
 }
