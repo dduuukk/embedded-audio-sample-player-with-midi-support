@@ -1,12 +1,12 @@
 #include "UART.h"
 
-void Error_Handler(void)
-{
-  __disable_irq();
-  while (1)
-  {
-  }
-}
+// void Error_Handler(void)
+// {
+//   __disable_irq();
+//   while (1)
+//   {
+//   }
+// }
 
 void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 {
@@ -56,7 +56,7 @@ static void initUART1(void)
 
   if (HAL_UART_Init(&huart1) != HAL_OK)
   {
-    Error_Handler();
+    __asm__ __volatile__("bkpt #0");
   }
 }
 
@@ -70,8 +70,14 @@ void USART1_IRQHandler(void)
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-  HAL_UART_Receive_IT(&huart1, rx_buff, 1);
-  midi_handler.enqueueByte(rx_buff[0]);
+  //HAL_UART_Receive_IT(&huart1, rx_buff, 1);
+  //midi_handler.enqueueByte(rx_buff[0]);
+
+  if(huart->Instance==USART1)
+  {
+    HAL_UART_Receive_IT(huart, rx_buff, 1);
+    midi_handler.enqueueByte(rx_buff[0]);
+  }
 }
 
 }

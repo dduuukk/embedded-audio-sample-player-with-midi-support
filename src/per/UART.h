@@ -6,11 +6,11 @@
 #include "MIDI_handler.h"
 #include "MIDI_event.h"
 
-midiHandler<16, 16> midi_handler;
+extern midiHandler<16, 16> midi_handler;
 
-UART_HandleTypeDef huart1;
+extern uint8_t rx_buff[8];
 
-uint8_t rx_buff[8];
+extern UART_HandleTypeDef huart1;
 
 void HAL_UART_MspInit(UART_HandleTypeDef* huart);
 
