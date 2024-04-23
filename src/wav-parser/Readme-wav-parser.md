@@ -10,6 +10,12 @@ This WAV file parser is intended for embedded systems where resources are limite
 
 To use this code, include the necessary header files (`wav-parser.h`, `fatfs.h`, `codec_wm8731.h`) in your project. Ensure that you have a compatible microcontroller platform with sufficient memory and processing capabilities.
 
+## Design
+
+
+## Implementaion 
+
+
 ## Functions 
 
 #### `read_wave()`
