@@ -31,17 +31,12 @@ struct wave_header {
                           // is the number of bytes in the data.  4
 };
 
-void pr_usage(char *pname);
 void read_wave(uint8_t *fp, struct wave_header *dest);
 
 int validate_wave(struct wave_header *wavHeader);
-void write_word(int32_t word);
 
-uint16_t audio_word_from_buf(struct wave_header wavHeader, int8_t *buf);
-int8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
-                         uint32_t sample_count, unsigned int start,
-                         SAIDriver &SAIBDriver);
-
-void handleStereoMono(struct wave_header *wavHeader);
+uint8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
+                          uint32_t sample_count, unsigned int start,
+                          SAIDriver &SAIBDriver);
 
 #endif /* WAVE_H */

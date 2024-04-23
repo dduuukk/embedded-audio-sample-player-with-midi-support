@@ -81,7 +81,7 @@ void write_word(uint16_t lWord, uint16_t rWord, SAIDriver &SAIBDriver) {
    @param hdr WAVE header
    @param buf a byte array
    @return 32-bit word */
-uint16_t audio_word_from_buf(struct wave_header wavHeader, int8_t *buf) {
+uint16_t audio_word_from_buf(struct wave_header wavHeader, uint8_t *buf) {
   // build word depending on bits per sample, etc
   uint16_t audio_word = 0;
   audio_word = (buf[0]) | (buf[1] << 8);
@@ -98,9 +98,9 @@ uint16_t audio_word_from_buf(struct wave_header wavHeader, int8_t *buf) {
 }
 
 // calculate buffer size for audio data depending on stereo or mono
-int8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
-                         uint32_t sample_count, unsigned int start,
-                         SAIDriver &SAIBDriver) {
+uint8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
+                          uint32_t sample_count, unsigned int start,
+                          SAIDriver &SAIBDriver) {
 
   if (!fp) {
     return -1;
@@ -110,9 +110,9 @@ int8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
     return -1;
   }
 
-  int8_t bytesPerSample = wavHeader->bitsPerSample / 8;
-  int8_t lbuf[2];
-  int8_t rbuf[2];
+  uint8_t bytesPerSample = wavHeader->bitsPerSample / 8;
+  uint8_t lbuf[2];
+  uint8_t rbuf[2];
 
   while (indx < sample_count * 2) {
     if (wavHeader->numChannels == 2) // Seperate into two different buffers for
@@ -126,6 +126,8 @@ int8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
       for (int i = 0; i < bytesPerSample; i++) {
         rbuf[i] = fp[start + indx * bytesPerSample + i];
       }
+      write_word(audio_word_from_buf(*wavHeader, lbuf),
+                 audio_word_from_buf(*wavHeader, rbuf), SAIBDriver);
     } else // mono
     {
       for (int i = 0; i < bytesPerSample; i++) {
