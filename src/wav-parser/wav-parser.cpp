@@ -123,7 +123,7 @@ int8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
     }
   }
 
-  SAIBDriver.txTransmit(reinterpret_cast<uint8_t *>(outputBuffer), 44000, 2000);
+  SAIBDriver.txTransmit(reinterpret_cast<uint8_t *>(outputBuffer), 20000, 2000);
 
   return 0;
 }

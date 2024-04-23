@@ -218,20 +218,20 @@ int main(void) {
 
   codec.configureSampleRate(ADC_44k1_DAC_44k1);
 
-  codec.configureInputDataLength(INPUT_16BITS);
+  codec.configureInputDataLength(INPUT_32BITS);
 
   codec.configureBypass(BYPASS_DISABLE);
 
   // New initialization code
-  SAIDriver newSaiDriver = SAIDriver(true, SAIDriver::BitDepth::BIT_DEPTH_16,
+  SAIDriver newSaiDriver = SAIDriver(true, SAIDriver::BitDepth::BIT_DEPTH_32,
                                      SAIDriver::SampleRate::SAMPLE_RATE_44K);
 
-  newSaiDriver.txTransmit((buff), 65535, 2000);
+  // newSaiDriver.txTransmit((buff), 65535, 2000);
 
   // newSaiDriver.txTransmit(x, 2, 1);
 
   // TODO play sound (from pre-lab 5a)
-  play_wave_samples(buff, &wavHeader, 65535, 0, newSaiDriver);
+  play_wave_samples(buff, &wavHeader, 20000, 0, newSaiDriver);
 
   f_close(&fp);
 
