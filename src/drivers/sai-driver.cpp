@@ -54,7 +54,7 @@ SAIDriver::SAIDriver(bool stereo, BitDepth bitDepth, SampleRate sampleRate) {
   case BitDepth::BIT_DEPTH_24:
     bitDepthValue = SAI_PROTOCOL_DATASIZE_24BIT;
     // TODO: CHECK IF 24 BIT CAN BE STD ON DAISY
-    protocolValue = SAI_I2S_MSBJUSTIFIED;
+    protocolValue = SAI_I2S_STANDARD;
     this->bitDepth = 24;
     break;
   case BitDepth::BIT_DEPTH_32:
@@ -162,7 +162,6 @@ void SAIDriver::genericHSAISetup(SAI_HandleTypeDef *hsai) {
   hsai->Init.OutputDrive = SAI_OUTPUTDRIVE_DISABLED;
   hsai->Init.NoDivider = SAI_MASTERDIVIDER_ENABLE;
   hsai->Init.FIFOThreshold = SAI_FIFOTHRESHOLD_EMPTY;
-  hsai->Init.AudioFrequency = SAI_AUDIO_FREQUENCY_48K;
   // TODO: CHECK IF NOT DEFINING THIS IS OK
   // hsai->Init.Mckdiv = 0;
   // TODO: OVERSAMPLING
@@ -170,8 +169,6 @@ void SAIDriver::genericHSAISetup(SAI_HandleTypeDef *hsai) {
   hsai->Init.MonoStereoMode = SAI_STEREOMODE;
   hsai->Init.CompandingMode = SAI_NOCOMPANDING;
   hsai->Init.TriState = SAI_OUTPUT_NOTRELEASED;
-  hsai->Init.Protocol = SAI_I2S_STANDARD;
-  hsai->Init.DataSize = SAI_DATASIZE_32;
 }
 
 /**
@@ -262,9 +259,9 @@ void initDMA(SAI_HandleTypeDef *hsai) {
   // Set up the DMA to take and output audio words
   hdma.Init.MemInc = DMA_MINC_ENABLE; // Memory increment enabled
   hdma.Init.PeriphDataAlignment =
-      DMA_PDATAALIGN_WORD; // Peripheral data alignment is word
+      DMA_PDATAALIGN_HALFWORD; // Peripheral data alignment is word
   hdma.Init.MemDataAlignment =
-      DMA_MDATAALIGN_WORD; // Memory data alignment is word
+      DMA_MDATAALIGN_HALFWORD; // Memory data alignment is word
   hdma.Init.Mode =
       DMA_CIRCULAR; // Circular mode (emulate FIFO with more control)
   hdma.Init.Priority = DMA_PRIORITY_HIGH; // High priority
@@ -314,8 +311,8 @@ extern "C" void HAL_SAI_MspInit(SAI_HandleTypeDef *hsai) {
       initDMA(hsai);
     }
 
-    HAL_NVIC_SetPriority(SAI1_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(SAI1_IRQn);
+    // HAL_NVIC_SetPriority(SAI1_IRQn, 0, 0);
+    // HAL_NVIC_EnableIRQ(SAI1_IRQn);
   }
 }
 

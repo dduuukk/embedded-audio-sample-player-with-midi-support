@@ -6,6 +6,7 @@
 
 #include "codec_wm8731.h"
 #include "ff.h"
+#include "stm32h7xx_hal_conf.h"
 #include "wav-parser.h"
 
 #define LED_PORT GPIOC
@@ -172,7 +173,7 @@ int main(void) {
 
   UINT bRead;
 
-  if (f_open(&fp, "my_wav.wav", FA_READ | FA_OPEN_EXISTING) != FR_OK) {
+  if (f_open(&fp, "my_wavno.wav", FA_READ | FA_OPEN_EXISTING) != FR_OK) {
     __asm__ __volatile__("bkpt #0");
   }
   if (f_read(&fp, buff, 163840, &bRead) != FR_OK) {
@@ -195,36 +196,47 @@ int main(void) {
   codec.init();
   SAIDriver::SampleRate sample_rate;
 
-  switch (wavHeader.sampleRate) {
-  case 44100:
-    codec.configureSampleRate(ADC_44k1_DAC_44k1);
-    sample_rate = SAIDriver::SampleRate::SAMPLE_RATE_44K;
-    break;
-  case 8000:
-    codec.configureSampleRate(ADC_8k_DAC_8k);
-    sample_rate = SAIDriver::SampleRate::SAMPLE_RATE_8K;
-    break;
-  case 48000:
-    codec.configureSampleRate(ADC_48k_DAC_48k);
-    sample_rate = SAIDriver::SampleRate::SAMPLE_RATE_48K;
-    break;
-  default:
-    codec.configureSampleRate(ADC_48k_DAC_48k);
-    sample_rate = SAIDriver::SampleRate::SAMPLE_RATE_48K;
-  }
+  // switch (wavHeader.sampleRate) {
+  // case 44100:
+  //   codec.configureSampleRate(ADC_44k1_DAC_44k1);
+  //   sample_rate = SAIDriver::SampleRate::SAMPLE_RATE_44K;
+  //   break;
+  // case 8000:
+  //   codec.configureSampleRate(ADC_8k_DAC_8k);
+  //   sample_rate = SAIDriver::SampleRate::SAMPLE_RATE_8K;
+  //   break;
+  // case 48000:
+  //   codec.configureSampleRate(ADC_48k_DAC_48k);
+  //   sample_rate = SAIDriver::SampleRate::SAMPLE_RATE_48K;
+  //   break;
+  // default:
+  //   codec.configureSampleRate(ADC_44k1_DAC_44k1);
+  //   sample_rate = SAIDriver::SampleRate::SAMPLE_RATE_44K;
+  // }
 
-  codec.configureInputDataLength(INPUT_24BITS);
+  // codec.configureInputDataLength(INPUT_24BITS);
+
+  codec.configureSampleRate(ADC_44k1_DAC_44k1);
+
+  codec.configureInputDataLength(INPUT_16BITS);
 
   codec.configureBypass(BYPASS_DISABLE);
 
   // New initialization code
-  SAIDriver newSaiDriver =
-      SAIDriver(true, SAIDriver::BitDepth::BIT_DEPTH_24, sample_rate);
+  SAIDriver newSaiDriver = SAIDriver(true, SAIDriver::BitDepth::BIT_DEPTH_16,
+                                     SAIDriver::SampleRate::SAMPLE_RATE_44K);
+
+  newSaiDriver.txTransmit((buff), 65535, 2000);
+
+  // newSaiDriver.txTransmit(x, 2, 1);
 
   // TODO play sound (from pre-lab 5a)
-  play_wave_samples(buff, &wavHeader, -1, 0, newSaiDriver);
+  // play_wave_samples(buff, &wavHeader, 44000, 0, newSaiDriver);
 
   f_close(&fp);
+
+  while (1) {
+  }
 
   return 0;
 }

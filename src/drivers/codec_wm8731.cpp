@@ -156,13 +156,13 @@ void WM8731::configureBypass(uint8_t bypass)
 void WM8731::configureAudioDataFormat(uint8_t format)
 {
     digitalFormat_Config = (digitalFormat_Config & 0xFFFC) | (format & 0x03);
-    registerWrite(REG_DIGITAL_ROUTING, digitalFormat_Config);
+    registerWrite(REG_DIGITAL_FORMAT, digitalFormat_Config);
 }
 
 void WM8731::configureInputDataLength(uint8_t length)
 {
     digitalFormat_Config = (digitalFormat_Config & 0xFFF3) | (length & 0x0C);
-    registerWrite(REG_DIGITAL_ROUTING, digitalFormat_Config);
+    registerWrite(REG_DIGITAL_FORMAT, digitalFormat_Config);
 }
 
 
@@ -170,7 +170,7 @@ void WM8731::configureInputDataLength(uint8_t length)
 void WM8731::configureSampleRate(uint8_t sampleRate)
 {
     samplingCtrl_Config = (samplingCtrl_Config & 0xFFC3) | (sampleRate & 0x3C);
-    registerWrite(REG_DIGITAL_ROUTING, samplingCtrl_Config);
+    registerWrite(REG_SAMPLING_CTRL, samplingCtrl_Config);
 }
 
 

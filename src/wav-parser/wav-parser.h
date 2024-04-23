@@ -1,17 +1,15 @@
 #ifndef WAVE_H
 #define WAVE_H
 
-
-#include "fatfs.h"
 #include "codec_wm8731.h"
+#include "fatfs.h"
 #include "sai-driver.h"
 #include <cstdint>
 
-struct wave_header
-{
-  uint32_t chunkID;       //"RIFF" (0x52494646 big-endian form) 4
-  uint32_t chunkSize;     // file size - 8 bytes  4
-  uint32_t format;        // "WAVE" (0x57415645 big-endian form)  4
+struct wave_header {
+  uint32_t chunkID;   //"RIFF" (0x52494646 big-endian form) 4
+  uint32_t chunkSize; // file size - 8 bytes  4
+  uint32_t format;    // "WAVE" (0x57415645 big-endian form)  4
 
   //"WAVE" format, "fmt" and "data"
   //"fmt" describes the sound data's format
@@ -20,10 +18,10 @@ struct wave_header
   uint16_t audioFormat;   // PCM=1  2
   uint16_t numChannels;   // Mono = 1, Stereo = 2, etc. 2
 
-  uint32_t sampleRate;    // 8000,44100, etc.  4
-  uint32_t byteRate;      //= SampleRate * NumChannels * BitsPerSample/8  4
+  uint32_t sampleRate; // 8000,44100, etc.  4
+  uint32_t byteRate;   //= SampleRate * NumChannels * BitsPerSample/8  4
 
-  uint16_t blockAlign;    //= NumChannels * BitsPerSample/8   The number of bytes
+  uint16_t blockAlign; //= NumChannels * BitsPerSample/8   The number of bytes
                        // for one sample including all channels  2
   uint16_t bitsPerSample; // 8 bits = 8, 16 bits = 16, etc.  2
 
@@ -33,19 +31,17 @@ struct wave_header
                           // is the number of bytes in the data.  4
 };
 
+void pr_usage(char *pname);
+void read_wave(uint8_t *fp, struct wave_header *dest);
 
-void pr_usage(char* pname);
-void read_wave(uint8_t* fp, struct wave_header* dest);
-
-int validate_wave(struct wave_header* wavHeader);
+int validate_wave(struct wave_header *wavHeader);
 void write_word(int32_t word);
 
-uint32_t audio_word_from_buf(struct wave_header wavHeader, int8_t* buf);
+uint32_t audio_word_from_buf(struct wave_header wavHeader, int8_t *buf);
 int8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
-                         int sample_count, unsigned int start,
+                         uint32_t sample_count, unsigned int start,
                          SAIDriver &SAIBDriver);
 
-void handleStereoMono(struct wave_header* wavHeader);
-
+void handleStereoMono(struct wave_header *wavHeader);
 
 #endif /* WAVE_H */
