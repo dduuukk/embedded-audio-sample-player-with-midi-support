@@ -62,6 +62,8 @@ target_link_libraries(${TARGET}
         HAL::STM32::H7::M7::I2C
         HAL::STM32::H7::M7::UART
         HAL::STM32::H7::M7::UARTEx
+        HAL::STM32::H7::M7::USART
+        HAL::STM32::H7::M7::USARTEx
         HAL::STM32::H7::M7::DMA
         HAL::STM32::H7::M7::PWREx
         CMSIS::STM32::H750IB::M7

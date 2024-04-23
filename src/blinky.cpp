@@ -2,6 +2,7 @@
 #include "fatfs.h"
 #include <stm32h7xx_hal.h>
 #include <stm32h7xx_hal_gpio.h>
+#include <stm32h7xx_hal_uart.h>
 
 #include "MIDI_handler.h"
 #include "codec_wm8731.h"
@@ -174,7 +175,10 @@ int main(void) {
 
   initUART1(&huart1, rx_buff);
 
-  HAL_UART_Receive_IT(&huart1, rx_buff, 1);
+  if (HAL_UART_Receive_IT(&huart1, rx_buff, 1) != HAL_OK)\
+  {
+    __asm__ __volatile__("bkpt #0");
+  }
 
   while (1) {
     if (midi_handler.midiRecieveCheckEmpty() == false) {
@@ -198,24 +202,30 @@ int main(void) {
 
 // This prevent name mangling for functions used in C/assembly files.
 extern "C" {
-void SysTick_Handler(void) {
-  // __asm__ __volatile__("bkpt #0");
-  HAL_IncTick();
+  void SysTick_Handler(void) {
+    // __asm__ __volatile__("bkpt #0");
+    HAL_IncTick();
 
-  // 1 Hz blinking
-  if ((HAL_GetTick() % 1000) == 0) {
-    HAL_GPIO_TogglePin(LED_PORT, LED_PIN);
+    // 1 Hz blinking
+    if ((HAL_GetTick() % 1000) == 0) {
+      HAL_GPIO_TogglePin(LED_PORT, LED_PIN);
+    }
+    HAL_SYSTICK_IRQHandler();
   }
-  HAL_SYSTICK_IRQHandler();
-}
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-  // HAL_UART_Receive_IT(&huart1, rx_buff, 1);
-  // midi_handler.enqueueByte(rx_buff[0]);
+  void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+    // HAL_UART_Receive_IT(&huart1, rx_buff, 1);
+    // midi_handler.enqueueByte(rx_buff[0]);
 
-  if (huart->Instance == USART1) {
-    HAL_UART_Receive_IT(huart, rx_buff, 1);
-    midi_handler.enqueueByte(rx_buff[0]);
+    if (huart->Instance == USART1) {
+      HAL_UART_Receive_IT(huart, rx_buff, 1);
+      midi_handler.enqueueByte(rx_buff[0]);
+      //__asm__ __volatile__("bkpt #0");
+    }
   }
-}
+
+  void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
+    volatile uint32_t wompwomp = huart->ErrorCode;
+    __asm__ __volatile__("bkpt #0");
+  }
 }
