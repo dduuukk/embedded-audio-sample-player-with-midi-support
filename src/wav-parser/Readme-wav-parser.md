@@ -10,10 +10,13 @@ This WAV file parser is intended for embedded systems where resources are limite
 
 To use this code, include the necessary header files (`wav-parser.h`, `fatfs.h`, `codec_wm8731.h`) in your project. Ensure that you have a compatible microcontroller platform with sufficient memory and processing capabilities.
 
-## Design
+## Design and Challenges
+The beginning code was taken from Lab 5/6 and turned from a Linux platform to run on a BareMetal platform. Due to changes the libc library was not able to be used, this included no use of the printf function, no kernel, and no fseek or f function. To work around this these functions were reimplemented and fseek was changed to f_lseek and fread was changed to f_read. 
 
 
 ## Implementaion 
+
+This was used in tandem with the codec and audio driver. To configure the codec the sample rate and bits per sample were passed through. The audio driver was called to transmit the data array. 
 
 
 ## Functions 
@@ -46,11 +49,11 @@ This function handles stereo and mono formats, indicating whether the WAV file c
 ## Lessons learned 
 
 
-### Understanding File Formats 
+#### Understanding File Formats 
 
 A deep understanding of the WAV file format allowed us to learned about the structure of WAV files, including chunk headers, sample formats, and audio data layout. This understanding was essential for accurately parsing and interpreting the contents of WAV files.
 
-### Error Handling and Validation  
+#### Error Handling and Validation  
 
 Validating input data is critical, especially in embedded systems where reliability is paramount. Implementing thorough error checking and validation mechanisms ensured that the parser could handle various WAV file formats and detect potential corruption or errors in input files.
 
