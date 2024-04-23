@@ -80,7 +80,7 @@ target_link_libraries(${TARGET}
     )
 
 # TODO if you want a linker script
-stm32_add_linker_script(${TARGET} PUBLIC STM32H750IB_sram.lds)
+# stm32_add_linker_script(${TARGET} PUBLIC STM32H750IB_sram.lds)
 
 
 # Make gcc go brrrr

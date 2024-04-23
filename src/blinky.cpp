@@ -160,20 +160,21 @@ void initGPIO() {
 int main(void) {
   HAL_Init();
   initGPIO();
-  initUART1(&huart1, rx_buff);
 
   clocks_initialise();
   // 1kHz ticks
   HAL_SYSTICK_Config(SystemCoreClock / 1000);
   HAL_InitTick(1UL << (__NVIC_PRIO_BITS - 1));
 
+  // WM8731 codec = WM8731();
+
+  // codec.init();
+
+  // codec.configureBypass(BYPASS_ENABLE);
+
+  initUART1(&huart1, rx_buff);
+
   HAL_UART_Receive_IT(&huart1, rx_buff, 1);
-
-  WM8731 codec = WM8731();
-
-  codec.init();
-
-  codec.configureBypass(BYPASS_ENABLE);
 
   while (1) {
     if (midi_handler.midiRecieveCheckEmpty() == false) {
