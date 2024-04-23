@@ -61,9 +61,10 @@ void write_word(uint32_t lWord, uint32_t rWord, SAIDriver &SAIBDriver) {
   // Check if the output buffer is full (i.e. the buffer is uint16 MAX)
   if (indxOut >= UINT16_MAX) {
     // Transmit the buffer to the DMA
-    SAIBDriver.txTransmit(reinterpret_cast<uint8_t *>(outputBuffer), UINT16_MAX, 0);
+    SAIBDriver.txTransmit(reinterpret_cast<uint8_t *>(outputBuffer), UINT16_MAX,
+                          0);
     // Wait for the DMA to finish
-    while(SAIBDriver.returnDMABusy()) {
+    while (SAIBDriver.returnDMABusy()) {
       // Block and wait
     }
     // Clear the output buffer
@@ -86,10 +87,12 @@ uint32_t audio_word_from_buf(struct wave_header wavHeader, int8_t *buf) {
 
   // Loop through the number of bytes in a sample, perform shifting
   for (int i = 0; i < wavHeader.bitsPerSample / 8; i++) {
-    audio_word |= (buf[i] << (3 - (i * 8)));
-    // audio_word |= (buf[i] << (i * 8));
+    // audio_word |= (buf[i] << (24 - (i * 8)));
+    audio_word |= (buf[i] << ((i * 8) + 16));
   }
-
+  // volatile uint8_t byte1 = buf[0];
+  // volatile uint8_t byte2 = buf[1];
+  // __asm__ __volatile__("bkpt #0");
   return audio_word;
 }
 
@@ -120,7 +123,8 @@ int8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
         rbuf[i] = fp[start + 2 * indx * bytesPerSample + i + bytesPerSample];
       }
 
-      write_word(audio_word_from_buf(*wavHeader, lbuf), audio_word_from_buf(*wavHeader, rbuf), SAIBDriver);
+      write_word(audio_word_from_buf(*wavHeader, lbuf),
+                 audio_word_from_buf(*wavHeader, rbuf), SAIBDriver);
       sample_count -= 1;
 
     } else // mono
@@ -129,14 +133,15 @@ int8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
         lbuf[i] = fp[start + indx * bytesPerSample + i];
       }
 
-       write_word(audio_word_from_buf(*wavHeader, lbuf), audio_word_from_buf(*wavHeader, rbuf), SAIBDriver);
+      write_word(audio_word_from_buf(*wavHeader, lbuf),
+                 audio_word_from_buf(*wavHeader, rbuf), SAIBDriver);
 
       sample_count -= 1;
     }
     indx++;
   }
 
-  SAIBDriver.txTransmit(reinterpret_cast<uint8_t *>(outputBuffer), 20000, 2000);
+  SAIBDriver.txTransmit(reinterpret_cast<uint8_t *>(outputBuffer), 65000, 2000);
 
   return 0;
 }

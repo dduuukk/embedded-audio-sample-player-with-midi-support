@@ -231,7 +231,7 @@ int main(void) {
   // newSaiDriver.txTransmit(x, 2, 1);
 
   // TODO play sound (from pre-lab 5a)
-  play_wave_samples(buff, &wavHeader, 20000, 0, newSaiDriver);
+  play_wave_samples(buff, &wavHeader, 65000, 44, newSaiDriver);
 
   f_close(&fp);
 
