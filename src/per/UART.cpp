@@ -1,4 +1,5 @@
 #include "UART.h"
+#include "stm32h7xx_hal_uart.h"
 
 // void Error_Handler(void)
 // {
@@ -8,13 +9,13 @@
 //   }
 // }
 
-void HAL_UART_MspInit(UART_HandleTypeDef* huart)
-{
+UART_HandleTypeDef *my_huart;
+
+void HAL_UART_MspInit(UART_HandleTypeDef *huart) {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(huart->Instance==USART1)
-  {
+  if (huart->Instance == USART1) {
     __HAL_RCC_USART1_CLK_ENABLE();
-    
+
     __HAL_RCC_GPIOB_CLK_ENABLE();
     /**I2C2 GPIO Configuration
     PB6      ------> USART1_TX
@@ -42,42 +43,25 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
   }
 }
 
-static void initUART1(void)
-{
+void initUART1(UART_HandleTypeDef *huart1, uint8_t *rx_buff) {
 
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 31250;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart1->Instance = USART1;
+  huart1->Init.BaudRate = 31250;
+  huart1->Init.WordLength = UART_WORDLENGTH_8B;
+  huart1->Init.StopBits = UART_STOPBITS_1;
+  huart1->Init.Parity = UART_PARITY_NONE;
+  huart1->Init.Mode = UART_MODE_TX_RX;
+  huart1->Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1->Init.OverSampling = UART_OVERSAMPLING_16;
 
-  if (HAL_UART_Init(&huart1) != HAL_OK)
-  {
+  if (HAL_UART_Init(huart1) != HAL_OK) {
     __asm__ __volatile__("bkpt #0");
   }
+
+  my_huart = huart1;
 }
 
 extern "C" {
 
-void USART1_IRQHandler(void)
-{
-  HAL_UART_IRQHandler(&huart1);
-}
-
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-  //HAL_UART_Receive_IT(&huart1, rx_buff, 1);
-  //midi_handler.enqueueByte(rx_buff[0]);
-
-  if(huart->Instance==USART1)
-  {
-    HAL_UART_Receive_IT(huart, rx_buff, 1);
-    midi_handler.enqueueByte(rx_buff[0]);
-  }
-}
-
+void USART1_IRQHandler(void) { HAL_UART_IRQHandler(my_huart); }
 }
