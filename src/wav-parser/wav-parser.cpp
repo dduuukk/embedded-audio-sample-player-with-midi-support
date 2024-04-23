@@ -114,18 +114,18 @@ int8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
   int8_t lbuf[2];
   int8_t rbuf[2];
 
-  while (indx < sample_count) {
+  while (indx < sample_count * 2) {
     if (wavHeader->numChannels == 2) // Seperate into two different buffers for
                                      // left and right, for 2-channel audio
     {
       // stereo
       for (int i = 0; i < bytesPerSample; i++) {
-        lbuf[i] = fp[start + 2 * indx * bytesPerSample + i];
-        rbuf[i] = fp[start + 2 * indx * bytesPerSample + i + bytesPerSample];
+        lbuf[i] = fp[start + indx * bytesPerSample + i];
       }
-
-      write_word(audio_word_from_buf(*wavHeader, lbuf),
-                 audio_word_from_buf(*wavHeader, rbuf), SAIBDriver);
+      indx++;
+      for (int i = 0; i < bytesPerSample; i++) {
+        rbuf[i] = fp[start + indx * bytesPerSample + i];
+      }
     } else // mono
     {
       for (int i = 0; i < bytesPerSample; i++) {
