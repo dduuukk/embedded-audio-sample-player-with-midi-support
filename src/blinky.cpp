@@ -156,6 +156,15 @@ void initGPIO() {
 
   LED_PORT_CLK_ENABLE();
   HAL_GPIO_Init(LED_PORT, &GPIO_Config);
+  
+  GPIO_Config.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_Config.Pull = GPIO_NOPULL;
+  GPIO_Config.Speed = GPIO_SPEED_FREQ_HIGH;
+
+  GPIO_Config.Pin = GPIO_PIN_3;
+
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  HAL_GPIO_Init(GPIOA, &GPIO_Config);
 }
 
 int main(void) {
@@ -188,12 +197,12 @@ int main(void) {
     if (midi_handler.midiEventCheckEmpty() == false) {
       MidiEvent event = midi_handler.dequeueEvent();
 
-      if (event.channel == 0 && event.messageType == ControlChange &&
-          event.data[0] == 0 && event.data[1] > 0) {
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
-      } else if (event.channel == 0 && event.messageType == ControlChange &&
-                 event.data[0] == 0 && event.data[1] == 0) {
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+      if (event.channel == 0 && event.messageType == NoteOn &&
+          event.data[0] == 48 && event.data[1] > 0) {
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET);
+      } else if (event.channel == 0 && event.messageType == NoteOff &&
+                 event.data[0] == 48 && event.data[1] == 0) {
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
       }
     }
   }
