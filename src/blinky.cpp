@@ -1,11 +1,17 @@
 #include "MIDI_event.h"
 #include "fatfs.h"
+#include "ff.h"
+#include "sai-driver.h"
+#include <cstdint>
 #include <stm32h7xx_hal.h>
 #include <stm32h7xx_hal_gpio.h>
 #include <stm32h7xx_hal_uart.h>
 
 #include "MIDI_handler.h"
 #include "codec_wm8731.h"
+#include "ff.h"
+#include "stm32h7xx_hal_conf.h"
+#include "wav-parser.h"
 
 #include "UART.h"
 
@@ -17,6 +23,9 @@ UART_HandleTypeDef huart1 = {};
 #define LED_PORT GPIOC
 #define LED_PIN GPIO_PIN_0
 #define LED_PORT_CLK_ENABLE __HAL_RCC_GPIOC_CLK_ENABLE
+
+// The buffer to read samples into
+uint8_t FATFS_BUFFER_MEM_SECTION buff[163840];
 
 void clocks_initialise(void) {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -176,11 +185,7 @@ int main(void) {
   HAL_SYSTICK_Config(SystemCoreClock / 1000);
   HAL_InitTick(1UL << (__NVIC_PRIO_BITS - 1));
 
-  // WM8731 codec = WM8731();
-
-  // codec.init();
-
-  // codec.configureBypass(BYPASS_ENABLE);
+  struct wave_header wavHeader;
 
   initUART1(&huart1, rx_buff);
 
@@ -191,6 +196,47 @@ int main(void) {
   initUART1(&huart1, rx_buff);
 
   HAL_UART_Receive_IT(&huart1, rx_buff, 1);
+
+  FIL fp;
+
+  UINT bRead;
+
+  if (f_open(&fp, "boomba-junk-test.wav", FA_READ | FA_OPEN_EXISTING) !=
+      FR_OK) {
+    __asm__ __volatile__("bkpt #0");
+  }
+  if (f_read(&fp, buff, 80896, &bRead) != FR_OK) {
+    __asm__ __volatile__("bkpt #0");
+  }
+
+  // read file header
+  read_wave(buff, &wavHeader);
+
+  // parse file header, verify that is wave
+  if (validate_wave(&wavHeader) != 0) {
+    return -1;
+  }
+
+  WM8731 codec = WM8731();
+
+  codec.init();
+  SAIDriver::SampleRate sample_rate;
+
+  codec.configureSampleRate(ADC_44k1_DAC_44k1);
+
+  codec.configureInputDataLength(INPUT_16BITS);
+
+  codec.configureBypass(BYPASS_DISABLE);
+
+  // New initialization code
+  SAIDriver newSaiDriver = SAIDriver(true, SAIDriver::BitDepth::BIT_DEPTH_16,
+                                     SAIDriver::SampleRate::SAMPLE_RATE_44K);
+
+  // newSaiDriver.txTransmit((buff), 65535, 2000);
+
+  play_wave_samples(buff, &wavHeader, 32596, 44, newSaiDriver);
+
+  f_close(&fp);
 
   while (1) {
     if (midi_handler.midiRecieveCheckEmpty() == false) {
@@ -209,6 +255,7 @@ int main(void) {
       }
     }
   }
+
   return 0;
 }
 

@@ -55,6 +55,9 @@ target_link_libraries(${TARGET}
         HAL::STM32::H7::M7::RCCEx
         HAL::STM32::H7::M7::GPIO
         HAL::STM32::H7::M7::CORTEX
+        HAL::STM32::H7::M7::SAI
+        HAL::STM32::H7::M7::RCCEx
+        HAL::STM32::H7::M7::DMA
         HAL::STM32::H7::M7::SD
         HAL::STM32::H7::M7::PWREx
         HAL::STM32::H7::M7::LL_SDMMC
@@ -72,6 +75,8 @@ target_link_libraries(${TARGET}
         #FreeRTOS::Heap::4
         #FreeRTOS::ARM_CM4F
         #TODO your object libraries go here
+        wav-parser
+        sai-driver
         fatfs-interface-driver
         fatfs
         sdmmc-driver
@@ -121,6 +126,7 @@ add_compile_options(
     )
 
 # TODO add_subdirectory(folder-name) goes here for all folders!
+add_subdirectory(wav-parser)
 add_subdirectory(drivers)
 add_subdirectory(FatFS)
 add_subdirectory(util)

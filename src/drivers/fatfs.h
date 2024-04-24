@@ -10,7 +10,7 @@ public:
 
 private:
   SDMMC sd;
-  FATFS fs;
+  FATFS *fs;
   char my_path[4] = {};
 };
 

@@ -10,9 +10,9 @@ Using the STM32 Serial Audio Interface (SAI) peripheral, (which is I2S-compatibl
 The primary objective is to parse a .WAV file stored on an SD card and play it through the headphone output. Achieving this involves sending .WAV data from the SD card to the MCU, processing that data and sending it to the DMA FIFO, and then sending that data to the codec over SAI/I2S. Additionally, if there is time, there is a stretch goal that will involve implementing a user interface with buttons and an OLED screen for enhanced user interaction.
 
 ## System diagram
-![system diagram](IMG_0088.jpg)
+![system diagram](boomba-system-light2.png)
 
-## Team Members And Responsibilities 
+## Team Members And Responsibilities
 
 ### Katherine Cloutier: Parsing wave
 

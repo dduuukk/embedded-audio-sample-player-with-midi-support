@@ -1,3 +1,12 @@
+add_library(sai-driver-intf
+INTERFACE
+) 
+
+target_include_directories(sai-driver-intf
+INTERFACE
+.
+)
+
 add_library(sdmmc-driver-intf
 INTERFACE
 ) 
@@ -7,11 +16,26 @@ INTERFACE
 .
 )
 
+target_link_libraries(sai-driver-intf
+INTERFACE
+hal-intf
+)
 target_link_libraries(sdmmc-driver-intf
 INTERFACE
 hal-intf
 )
 
+add_library(sai-driver
+OBJECT 
+sai-driver.cpp
+)
+
+target_link_libraries(sai-driver
+PUBLIC
+sai-driver-intf
+core-conf
+hal-intf
+)
 add_library(sdmmc-driver
 OBJECT 
 sdmmc-driver.cpp
