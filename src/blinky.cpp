@@ -173,10 +173,11 @@ int main(void) {
 
   UINT bRead;
 
-  if (f_open(&fp, "my_wavno.wav", FA_READ | FA_OPEN_EXISTING) != FR_OK) {
+  if (f_open(&fp, "boomba-junk-test.wav", FA_READ | FA_OPEN_EXISTING) !=
+      FR_OK) {
     __asm__ __volatile__("bkpt #0");
   }
-  if (f_read(&fp, buff, 163840, &bRead) != FR_OK) {
+  if (f_read(&fp, buff, 80896, &bRead) != FR_OK) {
     __asm__ __volatile__("bkpt #0");
   }
   // if (newSaiDriver.txTransmit(buff, 163840 / 4, 2000) == 1) {
@@ -231,7 +232,7 @@ int main(void) {
   // newSaiDriver.txTransmit(x, 2, 1);
 
   // TODO play sound (from pre-lab 5a)
-  play_wave_samples(buff, &wavHeader, 65534, 112, newSaiDriver);
+  play_wave_samples(buff, &wavHeader, 32596, 44, newSaiDriver);
 
   f_close(&fp);
 

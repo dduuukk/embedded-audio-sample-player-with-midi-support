@@ -107,7 +107,12 @@ uint8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
   }
 
   if (wavHeader->numChannels != 1 && wavHeader->numChannels != 2) {
-    return -1;
+    wavHeader->numChannels = 2;
+  }
+
+  if (wavHeader->bitsPerSample != 8 && wavHeader->bitsPerSample != 16 &&
+      wavHeader->bitsPerSample != 24) {
+    wavHeader->bitsPerSample = 16;
   }
 
   uint8_t bytesPerSample = wavHeader->bitsPerSample / 8;
