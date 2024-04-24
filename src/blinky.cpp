@@ -177,7 +177,7 @@ void initGPIO() {
   HAL_GPIO_Init(GPIOA, &GPIO_Config);
 }
 
-std::string filenames[25] = {
+std::string boombaFiles[25] = {
     "boomba-1.wav",  "boomba-2.wav",  "boomba-3.wav",  "boomba-4.wav",
     "boomba-5.wav",  "boomba-6.wav",  "boomba-7.wav",  "boomba-8.wav",
     "boomba-9.wav",  "boomba-10.wav", "boomba-11.wav", "boomba-12.wav",
@@ -185,6 +185,12 @@ std::string filenames[25] = {
     "boomba-17.wav", "boomba-18.wav", "boomba-19.wav", "boomba-20.wav",
     "boomba-21.wav", "boomba-22.wav", "boomba-23.wav", "boomba-24.wav",
     "boomba-25.wav"};
+
+std::string drumFiles[10] = {"hell-naw.wav",         "big-boomba.wav",
+                             "metal-pipe-short.wav", "bruh.wav",
+                             "honk-bonk.wav",        "omg.wav",
+                             "BENZ_-_Snare_16.wav",  "BENZ_-_Kick_04.wav",
+                             "BENZ_-_Hi_Hat_05.wav", "808-short.wav"};
 
 int main(void) {
   HAL_Init();
@@ -230,7 +236,7 @@ int main(void) {
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
       }
       if (event.channel == 0 && event.messageType == NoteOn) {
-        if (f_open(&fp, filenames[event.data[0] - 48].c_str(),
+        if (f_open(&fp, boombaFiles[event.data[0] - 48].c_str(),
                    FA_READ | FA_OPEN_EXISTING) != FR_OK) {
           __asm__ __volatile__("bkpt #0");
         }
@@ -246,6 +252,64 @@ int main(void) {
           return -1;
         }
         play_wave_samples(buff, &wavHeader, 32596, 128, newSaiDriver);
+
+        f_close(&fp);
+      } else if (event.channel == 9 && event.messageType == NoteOn) {
+        uint32_t toRead = 0;
+        switch (event.data[0] - 36) {
+        case 0:
+          toRead = 151552;
+          break;
+        case 1:
+          toRead = 81920;
+          break;
+        case 2:
+          toRead = 163840;
+          break;
+        case 3:
+          toRead = 122880;
+          break;
+        case 4:
+          toRead = 143360;
+          break;
+        case 5:
+          toRead = 143360;
+          break;
+        case 6:
+          toRead = 106496;
+          break;
+        case 7:
+          toRead = 118784;
+          break;
+        case 8:
+          toRead = 69632;
+          break;
+        case 9:
+          toRead = 163840;
+          break;
+        default:
+          toRead = 0;
+          break;
+        }
+        if (toRead == 0) {
+          continue;
+        }
+        if (f_open(&fp, drumFiles[event.data[0] - 36].c_str(),
+                   FA_READ | FA_OPEN_EXISTING) != FR_OK) {
+          __asm__ __volatile__("bkpt #0");
+        }
+        if (f_read(&fp, buff, toRead, &bRead) != FR_OK) {
+          __asm__ __volatile__("bkpt #0");
+        }
+
+        // read file header
+        read_wave(buff, &wavHeader);
+
+        // parse file header, verify that is wave
+        if (validate_wave(&wavHeader) != 0) {
+          return -1;
+        }
+        play_wave_samples(buff, &wavHeader, toRead / 4, 128, newSaiDriver);
 
         f_close(&fp);
       }

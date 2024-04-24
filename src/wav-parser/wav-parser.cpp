@@ -56,6 +56,7 @@ int validate_wave(struct wave_header *wavHeader) {
 
 uint32_t indx = 0;
 uint32_t indxOut = 0;
+uint32_t midTransferCount = 0;
 
 void write_word(uint16_t lWord, uint16_t rWord, SAIDriver &SAIBDriver) {
   // Check if the output buffer is full (i.e. the buffer is uint16 MAX)
@@ -69,6 +70,7 @@ void write_word(uint16_t lWord, uint16_t rWord, SAIDriver &SAIBDriver) {
     }
     // Clear the output buffer
     indxOut = 0;
+    midTransferCount++;
   }
 
   outputBuffer[indxOut] = lWord;
@@ -145,10 +147,12 @@ uint8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
     indx++;
   }
 
-  SAIBDriver.txTransmit(reinterpret_cast<uint8_t *>(outputBuffer), sample_count,
+  SAIBDriver.txTransmit(reinterpret_cast<uint8_t *>(outputBuffer),
+                        sample_count - start - midTransferCount * UINT16_MAX,
                         2000);
   indx = 0;
   indxOut = 0;
+  midTransferCount = 0;
 
   return 0;
 }
