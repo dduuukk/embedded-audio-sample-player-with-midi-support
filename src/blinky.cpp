@@ -6,6 +6,7 @@
 #include <stm32h7xx_hal.h>
 #include <stm32h7xx_hal_gpio.h>
 #include <stm32h7xx_hal_uart.h>
+#include <string>
 
 #include "MIDI_handler.h"
 #include "codec_wm8731.h"
@@ -176,67 +177,42 @@ void initGPIO() {
   HAL_GPIO_Init(GPIOA, &GPIO_Config);
 }
 
+std::string filenames[25] = {
+    "boomba-1.wav",  "boomba-2.wav",  "boomba-3.wav",  "boomba-4.wav",
+    "boomba-5.wav",  "boomba-6.wav",  "boomba-7.wav",  "boomba-8.wav",
+    "boomba-9.wav",  "boomba-10.wav", "boomba-11.wav", "boomba-12.wav",
+    "boomba-13.wav", "boomba-14.wav", "boomba-15.wav", "boomba-16.wav",
+    "boomba-17.wav", "boomba-18.wav", "boomba-19.wav", "boomba-20.wav",
+    "boomba-21.wav", "boomba-22.wav", "boomba-23.wav", "boomba-24.wav",
+    "boomba-25.wav"};
+
 int main(void) {
   HAL_Init();
   initGPIO();
-
   clocks_initialise();
-  // 1kHz ticks
   HAL_SYSTICK_Config(SystemCoreClock / 1000);
   HAL_InitTick(1UL << (__NVIC_PRIO_BITS - 1));
 
-  struct wave_header wavHeader;
-
   initUART1(&huart1, rx_buff);
-
   if (HAL_UART_Receive_IT(&huart1, rx_buff, 1) != HAL_OK) {
     __asm__ __volatile__("bkpt #0");
   }
 
-  initUART1(&huart1, rx_buff);
-
-  HAL_UART_Receive_IT(&huart1, rx_buff, 1);
-
+  FatFsIntf fatFsIntf = FatFsIntf();
+  struct wave_header wavHeader;
   FIL fp;
-
   UINT bRead;
 
-  if (f_open(&fp, "boomba-junk-test.wav", FA_READ | FA_OPEN_EXISTING) !=
-      FR_OK) {
-    __asm__ __volatile__("bkpt #0");
-  }
-  if (f_read(&fp, buff, 80896, &bRead) != FR_OK) {
-    __asm__ __volatile__("bkpt #0");
-  }
-
-  // read file header
-  read_wave(buff, &wavHeader);
-
-  // parse file header, verify that is wave
-  if (validate_wave(&wavHeader) != 0) {
-    return -1;
-  }
-
   WM8731 codec = WM8731();
-
   codec.init();
-  SAIDriver::SampleRate sample_rate;
-
   codec.configureSampleRate(ADC_44k1_DAC_44k1);
-
   codec.configureInputDataLength(INPUT_16BITS);
-
   codec.configureBypass(BYPASS_DISABLE);
 
-  // New initialization code
   SAIDriver newSaiDriver = SAIDriver(true, SAIDriver::BitDepth::BIT_DEPTH_16,
                                      SAIDriver::SampleRate::SAMPLE_RATE_44K);
 
   // newSaiDriver.txTransmit((buff), 65535, 2000);
-
-  play_wave_samples(buff, &wavHeader, 32596, 44, newSaiDriver);
-
-  f_close(&fp);
 
   while (1) {
     if (midi_handler.midiRecieveCheckEmpty() == false) {
@@ -252,6 +228,26 @@ int main(void) {
       } else if (event.channel == 0 && event.messageType == NoteOff &&
                  event.data[0] == 48 && event.data[1] == 0) {
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
+      }
+      if (event.channel == 0 && event.messageType == NoteOn) {
+        if (f_open(&fp, filenames[event.data[0] - 48].c_str(),
+                   FA_READ | FA_OPEN_EXISTING) != FR_OK) {
+          __asm__ __volatile__("bkpt #0");
+        }
+        if (f_read(&fp, buff, 80896, &bRead) != FR_OK) {
+          __asm__ __volatile__("bkpt #0");
+        }
+
+        // read file header
+        read_wave(buff, &wavHeader);
+
+        // parse file header, verify that is wave
+        if (validate_wave(&wavHeader) != 0) {
+          return -1;
+        }
+        play_wave_samples(buff, &wavHeader, 32596, 128, newSaiDriver);
+
+        f_close(&fp);
       }
     }
   }

@@ -147,6 +147,8 @@ uint8_t play_wave_samples(uint8_t *fp, struct wave_header *wavHeader,
 
   SAIBDriver.txTransmit(reinterpret_cast<uint8_t *>(outputBuffer), sample_count,
                         2000);
+  indx = 0;
+  indxOut = 0;
 
   return 0;
 }
