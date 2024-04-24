@@ -2,6 +2,7 @@
 #include "fatfs.h"
 #include <stm32h7xx_hal.h>
 #include <stm32h7xx_hal_gpio.h>
+#include <stm32h7xx_hal_uart.h>
 
 #include "MIDI_handler.h"
 #include "codec_wm8731.h"
@@ -155,6 +156,15 @@ void initGPIO() {
 
   LED_PORT_CLK_ENABLE();
   HAL_GPIO_Init(LED_PORT, &GPIO_Config);
+
+  GPIO_Config.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_Config.Pull = GPIO_NOPULL;
+  GPIO_Config.Speed = GPIO_SPEED_FREQ_HIGH;
+
+  GPIO_Config.Pin = GPIO_PIN_3;
+
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  HAL_GPIO_Init(GPIOA, &GPIO_Config);
 }
 
 int main(void) {
@@ -166,11 +176,17 @@ int main(void) {
   HAL_SYSTICK_Config(SystemCoreClock / 1000);
   HAL_InitTick(1UL << (__NVIC_PRIO_BITS - 1));
 
-  WM8731 codec = WM8731();
+  // WM8731 codec = WM8731();
 
-  codec.init();
+  // codec.init();
 
-  codec.configureBypass(BYPASS_ENABLE);
+  // codec.configureBypass(BYPASS_ENABLE);
+
+  initUART1(&huart1, rx_buff);
+
+  if (HAL_UART_Receive_IT(&huart1, rx_buff, 1) != HAL_OK) {
+    __asm__ __volatile__("bkpt #0");
+  }
 
   initUART1(&huart1, rx_buff);
 
@@ -184,12 +200,12 @@ int main(void) {
     if (midi_handler.midiEventCheckEmpty() == false) {
       MidiEvent event = midi_handler.dequeueEvent();
 
-      if (event.channel == 0 && event.messageType == ControlChange &&
-          event.data[0] == 0 && event.data[1] > 0) {
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
-      } else if (event.channel == 0 && event.messageType == ControlChange &&
-                 event.data[0] == 0 && event.data[1] == 0) {
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+      if (event.channel == 0 && event.messageType == NoteOn &&
+          event.data[0] == 48 && event.data[1] > 0) {
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET);
+      } else if (event.channel == 0 && event.messageType == NoteOff &&
+                 event.data[0] == 48 && event.data[1] == 0) {
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
       }
     }
   }
@@ -216,6 +232,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
   if (huart->Instance == USART1) {
     HAL_UART_Receive_IT(huart, rx_buff, 1);
     midi_handler.enqueueByte(rx_buff[0]);
+    //__asm__ __volatile__("bkpt #0");
   }
+}
+
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
+  volatile uint32_t wompwomp = huart->ErrorCode;
+  __asm__ __volatile__("bkpt #0");
 }
 }
