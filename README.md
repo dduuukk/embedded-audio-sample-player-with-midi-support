@@ -5,6 +5,8 @@ What, what, status.
 What is the objective in this lab? Describe the lab technical aspects, show its aim and the main
 findings.
 
+Audio sample player using an STM32H7 embedded platform and custom breakout board.
+
 
 This project involves the development of a FreeRTOS-based audio streaming system on an STM32 development board. The system integrates various components, including an audio codec, SD card reader, STM32 microprocessor, H7 DMA modules, and a headphone amplifier. Utilizing an SD card for data storage, the system employs a FATFS file system for file access. A .WAV parser within the STM32 MCU interprets .WAV file headers and audio data from the SD card, facilitating audio playback. Communication between the MCU and the codec is established through the STM32 Serial Audio Interface (SAI) peripheral, utilizing I2S compatibility. Additionally, an I2C connection configures the codec. The primary objective is to parse and play .WAV files stored on the SD card. A potential stretch goal involves implementing a user interface with buttons and an OLED screen for enhanced interaction.
 
@@ -38,16 +40,23 @@ The integration of audio streaming capabilities into embedded systems presents a
 Highlight similar approaches.
 What is the reason for our new implementation?
 
+Daisy library? https://github.com/electro-smith/libDaisy
+
+Daisy wav player: https://github.com/electro-smith/DaisyExamples/blob/master/seed/WavPlayer/WavPlayer.cpp
+
+Daisy based midi controller: https://github.com/heavyweight87/MidiController
+
+
 ## Top Level Design Overview
-The project involves bootstrapping a FreeRTOS-based audio streaming system on an STM32 development board, which includes the utilization of an audio codec, SD card reader and SD card, STM32 microprocessor, H7 DMA modules, and a headphone amplifier. 
+This project involved bootstrapping an audio streaming system on an STM32 development board, which includes the utilization of an audio codec, SD card reader and SD card, STM32 microprocessor, H7 DMA modules, MIDI, and a headphone amplifier. 
 
-The system architecture utilizes an SD card which interfaces with the STM32 MCU through SDIO. A FATFS file system will be implemented for SD card file access. The MCU will host a .WAV parser responsible for interpreting the header and audio data of the .WAV file from the SD card, transforming it into audio words for playback. This parsed data will then be sent to the codec through a DMA FIFO and an SAI peripheral.
+The system architecture utilizes an SD card which interfaces with the STM32 MCU through SDIO. A FATFS file system has been implemented for SD card file access. The MCU hosts a .WAV parser responsible for interpreting the header and audio data of the .WAV file from the SD card, transforming it into audio words for playback. This parsed data is then be sent to the codec through a DMA FIFO and an SAI peripheral.
 
-Using the STM32 Serial Audio Interface (SAI) peripheral, (which is I2S-compatible), communication between the STM32 and the codec will be established. An internal DMA channel will act as a FIFO, and will buffer the samples to be sent to the codec. The codec is also connected to the STM32 via I2C, which will be used for configuration. 
+Using the STM32 Serial Audio Interface (SAI) peripheral, (which is I2S-compatible), communication between the STM32 and the codec is established. An internal DMA channel acts as a FIFO, and buffers the samples to be sent to the codec. The codec is also connected to the STM32 via I2C, which is used for configuration. 
 
-The primary objective is to parse a .WAV file stored on an SD card and play it through the headphone output, using MIDI to control the sounds played. Achieving this involves sending .WAV data from the SD card to the MCU, processing that data and sending it to the DMA FIFO, and then sending that data to the codec over SAI/I2S.
+A MIDI keyboard interacts with the .WAV player through UART and a MIDI parser, which loads and plays different .WAV files stored on the SD card upon button press.
 
-The MIDI **IDK LETS ADD SOME MIDI STUFF HERE**
+The primary objective is to parse a .WAV file stored on an SD card and play it through the headphone output, using MIDI to control the sounds played. Achieving this involves triggering playing using MIDI, sending .WAV data from the SD card to the MCU, processing that data and sending it to the DMA FIFO, and then sending that data to the codec over SAI/I2S.
 
 A system diagram that highlights the interaction between these different components is shown in the below system diagram.
 
