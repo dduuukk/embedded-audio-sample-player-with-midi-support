@@ -1,97 +1,66 @@
-# Project BOOMBA: Embedded Audio Player On FreeRTOS-based System
+# Embedded Audio Sample Player with MIDI Support
 
-## Description
-The project involves bootstrapping a FreeRTOS-based audio streaming system on an STM32 development board, which includes the utilization of an audio codec, SD card reader and SD card, STM32 microprocessor, H7 DMA modules, and a headphone amplifier. 
+## Abstract
 
-The system architecture utilizes an SD card which interfaces with the STM32 MCU through SDIO. A FATFS file system will be implemented for SD card file access. The MCU will host a .WAV parser responsible for interpreting the header and audio data of the .WAV file from the SD card, transforming it into audio words for playback. This parsed data will then be sent to the codec through a DMA FIFO and an SAI peripheral.
-
-Using the STM32 Serial Audio Interface (SAI) peripheral, (which is I2S-compatible), communication between the STM32 and the codec will be established. An internal DMA channel will act as a FIFO, and will buffer the samples to be sent to the codec. The codec is also connected to the STM32 via I2C, which will be used for configuration. 
-
-The primary objective is to parse a .WAV file stored on an SD card and play it through the headphone output. Achieving this involves sending .WAV data from the SD card to the MCU, processing that data and sending it to the DMA FIFO, and then sending that data to the codec over SAI/I2S. Additionally, if there is time, there is a stretch goal that will involve implementing a user interface with buttons and an OLED screen for enhanced user interaction.
-
-## System diagram
-![system diagram](boomba-system-light2.png)
-
-## Team Members And Responsibilities
-
-### Katherine Cloutier: Parsing wave
-
-1. Research WAV File Format
-- look at past labs that delt with this
-- find resources and documentation that may be helful
-2. Design WAV File Header Structure
-- define a data struct for WAV file
-3. Validate WAV File Integrity
-- validation checks to ensure the WAV file is intact and valid
-4. Implement Header Parsing Function
-- create a function to parse the header of a WAV file
-5. Extract Audio Format Information
-- extract audio format details from the WAV file header
-6. Get Sample Rate and Bit Depth
-- extract sample rate and bit depth information from the WAV file header
-7. Handle Stereo and Mono Format
-- compatibility with both stereo and mono audio formats
-8. Implement Error Handling for WAV Parsing
-- error conditions and implement error handling
-9. Buffer Management for Audio Data
-- storing audio data read from the WAV file
-10. Handle Endianness and Data Alignment
-- big endian and little endian endianness and data alignment in the WAV file
-11. Integrate Parsing with Audio Playback
-- parsing with audio playback functionality
-
-### Christian Bender: DMA FIFO Management
-
-Tasks will involve setting up an H7 DMA (Direct Memory Access) as a FIFO (First-In-First-Out) to manage audio samples for the SAI (Serial Audio Interface) FIFO. The DMA will receive buffered .WAV samples processed by the STM32. The DMA FIFO, configured as a larger storage buffer (likely 512-1024 samples), will feed data to the SAI audio 8-word FIFO, which will subsequently output to the audio codec.
-
-To achieve this, reference documentation for the STM32H7 series will be used, such as the resource manual available [here](https://www.st.com/resource/en/reference_manual/dm00314099-stm32h742-stm32h743-753-and-stm32h750-value-line-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf). The DMA will serve as a bridge between the STM32-processed audio samples and the SAI interface FIFO.
-
-Key steps include initializing the DMA to function as a FIFO, establishing communication between the larger DMA FIFO and the SAI audio 8-word FIFO, and getting input samples from the STM37.
-
-This task is a crucial element in the overall project, enabling the smooth flow of audio data through the system. The codec and Christian's work will rely on the successful buffering of samples, and I will rely on the STM32 parsing for audio sample filling.
+This project involves the development of a bare-metal audio sample player with MIDI support on an STM32H7 development board. The primary objective is to parse and play .WAV files stored on the SD card when a MIDI keypress is recieved. Currently the system successfully parses MIDI messages, reads .wav files off of the SD card, and streams audio through the codec to a line out and a headphone out. We successfully minimized latency, with imperceptible delay between keypress and sample start, and achieved a 95% similarity index between our hardware output and the expected output (with the minimal differences likely being a product of D/A conversion rather than any implementation error)
 
 
-### Christian Cole
+## Intro
 
-Tasks will involve managing the system's audio codec, the Wolfson WM8731. This codec will first be configured over I2C based on the file it will be recieving samples from. To manage audio, we will simlarly configure the STM32's SAI communication with the codec to manage clock timings and data transfer from the dedicated 8-word SAI FIFO.
+The project delves into the realm of bare-metal embedded systems, focusing specifically on the development of an audio sample player system using an STM32H7 development board, the Electrosmith Daisy, and our own custom PCB. In embedded systems, integrating audio streaming capabilities poses significant challenges, especially concerning resource utilization, latency, and system complexity.
 
-To achieve this, the [WM8731's datasheet](https://cdn.sparkfun.com/datasheets/Dev/Arduino/Shields/WolfsonWM8731.pdf) will be utilized to understand the specifics of integration between the STM32H7 and the codec. Likewise, the [STM32H7's resource manual](https://www.st.com/resource/en/reference_manual/dm00314099-stm32h742-stm32h743-753-and-stm32h750-value-line-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf) will be used to manage the SAI system for audio data transfer.
+This project involves the development of a bare-metal audio sample player with MIDI support on an STM32H7 development board. The system integrates various hardware components, including an audio codec, SD card reader, STM32H750 ARM microprocessor, and UART MIDI interface. The system employs a FATFS file system for interaction with the SD card. A .WAV parser within the STM32 MCU interprets .WAV file headers and audio data from the SD card, facilitating audio playback. Communication between the MCU and the codec is established through the STM32 Serial Audio Interface (SAI) peripheral, utilizing I2S compatibility. Additionally, an I2C connection configures the codec. The primary objective is to parse and play .WAV files stored on the SD card when a MIDI keypress is recieved.
 
-Audio ouput will be available via a direct hardware line-out or a headphone amplifier that has already been designed on the custom development board.
-
-
-### Noah Mitchell
-
-Tasks will involve determining which filesystem library to use for interfacing with the SD card filesystem in software (potentially FatFS, FreeRTOS+Fat, or LittleFS), writing communication/peripheral drivers for the SD card using the SDMMC peripheral of the STM32H7 (described starting on page 2378 of the [STM32H7 reference manual](https://www.st.com/resource/en/reference_manual/dm00314099-stm32h742-stm32h743-753-and-stm32h750-value-line-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf)), and implementing file system handling functions in a preemption-safe/thread-aware manner. FreeRTOS configuration and task setup will also need to occur. 
-
-The overall goal will be to pass a file pointer to Kat's .WAV parsing code, along with an easy-to-use, thread-safe, performant interface for getting the data out of the file.
+This is a problem solved by many other samplers, such as the Teenage Engineering EP-133, and various software solutions, but our goal was to use this project to bootstrap our custom hardware. Existing solutions are prohibitively expensive, so if we want to play with one, we need to make it ourselves!
 
 
-<!-- ## Description 
-Bootstrap a FreeRTOS based system on an STM32 dev board with an audio
-codec, SD card reader, and headphone amplifier. Port WAV parser/player, and write drivers for
-codec (I2S) and headphone driver
-## End goal: parse a .WAV file off of the SD card on the system and play it over the headphone out
-## Stretch goal: UI with buttons and the OLED screen!
+## Related Work
+In exploring related work for our project, several notable efforts in audio streaming and sampling on the Daisy and STM32H7 platforms were found. 
 
-- Bootstrap a FreeRTOS based system on an STM32 dev board with an audio
-codec, SD card reader, and headphone amplifier. Port WAV parser/player, and write drivers for
-codec (I2S) and headphone driver
-- end goal: parse a .WAV file off of the SD card on the system and play it over the headphone out
-- Stretch goal: UI with buttons and the OLED screen!
-- SD card with an SDIO interface to MCU
-    - FS interface is FATFS
-- On MCU, wav parser that takes in a file pointer to a wav file on the SD card
-    - Parses header and audio data into audio words
-- Codec and STM32 i2C interface for codec configuration
-- SAI (which is i2s compatible) interface between STM32 and Codec, with a DMA in the middle that acts as a FIFO
-    - Setup the DMA as a FIFO
-- Output the audio to a headphone out
+Firstly, the [Daisy Library](https://github.com/electro-smith/libDaisy) stands out, offering drivers which enable various audio processes on the Daisy development board, such as audio file streaming and MIDI parsing. We used this library as reference during the development of our code.
+
+Other software solutions exist that also resemble our board's functionality. For instance, Daisy offers a [.WAV player](https://github.com/electro-smith/DaisyExamples/blob/master/seed/WavPlayer/WavPlayer.cpp) that, similar to our implementation, streams audio files from an SD card. Our implementation is very different from this, though. Additionally, [Daisy-based MIDI controllers](https://github.com/heavyweight87/MidiController) exist, though primarily designed for other purposes such as guitar pedals, provide similar functionality in terms of parsing MIDI data.
+
+Likewise, there are many hardware solutions that exist that similarly resemble our system's functionality. For example, the [Roland SP-404](https://www.roland.com/us/products/sp-404/) and the [Teenage Engineering EP-133](https://teenage.engineering/products/ep-133) are two commercial products that offer audio sample playback and MIDI capabilities, as well as a variety of other features.
+
+Our implementation serves two primary purposes. Firstly, it sets the stage for a future soft synth project on the Daisy board, laying essential groundwork and drivers for future development. By bypassing the Daisy library, we gain finer control over development and ensure compatibility with custom hardware, enabling greater efficiency and integration. Secondly, this is a personal project, and was fun to complete.
+
+## Top Level Design Overview
+This project involved bootstrapping an audio streaming system on an STM32 development board, which includes the utilization of an audio codec, SD card reader and SD card, STM32H750 microprocessor, UART MIDI, and a headphone amplifier. 
+
+The system architecture utilizes an SD card which interfaces with the STM32H7 MCU through SDIO/SDMMC. A FATFS file system has been implemented for SD card file access. The MCU hosts a .WAV parser responsible for interpreting the header and audio data of the .WAV file from the SD card, transforming it into audio words for playback. This parsed data is then be sent to the codec through a DMA FIFO and an SAI peripheral.
+
+Using the STM32 Serial Audio Interface (SAI) peripheral, (which is I2S-compatible), communication between the STM32 and the codec is established. An internal DMA channel manages the data transfer to the SAI. The codec is also connected to the STM32 via I2C, which is used for configuration. 
+
+To allow an external controller to interface with out system, a MIDI handler has been implemented to translate incoming MIDI over UART data into usable information. The driver handles the reception and storage of UART data, parsing of data into MIDI events, and providing stored MIDI events as needed by the system. This allows for the loading and playing of different .WAV files stored on the SD card upon button press.
+
+The primary objective is to parse a .WAV file stored on an SD card and play it through the headphone output, using MIDI to control the sounds played. Achieving this involves triggering playing using MIDI, sending .WAV data from the SD card to the MCU, processing that data and sending it to the DMA , and then sending that data to the codec over SAI/I2S.
+
+A system diagram that highlights the interaction between these different components is shown in the below system diagram.
+
+From a firmware perspective, this is a CMake-based project implemented in C++. We utilize the STM32 Hardware Abstraction Layer (HAL) for interactions with on-chip peripherals, which is downloaded on first build from ST's servers. The FatFS library is also used, which was downloaded from GitHub and included in the project.
+
+![alt text](docs/boomba-system-midi.png)
+
+## Contributions
+Who did what with links to where you can find the design documentation for each component.
+
+@dduuukk (Christian Bender) was responsible for completing the audio driver. The design, implementation, and operation of the audio driver is discussed in more detail [here](docs/sai-audio-driver/sai-design.md).
+
+@nmitchell02 (Noah Mitchell) implemented the SDMMC driver, block driver, and FatFS interfaces, explained [here](docs/sd-fs-driver/sd-fs-design.md) 
+
+Katherine Cloutier was responsible for completing the .WAV file parser. The design, implementation, and operation of the parser is discussed in more detail [here](docs/wav-player/Readme-wav-parser.md).
+
+Christian Cole (@cole-ch) was responsible for the development of the audio codec driver and the MIDI handler. More information about audio codec driver can be found [here](docs/i2c-codec-driver/i2c-codec-design.md), and more information about the MIDI handler can be found [here](docs/uart-midi-driver/uart-midi-design.md).
 
 
 
+## Implementation Progress
 
+Not only did we successfully create a .wav player with an SD card interface on our custom hardware, we reached a stretch goal of enabling MIDI communication, which made our project significantly more engaging to use and rewarding to complete. It was a success!
 
+## Future Work
 
-## Work involved: 
- -->
+Currently, our system is bare-metal, which limits how flexible and performant our implementation is. The first step to be taken is to integrate FreeRTOS into our system and split system components into individual tasks, such as the filesystem task, audio streaming task, and user input handler task. This will allow us to suspend the filesystem task while it waits for data to be fully transferred from the SD card, or suspend the audio task while it waits for samples to be transmitted to the codec. These optimizations will both be possible due to the use of DMA controllers, allowing us to perform other useful work while the DMAs are active and the task is waiting on completion.
+
+Beyond that, we intend to implement a SPI driver for our OLED screen, enabling us to create a user interface, and to turn this platform into a full-fledged software synthesizer, occupying a similar market to the Teenage Engineering OP-1 (but without a keyboard).
