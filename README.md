@@ -50,7 +50,7 @@ Who did what with links to where you can find the design documentation for each 
 
 @nmitchell02 (Noah Mitchell) implemented the SDMMC driver, block driver, and FatFS interfaces, explained [here](docs/sd-fs-driver/sd-fs-design.md) 
 
-Katherine Cloutier implemented the [WAV file parser](src/wav-parser/Readme-wav-parser.md).
+Katherine Cloutier was responsible for completing the .WAV file parser. The design, implementation, and operation of the parser is discussed in more detail [here](src/wav-parser/Readme-wav-parser.md).
 
 Christian Cole (@cole-ch) was responsible for the development of the audio codec driver and the MIDI handler. More information about audio codec driver can be found [here](docs/i2c-codec-driver/i2c-codec-design.md), and more information about the MIDI handler can be found [here](docs/uart-midi-driver/uart-midi-design.md).
 
