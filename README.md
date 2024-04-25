@@ -1,16 +1,8 @@
-# Embedded Audio Player on FreeRTOS Based System
+# Embedded Audio Sample Player with MIDI Support
 
 ## Abstract
-What, what, status.
-What is the objective in this lab? Describe the lab technical aspects, show its aim and the main
-findings.
 
-Audio sample player using an STM32H7 embedded platform and custom breakout board.
-
-
-This project involves the development of a FreeRTOS-based audio streaming system on an STM32 development board. The system integrates various components, including an audio codec, SD card reader, STM32 microprocessor, H7 DMA modules, and a headphone amplifier. Utilizing an SD card for data storage, the system employs a FATFS file system for file access. A .WAV parser within the STM32 MCU interprets .WAV file headers and audio data from the SD card, facilitating audio playback. Communication between the MCU and the codec is established through the STM32 Serial Audio Interface (SAI) peripheral, utilizing I2S compatibility. Additionally, an I2C connection configures the codec. The primary objective is to parse and play .WAV files stored on the SD card. A potential stretch goal involves implementing a user interface with buttons and an OLED screen for enhanced interaction.
-
-
+This project involves the development of a bare-metal audio sample player with MIDI support on an STM32H7 development board. The primary objective is to parse and play .WAV files stored on the SD card when a MIDI keypress is recieved. Currently the system successfully parses MIDI messages, reads .wav files off of the SD card, and streams audio through the codec to a line out and a headphone out. We successfully minimized latency, with imperceptible delay between keypress and sample start, and achieved a 95% similarity index between our hardware output and the expected output (with the minimal differences likely being a product of D/A conversion rather than any implementation error)
 
 
 ## Intro
@@ -18,22 +10,11 @@ Briefly outline the area your project applies to.
 Highlight what is missing in current approaches.
 Define the problem you want to solve and why it's important.
 
-The project delves into the realm of embedded systems, focusing specifically on the development of an audio streaming system using FreeRTOS on an STM32 development board. In embedded systems, integrating audio streaming capabilities poses significant challenges, especially concerning resource utilization and system complexity.
+The project delves into the realm of bare-metal embedded systems, focusing specifically on the development of an audio sample player system using an STM32H7 development board, the Electrosmith Daisy, and our own custom PCB. In embedded systems, integrating audio streaming capabilities poses significant challenges, especially concerning resource utilization, latency, and system complexity.
 
-Current approaches often lack a.....
+This project involves the development of a bare-metal audio sample player with MIDI support on an STM32H7 development board. The system integrates various hardware components, including an audio codec, SD card reader, STM32H750 ARM microprocessor, and UART MIDI interface. The system employs a FATFS file system for interaction with the SD card. A .WAV parser within the STM32 MCU interprets .WAV file headers and audio data from the SD card, facilitating audio playback. Communication between the MCU and the codec is established through the STM32 Serial Audio Interface (SAI) peripheral, utilizing I2S compatibility. Additionally, an I2C connection configures the codec. The primary objective is to parse and play .WAV files stored on the SD card when a MIDI keypress is recieved.
 
-
-The integration of audio streaming capabilities into embedded systems presents a complex challenge, particularly in environments with stringent resource constraints. In this project, we embark on the development of a sophisticated audio streaming system using a FreeRTOS-based approach on an STM32 development board. Central to the system architecture are components such as an audio codec, SD card reader, STM32 microprocessor, H7 DMA modules, and a headphone amplifier. Leveraging the capabilities of the STM32 MCU and its peripherals, including the Serial Audio Interface (SAI) and Inter-Integrated Circuit (I2C), our goal is to create a robust platform for parsing and playing .WAV files stored on an SD card. This introductory overview provides a glimpse into the intricacies of our system design, highlighting key components and objectives. Additionally, we outline a potential stretch goal involving the implementation of a user interface for enhanced user interaction. Through meticulous integration and software development, we aim to achieve seamless audio playback functionality while exploring avenues for further feature enhancements.
-
-
-
-
-
-
-
-
-
-
+This is a problem solved by many other samplers, such as the Teenage Engineering PO-133, and various software solutions, but our goal was to use this project to bootstrap our custom hardware.
 
 
 ## Related Work
@@ -65,7 +46,7 @@ Who did what with links to where you can find the design documentation for each 
 
 @dduuukk (Christian Bender) was responsible for completing the audio driver. The design, implementation, and operation of the audio driver is discussed in more detail [here](docs/sai-audio-driver/sai-design.md).
 
-Katherine Cloutier locked in doing the [WAV file parser](docs/wav-player/Readme-wav-parser.md).
+Katherine Cloutier implemented the [WAV file parser](src/wav-parser/Readme-wav-parser.md).
 
 
 
