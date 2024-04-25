@@ -53,7 +53,7 @@ Katherine Cloutier was responsible for completing the .WAV file parser. The desi
 
 Christian Cole (@cole-ch) was responsible for the development of the audio codec driver and the MIDI handler. More information about audio codec driver can be found [here](docs/i2c-codec-driver/i2c-codec-design.md), and more information about the MIDI handler can be found [here](docs/uart-midi-driver/uart-midi-design.md).
 
-
+For a more in depth analysis of the performance of the system, see [Experimental Results](docs/experimental-results/EXPERIMENTAL-RESULTS.md), and for more information about lessons learned, see [Lessons Learned](docs/lessons-learned/LESSONS-LEARNED.md).
 
 ## Implementation Progress
 
