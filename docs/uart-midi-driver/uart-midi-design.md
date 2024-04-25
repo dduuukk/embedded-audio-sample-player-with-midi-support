@@ -2,44 +2,52 @@
 ### Design
 To encourage more musical and generally more interesting usage of the sample player, samples can be triggered and played through the means of some sort of controller. To allow an external controller to interface with out system, we developed a MIDI handler to translate incoming MIDI (UART) data into usable information. This driver handles the reception and storage of UART data, parsing of data into MIDI events, and providing stored MIDI events as needed by the system. The MIDI driver does not explicitly handle the UART peripheral initialization, though it will be mentioned in this report to emcompass the information in one place.
 
+As the actual processing of MIDI events is left up to the system, the MIDI driver only has one real job: converting incoming UART MIDI into usable MIDI events. To do this, the handler needs to be able to be able to take in incoming MIDI data via UART and store it to make sure no data is lost or overwritten when higher priority processes are occuring. These bytes of data can the be processed into MIDI events, which stores information about the target channel, messgae type, and any other pertinent information to the event. This in turn allows for easy processing by the system, especially when the work of dealing with more complex messages (like system real time and system exclusive messages) can be left to the handler.
 
-
-As the system utilizes the codec in "slave mode", where the clocking and SAI/I2S is all handles by the "master" (in our case the STM32), the driver consists of functions that focus on the ability to control the codec over I2C. This includes being able to turn on and off the codec, configure bypass, data formating, and general use functions to make communication easier as the codec does not communicate through a standard I2C protocol(which will be discussed later in the implementation of the driver).
+While MIDI data is is most commonly transfered over UART (the original standard completed in 1983) and over USB (developed in 1999), this driver is specifically designed for use with MIDI over UART in mind. This can be handled using the STM32H7's plethora of UART/USART peripherals in a variety of modes, which can be managed by the system designer. Due to the infrequent and variable length nature of MIDI, some form of interupt or DMA-based handling of UART reception is recommended (how our system was handled will be convered more in implementation, though the current design of the driver allows for the user to manage the UART peripheral as desired). MIDI specifications require transmission to occur at a baud rate of 31250 and a word length of 8 bits.
 
 ### Implementation
-The codec driver is encapsulated within the `WM8731` class, which serves as the central component responsible for configuation of the codec and initialization of the required hardware peripherals hardware. By organizing the driver into a class, the creation of a codec driver object and all associated HAL objects is fully encapsulated in and managed by the class, increasing code organization and easing user parsing level interaction. C++ classes offer additional benefits including improved modularity and ease of maintenance.
+The codec driver is encapsulated within the `midiHandler` class, which serves as the central component responsible for parsing MIDI events, storage of MIDI data and parsed MIDI events, and data I/O. The class was created as a template in order to allow for the sizes of the two emcompassed circular buffers to be varied if multiple handlers are created (as a note, this concept will be revisited in the future due to unneeded complexities being added, and the use case for having multiple MIDI handlers is few and far between).
 
-Upon creation, the `WM8731` initializes all attributes, including device addresses and initial configuartion values for each of the codec's registers. These values are all set in the initialization and are easy to be set to a desired starting configuration based on the users needs, removing the need for manual configuration later. Creation also creates a `I2C_HandleTypeDef` that is then used to initialize the STM32's I2C2 peripheral and will be used for later I2C data transmission. The choice for isolated I2C initialization and usage is due to the Electrosmith Daisy's hardware configuration that only has the codec on the I2C2 peripheral bus and does not have any further access to it.
+Upon creation, the `midiHandler` object initializes it's two circular buffers and it's `midiParser` object, both of which have been designed for use with the `midiHandler`. The circular objects are initialized with the specified type and size (provided as a constant value in the template class instantiation), with the `midiRecieveBuffer` being of type uint8_t and the `midiEventBuffer` being of custom type `MidiEvent`.
+
+The `MidiEvent` type is used to improve readability and general handling of parsed MIDI events. Defined in it's respective header file, a `MidiEvent` structure consists of a `MidiMessageType` that defines the core type of the event, the relevant channel the event is for, a uint8_t data array of size two to store the up to two bytes of data some events require, and additional message type information used for System Common, System Exclusive, and Channel Mode messages.
+
+The `midiParser` object is used to make the `midiHandler` more intuitive and user friendly, hiding much of the underlying processing of recieved bytes from the handler itself. Other than it's intializer, the `midiParser` class only has one function: `parse`. This function takes in a byte of data and a pointer to `MidiEvent` variable, which is used to store and "build" an event over various incoming bytes until the event has been created. As data is parsed, the `midiParser` keeps track of the event in a state machine-like way, handling data until the event has been "built" or an invalid input causes the process to restart. A visual representation of the `parse` function's process is shown below.
 
 ![alt text](image.png)
 
-Post construction, the `WM8731` provides a few public functions to the user. The core to all of them is `registerWrite`, which takes in a driver defined register value and a uint16_t data value to transmit data to the codec over I2C. This is because some of the codec's registers make use of a 9th bit for configuration (usually used to configure both left and right channels at the same time) that is added as the LSB of the first data byte (alongside the register address). The `registerWrite` function allows for easier distinction of the register address and data values, and is used as the underlying transmit function for all other object functions. The rest of the class' functions are used to configure various parameters of the codec. As the codec does not have the ability to have it's registers read, the configuartion functions make use of stored register values that are updated with each function use so that individual controls can be updated without the need of configuring the entire register every time.
+Post construction, the `midiHandler` provides a few public functions to the user. To handle the raw UART data, the `enqueueByte`, `dequeueByte`, and `midiRecieveCheckEmpty` are used to manage the MIDI data circular buffer. Similarly, `dequeueEvent`, and `midiEventCheckEmpty` are used to manage the MIDI event circular buffer. Unlike the data buffer, the MIDI event buffer does not have any way to enqueue events into the buffer. This is because the `parse` function (which makes use of the class' parser object) will automatically enqueue the event into the corresponding buffer, without the need for the user to handle the data. Lastly, the `parse` function takes in a byte of MIDI data and provides it to the `midiParser` object. Once a MIDI event is completed via parsing, the event is automatically enqueued to the `midiEventBuffer`.
+
+In order to recieve incoming MIDI data from a controller, the system needs to be able to reliably receieve incoming UART data. This was done by utilizing the USART1 peripheral on the STM32H7 as an asyncronus UART reciever. **Note: the driver is not responsible for handling of UART peripheral, it is up to the user to do so. The following information describes how our implimentation of UART for the system was accomplished.** The UART peripheral was configured to MIDI specifications (a baud rate of 31250 and a word length of 8 bits). To handle the incoming bytes, we opted to utilize the UART peripheral in interupt mode to avoid consistently polling while audio playback was occuring. Upon an interupt and the reception of one byte of data, the recieved data is instantly enqueued into the `midiHandler`. This allows us to ignore the issues of unknown message lengths. While this works fine since we are not dealing with too many system processes and the MIDI specification is relatively slow, this design can be bottlenecked later on, leading to missed messages. A later improvement would be making use of DMA transfer of larger amounts of data at once, with the addition of idle line detection to handle the issue of unknown message lengths.
 
 ### Usage Definition
-In order to use the midi driver, an instance of the class must first be created. This can be done by defining a new codec driver class as shown below. 
+In order to use the MIDI driver, an instance of the class must first be created. This can be done by defining a new MIDI handler class as shown below. 
 
 ```c++
-WM8731 <codec object name> = WM8731();
+midiHandler<<data buffer size>, <event buffer size>> <MIDI handle object name>
 ```
 
-Once the codec audio driver object has been created, the codec can be configured with the previously initialized values using the `init` function or the `registerWrite` function, like shown below.
+The data and event buffer size must be defined at compile time through the use of a contant value or expression. It cannot be defined at run time as to avoid run time memory allocation.
+
+With the class object created, data can now be processed by the system. Reception of incoming data is done byte by byte using the `enqueueByte` function, which enqueues a provided byte of data into the corresponding circular buffer. This can be done like shown below.
 
 ```c++
-<codec object name>.init();
+<MIDI handle object name>.enqueueByte(<data byte>);
 ```
 
+Similarly, `dequeueByte` and `dequeueEvent` return the next piece of data from the MIDI data buffer and MIDI event buffer respectively. `dequeueByte` will normally be used to get the next byt of data to be processed by the parser, and `dequeueEvent` will normally be used to return the next MIDI event to be processed by the system.
+
+The `parse` function takes in a byte of MIDI data and provides it to the parser. Once the parser has a complete and valid MIDI event, the event will automatically be enqueued into its respective buffer. A valid way to combine the `parse` and `dequeueByte` functgions is shown below.
+
 ```c++
-<codec object name>.registerWrite(uint8_t <register definition>, uint16_t <value>);
+<MIDI handle object name>.parse(<MIDI handle object name>.dequeueByte());
 ```
 
-Providing valid parameters to `registerWrite` (and any other functions that require similar data) can be easily done by using the value definitions provided at the top of the driver's header function. An example is shown below.
+The two public functions `midiRecieveCheckEmpty` and `midiEventCheckEmpty` can be useful in knowning when data needs to be parsed or events need to be processed. An example of using the `midiRecieveCheckEmpty` to manage parsing is shown below.
 
 ```c++
-<codec object name>.registerWrite(REG_SAMPLING_CTRL, SAMPLE_MODE_NORM | BOSR_NORM | ADC_48k_DAC_48k);
-```
-
-Likewise, the codec can be easily enabled, disabled, and reset using the corresponding functions. The driver also has some specialty function implemented to configure important parameters, like sample rate. The function is called similarly to the `registerWrite` function, but does not require a specific register definition as it is built into the function. For example, a sample of the `configureSampleRate` fuction is shown below.
-
-```c++
-<codec object name>.configureSampleRate(ADC_44k1_DAC_44k1);
+if (midi_handler.midiRecieveCheckEmpty() == false) {
+      midi_handler.parse(midi_handler.dequeueByte());
+    }
 ```
