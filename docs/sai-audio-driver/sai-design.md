@@ -39,7 +39,7 @@ SAIDriver <sai object name> = SAIDriver(bool: <stereo true?>, BitDepth:<bit dept
 Please not that `BitDepth` and `SampleRate` are enum classes included in the `SAIDriver`. Once the SAI Audio Driver object has been created, and the CODEC has been initialized, parsed audio buffers up to a maximum size of `UINT16_MAX` can be passed to the CODEC through the DMA and SAI using the `txTransmit()` function. The usage of this function is shown below.
 
 ```c++
-<sai object name>.txTransmit(uint8_t :<audio pData>, uint32_t <array size>, uint32_t <timeout>);
+<sai object name>.txTransmit(uint8_t:<audio pData>, uint32_t:<array size>, uint32_t:<timeout>);
 ```
 
 Please note that array size is in number of samples, and timeout is in milliseconds. The transmit function will automatically wait for the DMA if it is currently busy with a transaction.
