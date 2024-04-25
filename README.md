@@ -11,7 +11,7 @@ The project delves into the realm of bare-metal embedded systems, focusing speci
 
 This project involves the development of a bare-metal audio sample player with MIDI support on an STM32H7 development board. The system integrates various hardware components, including an audio codec, SD card reader, STM32H750 ARM microprocessor, and UART MIDI interface. The system employs a FATFS file system for interaction with the SD card. A .WAV parser within the STM32 MCU interprets .WAV file headers and audio data from the SD card, facilitating audio playback. Communication between the MCU and the codec is established through the STM32 Serial Audio Interface (SAI) peripheral, utilizing I2S compatibility. Additionally, an I2C connection configures the codec. The primary objective is to parse and play .WAV files stored on the SD card when a MIDI keypress is recieved.
 
-This is a problem solved by many other samplers, such as the Teenage Engineering PO-133, and various software solutions, but our goal was to use this project to bootstrap our custom hardware. Existing solutions are prohibitively expensive, so if we want to play with one, we need to make it ourselves!
+This is a problem solved by many other samplers, such as the Teenage Engineering EP-133, and various software solutions, but our goal was to use this project to bootstrap our custom hardware. Existing solutions are prohibitively expensive, so if we want to play with one, we need to make it ourselves!
 
 
 ## Related Work
@@ -20,6 +20,8 @@ In exploring related work for our project, several notable efforts in audio stre
 Firstly, the [Daisy Library](https://github.com/electro-smith/libDaisy) stands out, offering drivers which enable various audio processes on the Daisy development board, such as audio file streaming and MIDI parsing. We used this library as reference during the development of our code.
 
 Other software solutions exist that also resemble our board's functionality. For instance, Daisy offers a [.WAV player](https://github.com/electro-smith/DaisyExamples/blob/master/seed/WavPlayer/WavPlayer.cpp) that, similar to our implementation, streams audio files from an SD card. Our implementation is very different from this, though. Additionally, [Daisy-based MIDI controllers](https://github.com/heavyweight87/MidiController) exist, though primarily designed for other purposes such as guitar pedals, provide similar functionality in terms of parsing MIDI data.
+
+Likewise, there are many hardware solutions that exist that similarly resemble our system's functionality. For example, the [Roland SP-404](https://www.roland.com/us/products/sp-404/) and the [Teenage Engineering EP-133](https://teenage.engineering/products/ep-133) are two commercial products that offer audio sample playback and MIDI capabilities, as well as a variety of other features.
 
 Our implementation serves two primary purposes. Firstly, it sets the stage for a future soft synth project on the Daisy board, laying essential groundwork and drivers for future development. By bypassing the Daisy library, we gain finer control over development and ensure compatibility with custom hardware, enabling greater efficiency and integration. Secondly, this is a personal project, and was fun to complete.
 
@@ -47,7 +49,7 @@ Who did what with links to where you can find the design documentation for each 
 
 @nmitchell02 (Noah Mitchell) implemented the SDMMC driver, block driver, and FatFS interfaces, explained [here](docs/sd-fs-driver/sd-fs-design.md) 
 
-Katherine Cloutier implemented the [WAV file parser](src/wav-parser/Readme-wav-parser.md).
+Katherine Cloutier was responsible for completing the .WAV file parser. The design, implementation, and operation of the parser is discussed in more detail [here](src/wav-parser/Readme-wav-parser.md).
 
 Christian Cole (@cole-ch) was responsible for the development of the audio codec driver and the MIDI handler. More information about audio codec driver can be found [here](docs/i2c-codec-driver/i2c-codec-design.md), and more information about the MIDI handler can be found [here](docs/uart-midi-driver/uart-midi-design.md).
 
