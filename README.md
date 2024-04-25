@@ -37,15 +37,13 @@ The integration of audio streaming capabilities into embedded systems presents a
 
 
 ## Related Work
-Highlight similar approaches.
-What is the reason for our new implementation?
+In exploring related work for our project, several notable efforts in audio streaming and sampling on the Daisy and STM32H7 platforms were found. 
 
-Daisy library? https://github.com/electro-smith/libDaisy
+Firstly, the [Daisy Library](https://github.com/electro-smith/libDaisy) stands out, offering drivers which enable various audio processes on the Daisy development board, such as audio file streaming and MIDI parsing. We used this library as reference during the development of our code.
 
-Daisy wav player: https://github.com/electro-smith/DaisyExamples/blob/master/seed/WavPlayer/WavPlayer.cpp
+Other software solutions exist that also resemble our board's functionality. For instance, Daisy offers a [.WAV player](https://github.com/electro-smith/DaisyExamples/blob/master/seed/WavPlayer/WavPlayer.cpp) that, similar to our implementation, streams audio files from an SD card. Additionally, [Daisy-based MIDI controllers](https://github.com/heavyweight87/MidiController) exist, though primarily designed for other purposes such as guitar pedals, provide similar functionality in terms of parsing MIDI data.
 
-Daisy based midi controller: https://github.com/heavyweight87/MidiController
-
+Our implementation serves two primary purposes. Firstly, it sets the stage for a future soft synth project on the Daisy board, laying essential groundwork and drivers for future development. By bypassing the Daisy library, we gain finer control over development and ensure compatibility with custom hardware, enabling greater efficiency and integration. Secondly, this is a personal project, and was fun to complete.
 
 ## Top Level Design Overview
 This project involved bootstrapping an audio streaming system on an STM32 development board, which includes the utilization of an audio codec, SD card reader and SD card, STM32 microprocessor, H7 DMA modules, MIDI, and a headphone amplifier. 
@@ -65,9 +63,9 @@ A system diagram that highlights the interaction between these different compone
 ## Contributions
 Who did what with links to where you can find the design documentation for each component.
 
-@dduuukk (Christian Bender) was responsible for completing the audio driver. The design, implementation, and operation of the audio driver is discussed in more detail [here](src/drivers/sai-design.md).
+@dduuukk (Christian Bender) was responsible for completing the audio driver. The design, implementation, and operation of the audio driver is discussed in more detail [here](docs/sai-audio-driver/sai-design.md).
 
-Katherine Cloutier locked in doing the [WAV file parser](src/wav-parser/Readme-wav-parser.md).
+Katherine Cloutier locked in doing the [WAV file parser](docs/wav-player/Readme-wav-parser.md).
 
 
 
