@@ -22,14 +22,14 @@ In exploring related work for our project, several notable efforts in audio stre
 
 Firstly, the [Daisy Library](https://github.com/electro-smith/libDaisy) stands out, offering drivers which enable various audio processes on the Daisy development board, such as audio file streaming and MIDI parsing. We used this library as reference during the development of our code.
 
-Other software solutions exist that also resemble our board's functionality. For instance, Daisy offers a [.WAV player](https://github.com/electro-smith/DaisyExamples/blob/master/seed/WavPlayer/WavPlayer.cpp) that, similar to our implementation, streams audio files from an SD card. Additionally, [Daisy-based MIDI controllers](https://github.com/heavyweight87/MidiController) exist, though primarily designed for other purposes such as guitar pedals, provide similar functionality in terms of parsing MIDI data.
+Other software solutions exist that also resemble our board's functionality. For instance, Daisy offers a [.WAV player](https://github.com/electro-smith/DaisyExamples/blob/master/seed/WavPlayer/WavPlayer.cpp) that, similar to our implementation, streams audio files from an SD card. Our implementation is very different from this, though. Additionally, [Daisy-based MIDI controllers](https://github.com/heavyweight87/MidiController) exist, though primarily designed for other purposes such as guitar pedals, provide similar functionality in terms of parsing MIDI data.
 
 Our implementation serves two primary purposes. Firstly, it sets the stage for a future soft synth project on the Daisy board, laying essential groundwork and drivers for future development. By bypassing the Daisy library, we gain finer control over development and ensure compatibility with custom hardware, enabling greater efficiency and integration. Secondly, this is a personal project, and was fun to complete.
 
 ## Top Level Design Overview
-This project involved bootstrapping an audio streaming system on an STM32 development board, which includes the utilization of an audio codec, SD card reader and SD card, STM32 microprocessor, H7 DMA modules, MIDI, and a headphone amplifier. 
+This project involved bootstrapping an audio streaming system on an STM32 development board, which includes the utilization of an audio codec, SD card reader and SD card, STM32H750 microprocessor, UART MIDI, and a headphone amplifier. 
 
-The system architecture utilizes an SD card which interfaces with the STM32 MCU through SDIO. A FATFS file system has been implemented for SD card file access. The MCU hosts a .WAV parser responsible for interpreting the header and audio data of the .WAV file from the SD card, transforming it into audio words for playback. This parsed data is then be sent to the codec through a DMA FIFO and an SAI peripheral.
+The system architecture utilizes an SD card which interfaces with the STM32H7 MCU through SDIO/SDMMC. A FATFS file system has been implemented for SD card file access. The MCU hosts a .WAV parser responsible for interpreting the header and audio data of the .WAV file from the SD card, transforming it into audio words for playback. This parsed data is then be sent to the codec through a DMA FIFO and an SAI peripheral.
 
 Using the STM32 Serial Audio Interface (SAI) peripheral, (which is I2S-compatible), communication between the STM32 and the codec is established. An internal DMA channel acts as a FIFO, and buffers the samples to be sent to the codec. The codec is also connected to the STM32 via I2C, which is used for configuration. 
 
