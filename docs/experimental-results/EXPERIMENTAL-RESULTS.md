@@ -1,5 +1,5 @@
 ## Experimental Results
-### Manual Analysis
+### Project Developed Analysis
 Initially, we created a Python script to align audio recordings using a threshold and then perform individual comparisons. We captured the output of our board and contrasted it with both the original audio file and another file sourced from the same audio interface, played from a computer. The script visually represented both the input and output aligned WAV samples for qualitative analysis, showing significant visual similarities. An example of this is shown in the below figure, where the similarity of the shape of the audio files is clearly apparent. The output of the custom board is shown in the bottom graph.
 
 ![alt text](audio-comparison.png)
@@ -8,7 +8,7 @@ For quantitative analysis, our script analyzed each aligned sample individually 
 
 ## API Analysis
 
-After conducting research, we discovered the [Audio Similarity](https://github.com/markstent/audio-similarity/tree/main?tab=readme-ov-file#rhythm-similarity) GitHub repository, which offers a comprehensive analysis of audio file similarity using a variety of algorithms. This repository provides a Python API capable of assessing similarities across different audio characteristics, including zero crossing rate (ZCR), rhythm, chroma, spectral contrast, and perceptual attributes. By allowing users to assign custom weights, the API calculates a combined metric known as stent weighted audio similarity, reflecting the overall likeness between two audio files.
+After conducting research, we discovered the [Audio Similarity](https://github.com/markstent/audio-similarity/tree/main?tab=readme-ov-file) GitHub repository, which offers a comprehensive analysis of audio file similarity using a variety of algorithms. This repository provides a Python API capable of assessing similarities across different audio characteristics, including zero crossing rate (ZCR), rhythm, chroma, spectral contrast, and perceptual attributes. By allowing users to assign custom weights, the API calculates a combined metric known as stent weighted audio similarity, reflecting the overall likeness between two audio files.
 
 Employing this API with a reduced emphasis on perceptual similarity, as it focused specifically on speech signal quality and intelligibility, we obtained a stent weighted audio similarity score of 0.9267 or 92.67% between the original audio file and the one output from our board. The API-generated graph below illustrates the various metrics.
 
