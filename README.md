@@ -48,12 +48,18 @@ Who did what with links to where you can find the design documentation for each 
 
 @dduuukk (Christian Bender) was responsible for completing the audio driver. The design, implementation, and operation of the audio driver is discussed in more detail [here](src/drivers/sai-design.md).
 
+@nmitchell02 (Noah Mitchell) implemented the SDMMC driver, block driver, and FatFS interfaces, explained [here](docs/sd-fs-driver/sd-fs-design.md) 
+
 Katherine Cloutier implemented the [WAV file parser](src/wav-parser/Readme-wav-parser.md).
 
 
 
 ## Implementation Progress
-Assess our goals in the project, were our goals met? Where did we fall short?
+
+Not only did we successfully create a .wav player with an SD card interface on our custom hardware, we reached a stretch goal of enabling MIDI communication, which made our project significantly more engaging to use and rewarding to complete. It was a success!
 
 ## Future Work
-What comes next?
+
+Currently, our system is bare-metal, which limits how flexible and performant our implementation is. The first step to be taken is to integrate FreeRTOS into our system and split system components into individual tasks, such as the filesystem task, audio streaming task, and user input handler task. This will allow us to suspend the filesystem task while it waits for data to be fully transferred from the SD card, or suspend the audio task while it waits for samples to be transmitted to the codec. These optimizations will both be possible due to the use of DMA controllers, allowing us to perform other useful work while the DMAs are active and the task is waiting on completion.
+
+Beyond that, we intend to implement a SPI driver for our OLED screen, enabling us to create a user interface, and to turn this platform into a full-fledged software synthesizer, occupying a similar market to the Teenage Engineering OP-1 (but without a keyboard).
