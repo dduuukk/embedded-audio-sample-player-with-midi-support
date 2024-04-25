@@ -54,7 +54,7 @@ The system architecture utilizes an SD card which interfaces with the STM32 MCU 
 
 Using the STM32 Serial Audio Interface (SAI) peripheral, (which is I2S-compatible), communication between the STM32 and the codec is established. An internal DMA channel acts as a FIFO, and buffers the samples to be sent to the codec. The codec is also connected to the STM32 via I2C, which is used for configuration. 
 
-A MIDI keyboard interacts with the .WAV player through UART and a MIDI parser, which loads and plays different .WAV files stored on the SD card upon button press.
+To allow an external controller to interface with out system, a MIDI handler has been implemented to translate incoming MIDI over UART data into usable information. The driver handles the reception and storage of UART data, parsing of data into MIDI events, and providing stored MIDI events as needed by the system. This allows for the loading and playing of different .WAV files stored on the SD card upon button press.
 
 The primary objective is to parse a .WAV file stored on an SD card and play it through the headphone output, using MIDI to control the sounds played. Achieving this involves triggering playing using MIDI, sending .WAV data from the SD card to the MCU, processing that data and sending it to the DMA FIFO, and then sending that data to the codec over SAI/I2S.
 
@@ -68,6 +68,8 @@ Who did what with links to where you can find the design documentation for each 
 @dduuukk (Christian Bender) was responsible for completing the audio driver. The design, implementation, and operation of the audio driver is discussed in more detail [here](src/drivers/sai-design.md).
 
 Katherine Cloutier locked in doing the [WAV file parser](src/wav-parser/Readme-wav-parser.md).
+
+Christian Cole (@cole-ch) was responsible for the development of the audio codec driver and the MIDI handler. More information about audio codec driver can be found [here](docs/i2c-codec-driver/i2c-codec-design.md), and more information about the MIDI handler can be found [here](docs/uart-midi-driver/uart-midi-design.md).
 
 
 
