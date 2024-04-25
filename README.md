@@ -45,11 +45,13 @@ The system architecture utilizes an SD card which interfaces with the STM32 MCU 
 
 Using the STM32 Serial Audio Interface (SAI) peripheral, (which is I2S-compatible), communication between the STM32 and the codec will be established. An internal DMA channel will act as a FIFO, and will buffer the samples to be sent to the codec. The codec is also connected to the STM32 via I2C, which will be used for configuration. 
 
-The primary objective is to parse a .WAV file stored on an SD card and play it through the headphone output. Achieving this involves sending .WAV data from the SD card to the MCU, processing that data and sending it to the DMA FIFO, and then sending that data to the codec over SAI/I2S. Additionally, if there is time, there is a stretch goal that will involve implementing a user interface with buttons and an OLED screen for enhanced user interaction.
+The primary objective is to parse a .WAV file stored on an SD card and play it through the headphone output, using MIDI to control the sounds played. Achieving this involves sending .WAV data from the SD card to the MCU, processing that data and sending it to the DMA FIFO, and then sending that data to the codec over SAI/I2S.
+
+The MIDI **IDK LETS ADD SOME MIDI STUFF HERE**
 
 A system diagram that highlights the interaction between these different components is shown in the below system diagram.
 
-![alt text](boomba-system-background.png)
+![alt text](docs/boomba-system-midi.png)
 
 ## Contributions
 Who did what with links to where you can find the design documentation for each component.
